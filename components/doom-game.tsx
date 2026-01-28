@@ -46,6 +46,7 @@ interface GameSettings {
   crosshairStyle: "cross" | "dot" | "circle";
   difficulty: "easy" | "normal" | "hard";
   timeScale: number;
+  debugMode: boolean;
 }
 
 interface SavedProgress {
@@ -62,6 +63,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   crosshairStyle: "cross",
   difficulty: "normal",
   timeScale: 1.0,
+  debugMode: false,
 };
 
 export default function DoomGame() {
@@ -574,7 +576,19 @@ export default function DoomGame() {
               const node = enemy.path[0];
               targetX = node.x;
               targetY = node.y;
-              if (getDistance(enemy.x, enemy.y, targetX, targetY) < 0.5) {
+
+              // Check if we can skip to the next node (smoothing)
+              if (enemy.path.length > 1) {
+                const nextNode = enemy.path[1];
+                if (hasLineOfSight(level.map, enemy.x, enemy.y, nextNode.x, nextNode.y)) {
+                  enemy.path.shift();
+                  targetX = nextNode.x;
+                  targetY = nextNode.y;
+                }
+              }
+
+              // Loosen the arrival threshold (0.5 -> 0.8) to prevent orbiting/getting stuck
+              if (getDistance(enemy.x, enemy.y, targetX, targetY) < 0.8) {
                 enemy.path.shift();
                 if (enemy.path.length > 0) {
                   targetX = enemy.path[0].x;
@@ -589,12 +603,31 @@ export default function DoomGame() {
           const moveEnemyX = Math.cos(angle) * speed;
           const moveEnemyY = Math.sin(angle) * speed;
 
-          if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y + moveEnemyY, 0.4)) {
+          // Stuck detection
+          const dx = enemy.x - enemy.lastX;
+          const dy = enemy.y - enemy.lastY;
+          if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) {
+            enemy.stuckFrameCount++;
+          } else {
+            enemy.stuckFrameCount = 0;
+          }
+
+          enemy.lastX = enemy.x;
+          enemy.lastY = enemy.y;
+
+          if (enemy.stuckFrameCount > 60) {
+            // Force re-path if stuck for ~1 second
+            enemy.path = [];
+            enemy.lastPathTime = 0; // Force immediate recalc
+            enemy.stuckFrameCount = 0;
+          }
+
+          if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y + moveEnemyY, 0.3)) {
             enemy.x += moveEnemyX;
             enemy.y += moveEnemyY;
-          } else if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y, 0.4)) {
+          } else if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y, 0.3)) {
             enemy.x += moveEnemyX;
-          } else if (!checkCollision(level.map, enemy.x, enemy.y + moveEnemyY, 0.4)) {
+          } else if (!checkCollision(level.map, enemy.x, enemy.y + moveEnemyY, 0.3)) {
             enemy.y += moveEnemyY;
           }
         }
@@ -690,7 +723,8 @@ export default function DoomGame() {
 
     animationId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationId);
-  }, [gameState, settings.mouseSensitivity, settings.timeScale]);
+  }, [gameState, settings.mouseSensitivity, settings.timeScale, settings.debugMode]);
+
   function getProjectileColor(type: EnemyType): string {
     switch (type) {
       case EnemyType.IMP: return "#ff6600";
@@ -702,6 +736,88 @@ export default function DoomGame() {
       default: return "#ffffff";
     }
   }
+
+  const renderDebugView = (
+    ctx: CanvasRenderingContext2D,
+    level: Level,
+    player: Player,
+    enemies: Enemy[]
+  ) => {
+    // Semi-transparent background
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    const scale = 20; // 20 pixels per map cell
+    const offsetX = SCREEN_WIDTH / 2 - (level.map[0].length * scale) / 2;
+    const offsetY = SCREEN_HEIGHT / 2 - (level.map.length * scale) / 2;
+
+    // Draw Map
+    for (let y = 0; y < level.map.length; y++) {
+      for (let x = 0; x < level.map[y].length; x++) {
+        const cell = level.map[y][x];
+        if (cell > 0) {
+          ctx.fillStyle = cell === 9 ? "#0f0" : "#888";
+          ctx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
+        }
+        ctx.strokeStyle = "#333";
+        ctx.strokeRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
+      }
+    }
+
+    // Draw Player
+    ctx.fillStyle = "#0af";
+    ctx.beginPath();
+    ctx.arc(offsetX + player.x * scale, offsetY + player.y * scale, 0.3 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    // Direction
+    ctx.strokeStyle = "#fff";
+    ctx.beginPath();
+    ctx.moveTo(offsetX + player.x * scale, offsetY + player.y * scale);
+    ctx.lineTo(
+      offsetX + (player.x + Math.cos(player.angle) * 2) * scale,
+      offsetY + (player.y + Math.sin(player.angle) * 2) * scale
+    );
+    ctx.stroke();
+
+    // Draw Enemies
+    for (const enemy of enemies) {
+      if (enemy.state === "dead") continue;
+
+      ctx.fillStyle = enemy.state === "chasing" ? "#f00" : "#ff0";
+      // Actual collision radius (0.3)
+      ctx.beginPath();
+      ctx.arc(offsetX + enemy.x * scale, offsetY + enemy.y * scale, 0.3 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.stroke();
+
+      // Stuck indicator
+      if (enemy.stuckFrameCount > 30) {
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px monospace";
+        ctx.fillText("STUCK", offsetX + enemy.x * scale - 10, offsetY + enemy.y * scale - 10);
+      }
+
+      // Draw Path
+      if (enemy.path && enemy.path.length > 0) {
+        ctx.strokeStyle = "#0f0";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(offsetX + enemy.x * scale, offsetY + enemy.y * scale);
+        for (const pt of enemy.path) {
+          ctx.lineTo(offsetX + pt.x * scale, offsetY + pt.y * scale);
+        }
+        ctx.stroke();
+        ctx.lineWidth = 1;
+
+        // Draw Nodes
+        ctx.fillStyle = "#0f0";
+        for (const pt of enemy.path) {
+          ctx.fillRect(offsetX + pt.x * scale - 2, offsetY + pt.y * scale - 2, 4, 4);
+        }
+      }
+    }
+  };
 
   const render = (
     ctx: CanvasRenderingContext2D,
@@ -797,6 +913,10 @@ export default function DoomGame() {
 
     drawWeapon(ctx, player, flash);
     drawHUD(ctx, player, enemies, level);
+
+    if (settings.debugMode) {
+      renderDebugView(ctx, level, player, enemies);
+    }
 
     // FPS counter
     if (settings.showFPS) {
@@ -1718,6 +1838,10 @@ export default function DoomGame() {
       if (key === "t") {
         const testLevelIndex = LEVELS.length - 1;
         startGame(testLevelIndex);
+      }
+
+      if (key === "p") {
+        setSettings(prev => ({ ...prev, debugMode: !prev.debugMode }));
       }
     };
 

@@ -122,6 +122,9 @@ export interface Enemy {
   isMelee: boolean;
   path: Point[];
   lastPathTime: number;
+  stuckFrameCount: number;
+  lastX: number;
+  lastY: number;
 }
 
 export enum EnemyType {
@@ -412,6 +415,9 @@ function createEnemy(type: EnemyType, x: number, y: number): Omit<Enemy, 'id'> {
     isMelee: config.isMelee,
     path: [],
     lastPathTime: 0,
+    stuckFrameCount: 0,
+    lastX: x,
+    lastY: y,
   };
 }
 
