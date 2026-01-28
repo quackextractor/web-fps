@@ -365,6 +365,24 @@ const LEVEL_3_MAP: number[][] = [
   [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
   [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 5],
   [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+];
+
+const TEST_LEVEL_MAP: number[][] = [
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 function createEnemy(type: EnemyType, x: number, y: number): Omit<Enemy, 'id'> {
@@ -472,6 +490,35 @@ export const LEVELS: Level[] = [
       { x: 2, y: 10, type: PickupType.WEAPON_CHAINSAW, collected: false },
     ],
   },
+  {
+    name: 'Test Level: Audio/VFX Lab',
+    map: TEST_LEVEL_MAP,
+    startX: 1.5,
+    startY: 1.5,
+    startAngle: 0,
+    exitX: 13,
+    exitY: 12,
+    enemies: [
+      createEnemy(EnemyType.ZOMBIE, 5, 3),
+      createEnemy(EnemyType.SOLDIER, 7, 3),
+      createEnemy(EnemyType.IMP, 9, 3),
+      createEnemy(EnemyType.DEMON, 11, 3),
+      createEnemy(EnemyType.CACODEMON, 5, 7),
+      createEnemy(EnemyType.BARON, 7, 7),
+      createEnemy(EnemyType.HELLKNIGHT, 9, 7),
+      createEnemy(EnemyType.CYBERDEMON, 11, 7),
+    ],
+    pickups: [
+      { x: 3, y: 3, type: PickupType.WEAPON_SHOTGUN, collected: false },
+      { x: 3, y: 5, type: PickupType.WEAPON_CHAINGUN, collected: false },
+      { x: 3, y: 7, type: PickupType.WEAPON_CHAINSAW, collected: false },
+      { x: 3, y: 9, type: PickupType.AMMO_BULLETS, collected: false },
+      { x: 5, y: 9, type: PickupType.AMMO_SHELLS, collected: false },
+      { x: 7, y: 9, type: PickupType.HEALTH, collected: false },
+      { x: 9, y: 9, type: PickupType.ARMOR, collected: false },
+      { x: 11, y: 9, type: PickupType.MEGAHEALTH, collected: false },
+    ],
+  },
 ];
 
 // Raycasting functions
@@ -543,8 +590,8 @@ export function castRay(
   const hitX = playerX + perpWallDist * rayDirX;
   const hitY = playerY + perpWallDist * rayDirY;
 
-  const wallType = mapY >= 0 && mapY < map.length && mapX >= 0 && mapX < map[0].length 
-    ? map[mapY][mapX] 
+  const wallType = mapY >= 0 && mapY < map.length && mapX >= 0 && mapX < map[0].length
+    ? map[mapY][mapX]
     : 1;
 
   return { distance: Math.max(perpWallDist, 0.1), wallType, side, hitX, hitY };

@@ -24,6 +24,7 @@ import {
   getDistance,
   normalizeAngle,
 } from "@/lib/doom-engine";
+import { soundManager } from "@/lib/sound-manager";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
@@ -73,7 +74,7 @@ export default function DoomGame() {
 
   // Weapons collected from PREVIOUS levels (not current)
   const previousLevelWeaponsRef = useRef<Set<WeaponType>>(new Set([WeaponType.FIST, WeaponType.PISTOL]));
-  const previousLevelAmmoRef = useRef<{ [AmmoType.BULLETS]: number; [AmmoType.SHELLS]: number }>({ [AmmoType.BULLETS]: 50, [AmmoType.SHELLS]: 0 });
+  const previousLevelAmmoRef = useRef<{ [AmmoType.BULLETS]: number;[AmmoType.SHELLS]: number }>({ [AmmoType.BULLETS]: 50, [AmmoType.SHELLS]: 0 });
 
   const playerRef = useRef<Player>(createInitialPlayer());
   const enemiesRef = useRef<Enemy[]>([]);
@@ -82,6 +83,7 @@ export default function DoomGame() {
   const killsRef = useRef(0);
   const totalKillsRef = useRef(0);
   const shootFlashRef = useRef(0);
+  const hurtFlashRef = useRef(0);
   const projectileIdRef = useRef(0);
   const lastShotTimeRef = useRef(0);
   const weaponsUnlockedRef = useRef<Set<WeaponType>>(new Set([WeaponType.FIST, WeaponType.PISTOL]));
@@ -95,6 +97,10 @@ export default function DoomGame() {
   const mouseMovementRef = useRef(0);
   const lastTimeRef = useRef(0);
   const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    soundManager.setEnabled(settings.soundEnabled);
+  }, [settings.soundEnabled]);
 
   useEffect(() => {
     offscreenCanvasRef.current = document.createElement('canvas');
@@ -173,14 +179,14 @@ export default function DoomGame() {
     weaponsUnlockedRef.current = new Set(previousLevelWeaponsRef.current);
     playerRef.current = createInitialPlayer();
     playerRef.current.ammo = { ...previousLevelAmmoRef.current };
-    
+
     // If we had a better weapon from previous levels, equip it
     if (previousLevelWeaponsRef.current.has(WeaponType.SHOTGUN)) {
       playerRef.current.weapon = WeaponType.SHOTGUN;
     } else if (previousLevelWeaponsRef.current.has(WeaponType.CHAINGUN)) {
       playerRef.current.weapon = WeaponType.CHAINGUN;
     }
-    
+
     loadLevel(currentLevelRef.current, false);
     setGameState("playing");
   }, [loadLevel]);
@@ -247,6 +253,7 @@ export default function DoomGame() {
 
     lastShotTimeRef.current = now;
     shootFlashRef.current = weapon.isMelee ? 4 : 8;
+    soundManager.playShoot(player.weapon);
 
     if (weapon.isMelee) {
       playerRef.current.isMeleeing = true;
@@ -277,6 +284,7 @@ export default function DoomGame() {
               enemy.state = "dead";
               enemy.animFrame = 0;
               killsRef.current += 1;
+              soundManager.playEnemyDeath(enemy.type);
             }
           }
         }
@@ -317,6 +325,7 @@ export default function DoomGame() {
             enemy.state = "dead";
             enemy.animFrame = 0;
             killsRef.current += 1;
+            soundManager.playEnemyDeath(enemy.type);
           } else {
             enemy.state = "hurt";
           }
@@ -428,6 +437,7 @@ export default function DoomGame() {
       };
 
       if (shootFlashRef.current > 0) shootFlashRef.current--;
+      if (hurtFlashRef.current > 0) hurtFlashRef.current -= 0.5;
 
       // Check pickups
       for (const pickup of pickupsRef.current) {
@@ -436,6 +446,7 @@ export default function DoomGame() {
         if (dist < 0.8) {
           const config = PICKUP_CONFIG[pickup.type];
           pickup.collected = true;
+          soundManager.playPickup(pickup.type);
 
           switch (pickup.type) {
             case PickupType.HEALTH:
@@ -511,6 +522,8 @@ export default function DoomGame() {
               damage -= armorAbsorb;
             }
             playerRef.current.health = Math.max(0, currentPlayer.health - damage);
+            hurtFlashRef.current = 10;
+            soundManager.playHurt();
           } else if (!enemy.isMelee && dist < enemy.attackRange && time - enemy.lastAttack > enemy.attackCooldown) {
             enemy.state = "attacking";
             enemy.lastAttack = time;
@@ -573,6 +586,8 @@ export default function DoomGame() {
               damage -= armorAbsorb;
             }
             playerRef.current.health = Math.max(0, playerRef.current.health - damage);
+            hurtFlashRef.current = 10;
+            soundManager.playHurt();
             return false;
           }
         }
@@ -587,6 +602,14 @@ export default function DoomGame() {
 
       render(offCtx, playerRef.current, enemiesRef.current, projectilesRef.current, pickupsRef.current, shootFlashRef.current, level);
       ctx.drawImage(offscreen, 0, 0);
+
+      const hurtAlpha = hurtFlashRef.current / 10;
+      if (hurtAlpha > 0) {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 0, 0, ${hurtAlpha * 0.5})`;
+        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        ctx.restore();
+      }
 
       forceUpdate((n) => n + 1);
       animationId = requestAnimationFrame(gameLoop);
@@ -859,7 +882,7 @@ export default function DoomGame() {
     const shade = Math.max(0.3, 1 - dist / 12);
 
     ctx.save();
-    
+
     ctx.beginPath();
     for (let r = startRay; r <= endRay; r++) {
       if (r >= 0 && r < NUM_RAYS && zBuffer[r] > dist - 0.3) {
@@ -896,7 +919,7 @@ export default function DoomGame() {
         drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
     }
-    
+
     ctx.restore();
   };
 
@@ -1485,7 +1508,7 @@ export default function DoomGame() {
     ctx.strokeStyle = "#0f0";
     ctx.fillStyle = "#0f0";
     ctx.lineWidth = 2;
-    
+
     if (settings.crosshairStyle === "cross") {
       ctx.beginPath();
       ctx.moveTo(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT / 2);
@@ -1620,6 +1643,11 @@ export default function DoomGame() {
 
       if (key === "[" || key === "-") switchWeapon(-1);
       if (key === "]" || key === "=") switchWeapon(1);
+
+      if (key === "t") {
+        const testLevelIndex = LEVELS.length - 1;
+        startGame(testLevelIndex);
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -1631,9 +1659,8 @@ export default function DoomGame() {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [attack, restartCurrentLevel, nextLevel, switchWeapon]);
+  }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame]);
 
   // Mouse controls
   useEffect(() => {
@@ -1702,13 +1729,13 @@ export default function DoomGame() {
         {gameState === "mainMenu" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black via-red-950/80 to-black">
             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fillRule=\"evenodd\"%3E%3Cg fill=\"%23ff0000\" fillOpacity=\"0.1\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')" }} />
-            
+
             <div className="relative z-10 flex flex-col items-center">
               <h1 className="text-7xl font-black text-red-600 mb-2 tracking-widest drop-shadow-lg" style={{ fontFamily: "Impact, sans-serif", textShadow: "0 0 30px rgba(255,0,0,0.5)" }}>
                 INFERNO
               </h1>
               <p className="text-red-400 text-xl mb-12 tracking-wider">DESCENT INTO DARKNESS</p>
-              
+
               <div className="flex flex-col gap-4 w-64">
                 <MenuButton onClick={() => startGame(0)}>
                   NEW GAME
@@ -1736,7 +1763,7 @@ export default function DoomGame() {
             <h2 className="text-4xl font-bold text-red-500 mb-8" style={{ fontFamily: "Impact, sans-serif" }}>
               SELECT LEVEL
             </h2>
-            
+
             <div className="grid grid-cols-3 gap-4 mb-8">
               {LEVELS.map((level, index) => {
                 const isUnlocked = savedProgress.unlockedLevels.has(index);
@@ -1746,11 +1773,10 @@ export default function DoomGame() {
                     type="button"
                     onClick={() => isUnlocked && startGame(index)}
                     disabled={!isUnlocked}
-                    className={`w-48 h-32 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center ${
-                      isUnlocked 
-                        ? "bg-gray-800 border-red-600 hover:bg-gray-700 hover:border-red-400 cursor-pointer transform hover:scale-105" 
-                        : "bg-gray-900 border-gray-700 cursor-not-allowed opacity-50"
-                    }`}
+                    className={`w-48 h-32 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center ${isUnlocked
+                      ? "bg-gray-800 border-red-600 hover:bg-gray-700 hover:border-red-400 cursor-pointer transform hover:scale-105"
+                      : "bg-gray-900 border-gray-700 cursor-not-allowed opacity-50"
+                      }`}
                   >
                     <span className="text-3xl font-bold text-red-500 mb-1">{index + 1}</span>
                     <span className="text-white text-sm font-bold">{level.name.split(":")[1]?.trim() || level.name}</span>
@@ -1772,7 +1798,7 @@ export default function DoomGame() {
             <h2 className="text-4xl font-bold text-red-500 mb-8" style={{ fontFamily: "Impact, sans-serif" }}>
               OPTIONS
             </h2>
-            
+
             <div className="w-96 space-y-6 mb-8">
               {/* Mouse Sensitivity */}
               <div className="flex flex-col gap-2">
@@ -1798,11 +1824,10 @@ export default function DoomGame() {
                       key={diff}
                       type="button"
                       onClick={() => setSettings({ ...settings, difficulty: diff })}
-                      className={`flex-1 py-2 rounded font-bold transition-colors ${
-                        settings.difficulty === diff
-                          ? "bg-red-600 text-white"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                      }`}
+                      className={`flex-1 py-2 rounded font-bold transition-colors ${settings.difficulty === diff
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        }`}
                     >
                       {diff.toUpperCase()}
                     </button>
@@ -1819,11 +1844,10 @@ export default function DoomGame() {
                       key={style}
                       type="button"
                       onClick={() => setSettings({ ...settings, crosshairStyle: style })}
-                      className={`flex-1 py-2 rounded font-bold transition-colors ${
-                        settings.crosshairStyle === style
-                          ? "bg-red-600 text-white"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                      }`}
+                      className={`flex-1 py-2 rounded font-bold transition-colors ${settings.crosshairStyle === style
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        }`}
                     >
                       {style.toUpperCase()}
                     </button>
@@ -1837,13 +1861,11 @@ export default function DoomGame() {
                 <button
                   type="button"
                   onClick={() => setSettings({ ...settings, showFPS: !settings.showFPS })}
-                  className={`w-16 h-8 rounded-full transition-colors ${
-                    settings.showFPS ? "bg-red-600" : "bg-gray-600"
-                  }`}
+                  className={`w-16 h-8 rounded-full transition-colors ${settings.showFPS ? "bg-red-600" : "bg-gray-600"
+                    }`}
                 >
-                  <div className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                    settings.showFPS ? "translate-x-9" : "translate-x-1"
-                  }`} />
+                  <div className={`w-6 h-6 bg-white rounded-full transition-transform ${settings.showFPS ? "translate-x-9" : "translate-x-1"
+                    }`} />
                 </button>
               </div>
 
