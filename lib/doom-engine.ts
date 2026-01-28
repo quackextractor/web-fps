@@ -15,6 +15,11 @@ export interface Player {
   meleeFrame: number;
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export enum WeaponType {
   FIST = 0,
   CHAINSAW = 1,
@@ -115,6 +120,8 @@ export interface Enemy {
   attackRange: number;
   meleeRange: number;
   isMelee: boolean;
+  path: Point[];
+  lastPathTime: number;
 }
 
 export enum EnemyType {
@@ -403,6 +410,8 @@ function createEnemy(type: EnemyType, x: number, y: number): Omit<Enemy, 'id'> {
     attackRange: config.attackRange,
     meleeRange: config.meleeRange,
     isMelee: config.isMelee,
+    path: [],
+    lastPathTime: 0,
   };
 }
 
@@ -653,4 +662,143 @@ export function normalizeAngle(angle: number): number {
   while (angle > Math.PI) angle -= 2 * Math.PI;
   while (angle < -Math.PI) angle += 2 * Math.PI;
   return angle;
+}
+
+// A* Pathfinding
+export function findPath(
+  map: number[][],
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number
+): Point[] {
+  const startNode = { x: Math.floor(startX), y: Math.floor(startY) };
+  const endNode = { x: Math.floor(endX), y: Math.floor(endY) };
+
+  // Optimization: If end is wall, look for closest free spot? 
+  // For now, if end is wall, we might fail. But enemies chase player, 
+  // and player is usually not IN a wall.
+
+  if (startNode.x === endNode.x && startNode.y === endNode.y) {
+    return [];
+  }
+
+  const openList: { x: number; y: number; f: number; g: number; h: number; parent: any }[] = [];
+  const closedList: boolean[][] = Array(map.length).fill(false).map(() => Array(map[0].length).fill(false));
+
+  openList.push({
+    x: startNode.x,
+    y: startNode.y,
+    f: 0,
+    g: 0,
+    h: 0,
+    parent: null,
+  });
+
+  const neighbors = [
+    { x: 0, y: -1 }, // Up
+    { x: 0, y: 1 },  // Down
+    { x: -1, y: 0 }, // Left
+    { x: 1, y: 0 },  // Right
+    { x: -1, y: -1 }, // Diagonals
+    { x: 1, y: -1 },
+    { x: -1, y: 1 },
+    { x: 1, y: 1 },
+  ];
+
+  let iterations = 0;
+  // Limit iterations to prevent freezing on large maps
+  while (openList.length > 0 && iterations < 500) {
+    iterations++;
+
+    // Find node with lowest f
+    let lowInd = 0;
+    for (let i = 0; i < openList.length; i++) {
+      if (openList[i].f < openList[lowInd].f) {
+        lowInd = i;
+      }
+    }
+    const currentNode = openList[lowInd];
+
+    // End case
+    if (currentNode.x === endNode.x && currentNode.y === endNode.y) {
+      let curr = currentNode;
+      const path: Point[] = [];
+      while (curr.parent) {
+        // We want the center of the tile
+        path.push({ x: curr.x + 0.5, y: curr.y + 0.5 });
+        curr = curr.parent;
+      }
+      return path.reverse();
+    }
+
+    // Move from open to closed
+    openList.splice(lowInd, 1);
+
+    // Bounds check before accessing closedList
+    if (currentNode.y >= 0 && currentNode.y < map.length && currentNode.x >= 0 && currentNode.x < map[0].length) {
+      closedList[currentNode.y][currentNode.x] = true;
+    }
+
+    // Neighbors
+    for (const neighbor of neighbors) {
+      const neighborX = currentNode.x + neighbor.x;
+      const neighborY = currentNode.y + neighbor.y;
+
+      // Check bounds
+      if (
+        neighborY < 0 ||
+        neighborY >= map.length ||
+        neighborX < 0 ||
+        neighborX >= map[0].length
+      ) {
+        continue;
+      }
+
+      // Check blocked
+      if (map[neighborY][neighborX] > 0 && map[neighborY][neighborX] !== 9) {
+        continue;
+      }
+
+      // Check closed
+      if (closedList[neighborY][neighborX]) {
+        continue;
+      }
+
+      // Corner cutting check for diagonals
+      if (neighbor.x !== 0 && neighbor.y !== 0) {
+        if (
+          (map[currentNode.y][neighborX] > 0 && map[currentNode.y][neighborX] !== 9) ||
+          (map[neighborY][currentNode.x] > 0 && map[neighborY][currentNode.x] !== 9)
+        ) {
+          continue; // Blocked by corner
+        }
+      }
+
+      const gScore = currentNode.g + (neighbor.x !== 0 && neighbor.y !== 0 ? 1.414 : 1);
+      let gScoreIsBest = false;
+
+      const existingNode = openList.find(n => n.x === neighborX && n.y === neighborY);
+
+      if (!existingNode) {
+        gScoreIsBest = true;
+        const h = Math.sqrt(Math.pow(neighborX - endNode.x, 2) + Math.pow(neighborY - endNode.y, 2));
+        openList.push({
+          x: neighborX,
+          y: neighborY,
+          g: gScore,
+          h: h,
+          f: gScore + h,
+          parent: currentNode,
+        });
+      } else if (gScore < existingNode.g) {
+        gScoreIsBest = true;
+        existingNode.g = gScore;
+        existingNode.f = existingNode.g + existingNode.h;
+        existingNode.parent = currentNode;
+      }
+    }
+  }
+
+  return [];
 }

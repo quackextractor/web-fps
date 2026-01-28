@@ -23,6 +23,7 @@ import {
   hasLineOfSight,
   getDistance,
   normalizeAngle,
+  findPath,
 } from "@/lib/doom-engine";
 import { soundManager } from "@/lib/sound-manager";
 
@@ -97,6 +98,7 @@ export default function DoomGame() {
 
   const [, forceUpdate] = useState(0);
   const keysRef = useRef<Set<string>>(new Set());
+  const mouseDownRef = useRef(false);
   const mouseMovementRef = useRef(0);
   const lastTimeRef = useRef(0);
   const accumulatorRef = useRef(0);
@@ -412,6 +414,10 @@ export default function DoomGame() {
       if (keysRef.current.has("arrowright")) newAngle += 0.05;
       if (keysRef.current.has("q")) newAngle -= 0.05;
 
+      if (keysRef.current.has(" ") || keysRef.current.has("f") || mouseDownRef.current) {
+        attack();
+      }
+
       if (player.isMeleeing) {
         player.meleeFrame += dt * 0.02;
         if (player.meleeFrame > 1) {
@@ -504,17 +510,12 @@ export default function DoomGame() {
           continue;
         }
 
+        const now = performance.now();
+        let shouldChase = false;
+
         if (canSee && dist < enemy.sightRange) {
-          // Using raw time for attack cooldowns might be an issue if timeScale changes, 
-          // but performance.now() is absolute. 
-          // Ideally we should use a game timer, but for now we'll stick to performance.now() 
-          // and assume cooldowns are real-time. 
-          // OR we could use a game-time accumulator for cooldowns.
-          // For this task, let's keep it simple: cooldowns are real-time.
-          // Wait, if I slow down game, cooldowns should slow down too?
-          // If so, I need to track gameTime.
-          // Let's stick to existing logic for now, refactoring everything to gameTime is risky.
-          const now = performance.now();
+          shouldChase = true;
+          enemy.path = []; // Clear path if we can see target
 
           if (dist < enemy.meleeRange && now - enemy.lastAttack > enemy.attackCooldown * 0.5) {
             enemy.state = "melee";
@@ -528,6 +529,7 @@ export default function DoomGame() {
             playerRef.current.health = Math.max(0, currentPlayer.health - damage);
             hurtFlashRef.current = 10;
             soundManager.playHurt();
+            shouldChase = false;
           } else if (!enemy.isMelee && dist < enemy.attackRange && now - enemy.lastAttack > enemy.attackCooldown) {
             enemy.state = "attacking";
             enemy.lastAttack = now;
@@ -545,17 +547,44 @@ export default function DoomGame() {
               size: enemy.type === EnemyType.CYBERDEMON ? 0.4 : 0.25,
             };
             projectilesRef.current.push(projectile);
-          } else if (dist > enemy.meleeRange * 1.2) {
-            enemy.state = "chasing";
+            shouldChase = false;
+          }
+        } else {
+          // If we were already chasing, keep chasing (using pathfinding)
+          if (enemy.state === "chasing") {
+            shouldChase = true;
           } else {
             enemy.state = "idle";
           }
-        } else {
-          enemy.state = "idle";
         }
 
-        if (enemy.state === "chasing") {
-          const angle = Math.atan2(currentPlayer.y - enemy.y, currentPlayer.x - enemy.x);
+        if (shouldChase && (enemy.state === "idle" || enemy.state === "chasing")) {
+          enemy.state = "chasing";
+          let targetX = currentPlayer.x;
+          let targetY = currentPlayer.y;
+
+          if (!canSee) {
+            // Recalculate path periodically or if empty
+            if (enemy.path.length === 0 || now - enemy.lastPathTime > 500) {
+              enemy.path = findPath(level.map, enemy.x, enemy.y, currentPlayer.x, currentPlayer.y);
+              enemy.lastPathTime = now;
+            }
+
+            if (enemy.path.length > 0) {
+              const node = enemy.path[0];
+              targetX = node.x;
+              targetY = node.y;
+              if (getDistance(enemy.x, enemy.y, targetX, targetY) < 0.5) {
+                enemy.path.shift();
+                if (enemy.path.length > 0) {
+                  targetX = enemy.path[0].x;
+                  targetY = enemy.path[0].y;
+                }
+              }
+            }
+          }
+
+          const angle = Math.atan2(targetY - enemy.y, targetX - enemy.x);
           const speed = enemy.speed * (dt / 16);
           const moveEnemyX = Math.cos(angle) * speed;
           const moveEnemyY = Math.sin(angle) * speed;
@@ -1640,7 +1669,6 @@ export default function DoomGame() {
 
       if ((key === " " || key === "f") && gameStateRef.current === "playing") {
         e.preventDefault();
-        attack();
       }
 
       // R to restart current level
@@ -1710,10 +1738,18 @@ export default function DoomGame() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleClick = () => {
-      if (gameStateRef.current === "playing") {
-        canvas.requestPointerLock();
-        attack();
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 0) { // Left click
+        mouseDownRef.current = true;
+        if (gameStateRef.current === "playing") {
+          canvas.requestPointerLock();
+        }
+      }
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 0) {
+        mouseDownRef.current = false;
       }
     };
 
@@ -1730,16 +1766,18 @@ export default function DoomGame() {
       }
     };
 
-    canvas.addEventListener("click", handleClick);
+    canvas.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("wheel", handleWheel, { passive: false });
     document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      canvas.removeEventListener("click", handleClick);
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
       canvas.removeEventListener("wheel", handleWheel);
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [attack, switchWeapon]);
+  }, [switchWeapon]);
 
   const player = playerRef.current;
 
