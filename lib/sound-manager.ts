@@ -15,10 +15,19 @@ export class SoundManager {
     try {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.value = 0.3; // Default volume
+      this.masterGain.gain.value = this.volume;
       this.masterGain.connect(this.ctx.destination);
     } catch (e) {
       console.warn("AudioContext not supported or failed to initialize", e);
+    }
+  }
+
+  private volume: number = 0.5;
+
+  public setVolume(volume: number) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.volume;
     }
   }
 
@@ -26,6 +35,9 @@ export class SoundManager {
     this.enabled = enabled;
     if (this.ctx && this.ctx.state === "suspended" && enabled) {
       this.ctx.resume();
+    }
+    if (this.masterGain) {
+      this.masterGain.gain.value = enabled ? this.volume : 0;
     }
   }
 

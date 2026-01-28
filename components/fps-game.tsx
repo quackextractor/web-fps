@@ -28,11 +28,10 @@ import {
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";
+import { SettingsMenu } from "./settings-menu";
+import { useSettings } from "@/hooks/use-settings";
 
-const SCREEN_WIDTH = 800;
-const SCREEN_HEIGHT = 600;
 const FOV = Math.PI / 3;
-const NUM_RAYS = 200;
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
 const PROJECTILE_SPEED = 0.18;
@@ -40,40 +39,20 @@ const TICK_RATE = 1000 / 60;
 
 type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete";
 
-interface GameSettings {
-  mouseSensitivity: number;
-  soundEnabled: boolean;
-  musicEnabled: boolean;
-  showFPS: boolean;
-  crosshairStyle: "cross" | "dot" | "circle";
-  difficulty: "easy" | "normal" | "hard";
-  timeScale: number;
-  debugMode: boolean;
-}
-
 interface SavedProgress {
   unlockedLevels: Set<number>;
   unlockedWeapons: Set<WeaponType>;
   highestLevel: number;
 }
 
-const DEFAULT_SETTINGS: GameSettings = {
-  mouseSensitivity: 1,
-  soundEnabled: true,
-  musicEnabled: true,
-  showFPS: false,
-  crosshairStyle: "cross",
-  difficulty: "normal",
-  timeScale: 1.0,
-  debugMode: false,
-};
-
 export default function DoomGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
   const [currentLevel, setCurrentLevel] = useState(0);
-  const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+
+  const { settings, setSettings, updateSetting, isLoaded } = useSettings();
+
   const [savedProgress, setSavedProgress] = useState<SavedProgress>({
     unlockedLevels: new Set([0]),
     unlockedWeapons: new Set([WeaponType.FIST, WeaponType.PISTOL]),
@@ -109,14 +88,20 @@ export default function DoomGame() {
   const gameStateRef = useRef(gameState);
 
   useEffect(() => {
-    soundManager.setEnabled(settings.soundEnabled);
-  }, [settings.soundEnabled]);
+    if (isLoaded) {
+      soundManager.setEnabled(settings.soundEnabled);
+      soundManager.setVolume(settings.volume);
+    }
+  }, [settings.soundEnabled, settings.volume, isLoaded]);
 
   useEffect(() => {
     offscreenCanvasRef.current = document.createElement('canvas');
-    offscreenCanvasRef.current.width = SCREEN_WIDTH;
-    offscreenCanvasRef.current.height = SCREEN_HEIGHT;
+    // Dimensions will be set by resolution effect
   }, []);
+
+  const screenWidthRef = useRef(800);
+  const screenHeightRef = useRef(600);
+  const numRaysRef = useRef(200);
 
   useEffect(() => {
     gameStateRef.current = gameState;
@@ -614,7 +599,7 @@ export default function DoomGame() {
         if (hurtAlpha > 0) {
           ctx.save();
           ctx.fillStyle = `rgba(255, 0, 0, ${hurtAlpha * 0.5})`;
-          ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+          ctx.fillRect(0, 0, screenWidthRef.current, screenHeightRef.current);
           ctx.restore();
         }
       }
@@ -645,11 +630,14 @@ export default function DoomGame() {
     player: Player,
     enemies: Enemy[]
   ) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+
     // Semi-transparent background
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    const scale = 20; // 20 pixels per map cell
+    const scale = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) / Math.max(level.map.length, level.map[0].length) * 0.8;
     const offsetX = SCREEN_WIDTH / 2 - (level.map[0].length * scale) / 2;
     const offsetY = SCREEN_HEIGHT / 2 - (level.map.length * scale) / 2;
 
@@ -730,6 +718,10 @@ export default function DoomGame() {
     flash: number,
     level: Level
   ) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+    const NUM_RAYS = numRaysRef.current;
+
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -835,6 +827,10 @@ export default function DoomGame() {
     dist: number,
     zBuffer: number[]
   ) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+    const NUM_RAYS = numRaysRef.current;
+
     const dx = proj.x - player.x;
     const dy = proj.y - player.y;
 
@@ -881,6 +877,10 @@ export default function DoomGame() {
     dist: number,
     zBuffer: number[]
   ) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+    const NUM_RAYS = numRaysRef.current;
+
     const dx = pickup.x - player.x;
     const dy = pickup.y - player.y;
 
@@ -941,6 +941,10 @@ export default function DoomGame() {
     dist: number,
     zBuffer: number[]
   ) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+    const NUM_RAYS = numRaysRef.current;
+
     const dx = enemy.x - player.x;
     const dy = enemy.y - player.y;
 
@@ -1357,6 +1361,9 @@ export default function DoomGame() {
   };
 
   const drawWeapon = (ctx: CanvasRenderingContext2D, player: Player, flash: number) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+
     const bob = player.isMoving ? Math.sin(player.bobPhase) * 10 : 0;
     const weaponX = SCREEN_WIDTH / 2;
     const weaponY = SCREEN_HEIGHT - 150 + bob;
@@ -1520,6 +1527,9 @@ export default function DoomGame() {
   };
 
   const drawHUD = (ctx: CanvasRenderingContext2D, player: Player, enemies: Enemy[], level: Level) => {
+    const SCREEN_WIDTH = screenWidthRef.current;
+    const SCREEN_HEIGHT = screenHeightRef.current;
+
     const deadEnemies = enemies.filter((e) => e.state === "dead").length;
     const totalEnemies = enemies.length;
 
@@ -1743,7 +1753,7 @@ export default function DoomGame() {
       }
 
       if (key === "p") {
-        setSettings(prev => ({ ...prev, debugMode: !prev.debugMode }));
+        updateSetting("debugMode", !settings.debugMode);
       }
     };
 
@@ -1805,6 +1815,68 @@ export default function DoomGame() {
     };
   }, [switchWeapon]);
 
+  // Handle Resolution
+  useEffect(() => {
+    const canvas = offscreenCanvasRef.current;
+    const visibleCanvas = canvasRef.current;
+    if (canvas && visibleCanvas) {
+      const [w, h] = settings.resolution.split("x").map(Number);
+      canvas.width = w;
+      canvas.height = h;
+      visibleCanvas.width = w;
+      visibleCanvas.height = h;
+      screenWidthRef.current = w;
+      screenHeightRef.current = h;
+      numRaysRef.current = Math.floor(w / 4); // maintain aspect of "rays"
+    }
+  }, [settings.resolution]);
+
+  // Handle Fullscreen
+  useEffect(() => {
+    if (settings.fullscreen) {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+          updateSetting("fullscreen", false);
+        });
+      }
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(err => {
+          console.warn(`Error attempting to exit fullscreen: ${err.message}`);
+        });
+      }
+    }
+  }, [settings.fullscreen, updateSetting]);
+
+  // Handle Savegame Persistence
+  useEffect(() => {
+    const saved = localStorage.getItem("doom-savegame");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSavedProgress({
+          unlockedLevels: new Set(parsed.unlockedLevels),
+          unlockedWeapons: new Set(parsed.unlockedWeapons),
+          highestLevel: parsed.highestLevel
+        });
+        weaponsUnlockedRef.current = new Set(parsed.unlockedWeapons);
+      } catch (e) {
+        console.error("Failed to load savegame", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const toSave = {
+      unlockedLevels: Array.from(savedProgress.unlockedLevels),
+      unlockedWeapons: Array.from(savedProgress.unlockedWeapons),
+      highestLevel: savedProgress.highestLevel
+    };
+    localStorage.setItem("doom-savegame", JSON.stringify(toSave));
+  }, [savedProgress]);
+
+
   const player = playerRef.current;
 
   // Menu button component
@@ -1823,13 +1895,12 @@ export default function DoomGame() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <div className="relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4 w-full h-full">
+      <div className="relative w-full h-full max-w-[100vw] max-h-[100vh] flex items-center justify-center aspect-video">
         <canvas
           ref={canvasRef}
-          width={SCREEN_WIDTH}
-          height={SCREEN_HEIGHT}
-          className="border-4 border-red-900 rounded-lg cursor-none"
+          className="border-4 border-red-900 rounded-lg cursor-none w-full h-full object-contain"
+          style={{ imageRendering: "pixelated" }}
         />
 
         {/* Main Menu */}
@@ -1901,122 +1972,13 @@ export default function DoomGame() {
 
         {/* Settings */}
         {gameState === "settings" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black p-8">
-            <h2 className="text-4xl font-bold text-red-500 mb-8" style={{ fontFamily: "Impact, sans-serif" }}>
-              OPTIONS
-            </h2>
-
-            <div className="w-96 space-y-6 mb-8">
-              {/* Mouse Sensitivity */}
-              <div className="flex flex-col gap-2">
-                <label className="text-white font-bold">Mouse Sensitivity</label>
-                <input
-                  type="range"
-                  min="0.2"
-                  max="3"
-                  step="0.1"
-                  value={settings.mouseSensitivity}
-                  onChange={(e) => setSettings({ ...settings, mouseSensitivity: parseFloat(e.target.value) })}
-                  className="w-full accent-red-600"
-                />
-                <span className="text-gray-400 text-sm">{settings.mouseSensitivity.toFixed(1)}x</span>
-              </div>
-
-              {/* Difficulty */}
-              <div className="flex flex-col gap-2">
-                <label className="text-white font-bold">Difficulty</label>
-                <div className="flex gap-2">
-                  {(["easy", "normal", "hard"] as const).map((diff) => (
-                    <button
-                      key={diff}
-                      type="button"
-                      onClick={() => setSettings({ ...settings, difficulty: diff })}
-                      className={`flex-1 py-2 rounded font-bold transition-colors ${settings.difficulty === diff
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        }`}
-                    >
-                      {diff.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Time Scale */}
-              <div className="flex flex-col gap-2">
-                <label className="text-white font-bold">Game Speed</label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="3"
-                  step="0.1"
-                  value={settings.timeScale}
-                  onChange={(e) => setSettings({ ...settings, timeScale: parseFloat(e.target.value) })}
-                  className="w-full accent-red-600"
-                />
-                <span className="text-gray-400 text-sm">{settings.timeScale.toFixed(1)}x</span>
-              </div>
-
-              {/* Crosshair Style */}
-              <div className="flex flex-col gap-2">
-                <label className="text-white font-bold">Crosshair Style</label>
-                <div className="flex gap-2">
-                  {(["cross", "dot", "circle"] as const).map((style) => (
-                    <button
-                      key={style}
-                      type="button"
-                      onClick={() => setSettings({ ...settings, crosshairStyle: style })}
-                      className={`flex-1 py-2 rounded font-bold transition-colors ${settings.crosshairStyle === style
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        }`}
-                    >
-                      {style.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Show FPS */}
-              <div className="flex items-center justify-between">
-                <label className="text-white font-bold">Show FPS</label>
-                <button
-                  type="button"
-                  onClick={() => setSettings({ ...settings, showFPS: !settings.showFPS })}
-                  className={`w-16 h-8 rounded-full transition-colors ${settings.showFPS ? "bg-red-600" : "bg-gray-600"
-                    }`}
-                >
-                  <div className={`w-6 h-6 bg-white rounded-full transition-transform ${settings.showFPS ? "translate-x-9" : "translate-x-1"
-                    }`} />
-                </button>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-gray-700 pt-4">
-                <p className="text-yellow-500 font-bold mb-4">CHEATS</p>
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={unlockAllLevels}
-                    className="flex-1 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded transition-colors"
-                  >
-                    UNLOCK LEVELS
-                  </button>
-                  <button
-                    type="button"
-                    onClick={unlockAllWeapons}
-                    className="flex-1 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded transition-colors"
-                  >
-                    UNLOCK WEAPONS
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <MenuButton onClick={() => setGameState("mainMenu")} variant="secondary">
-              BACK
-            </MenuButton>
-          </div>
+          <SettingsMenu
+            onBack={() => setGameState("mainMenu")}
+            settings={settings}
+            setSettings={setSettings}
+            unlockAllLevels={unlockAllLevels}
+            unlockAllWeapons={unlockAllWeapons}
+          />
         )}
 
         {/* Paused */}
