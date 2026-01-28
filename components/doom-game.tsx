@@ -24,8 +24,10 @@ import {
   getDistance,
   normalizeAngle,
   findPath,
+  hasClearWalkingPath,
 } from "@/lib/doom-engine";
 import { soundManager } from "@/lib/sound-manager";
+import { updateEnemyAI } from "@/lib/enemy-ai";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
@@ -500,136 +502,34 @@ export default function DoomGame() {
           continue;
         }
 
-        const dist = getDistance(enemy.x, enemy.y, currentPlayer.x, currentPlayer.y);
-        const canSee = hasLineOfSight(level.map, enemy.x, enemy.y, currentPlayer.x, currentPlayer.y);
-
-        if (enemy.state === "hurt") {
-          enemy.animFrame++;
-          if (enemy.animFrame > 10) {
-            enemy.state = "chasing";
-            enemy.animFrame = 0;
-          }
-          continue;
-        }
-
         const now = performance.now();
-        let shouldChase = false;
 
-        if (canSee && dist < enemy.sightRange) {
-          shouldChase = true;
-          enemy.path = []; // Clear path if we can see target
+        const result = updateEnemyAI(
+          enemy,
+          currentPlayer,
+          level.map,
+          enemiesRef.current,
+          dt, // ensure dt is available, yes fixedUpdate(dt)
+          now,
+          projectileIdRef.current
+        );
 
-          if (dist < enemy.meleeRange && now - enemy.lastAttack > enemy.attackCooldown * 0.5) {
-            enemy.state = "melee";
-            enemy.lastAttack = now;
-            let damage = enemy.damage * 1.5;
-            if (currentPlayer.armor > 0) {
-              const armorAbsorb = Math.min(currentPlayer.armor, damage * 0.5);
-              playerRef.current.armor -= armorAbsorb;
-              damage -= armorAbsorb;
-            }
-            playerRef.current.health = Math.max(0, currentPlayer.health - damage);
-            hurtFlashRef.current = 10;
-            soundManager.playHurt();
-            shouldChase = false;
-          } else if (!enemy.isMelee && dist < enemy.attackRange && now - enemy.lastAttack > enemy.attackCooldown) {
-            enemy.state = "attacking";
-            enemy.lastAttack = now;
-
-            const angle = Math.atan2(currentPlayer.y - enemy.y, currentPlayer.x - enemy.x);
-            const projectile: Projectile = {
-              id: projectileIdRef.current++,
-              x: enemy.x,
-              y: enemy.y,
-              dx: Math.cos(angle) * PROJECTILE_SPEED,
-              dy: Math.sin(angle) * PROJECTILE_SPEED,
-              damage: enemy.damage,
-              fromEnemy: true,
-              color: getProjectileColor(enemy.type),
-              size: enemy.type === EnemyType.CYBERDEMON ? 0.4 : 0.25,
-            };
-            projectilesRef.current.push(projectile);
-            shouldChase = false;
-          }
-        } else {
-          // If we were already chasing, keep chasing (using pathfinding)
-          if (enemy.state === "chasing") {
-            shouldChase = true;
-          } else {
-            enemy.state = "idle";
-          }
+        if (result.spawnProjectile) {
+          projectileIdRef.current++;
+          projectilesRef.current.push(result.spawnProjectile);
+          // No sound trigger in result? We can add it if we want.
         }
 
-        if (shouldChase && (enemy.state === "idle" || enemy.state === "chasing")) {
-          enemy.state = "chasing";
-          let targetX = currentPlayer.x;
-          let targetY = currentPlayer.y;
-
-          if (!canSee) {
-            // Recalculate path periodically or if empty
-            if (enemy.path.length === 0 || now - enemy.lastPathTime > 500) {
-              enemy.path = findPath(level.map, enemy.x, enemy.y, currentPlayer.x, currentPlayer.y);
-              enemy.lastPathTime = now;
-            }
-
-            if (enemy.path.length > 0) {
-              const node = enemy.path[0];
-              targetX = node.x;
-              targetY = node.y;
-
-              // Check if we can skip to the next node (smoothing)
-              if (enemy.path.length > 1) {
-                const nextNode = enemy.path[1];
-                if (hasLineOfSight(level.map, enemy.x, enemy.y, nextNode.x, nextNode.y)) {
-                  enemy.path.shift();
-                  targetX = nextNode.x;
-                  targetY = nextNode.y;
-                }
-              }
-
-              // Loosen the arrival threshold (0.5 -> 0.8) to prevent orbiting/getting stuck
-              if (getDistance(enemy.x, enemy.y, targetX, targetY) < 0.8) {
-                enemy.path.shift();
-                if (enemy.path.length > 0) {
-                  targetX = enemy.path[0].x;
-                  targetY = enemy.path[0].y;
-                }
-              }
-            }
+        if (result.damagePlayer) {
+          let damage = result.damagePlayer;
+          if (currentPlayer.armor > 0) {
+            const armorAbsorb = Math.min(currentPlayer.armor, damage * 0.5);
+            playerRef.current.armor -= armorAbsorb;
+            damage -= armorAbsorb;
           }
-
-          const angle = Math.atan2(targetY - enemy.y, targetX - enemy.x);
-          const speed = enemy.speed * (dt / 16);
-          const moveEnemyX = Math.cos(angle) * speed;
-          const moveEnemyY = Math.sin(angle) * speed;
-
-          // Stuck detection
-          const dx = enemy.x - enemy.lastX;
-          const dy = enemy.y - enemy.lastY;
-          if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) {
-            enemy.stuckFrameCount++;
-          } else {
-            enemy.stuckFrameCount = 0;
-          }
-
-          enemy.lastX = enemy.x;
-          enemy.lastY = enemy.y;
-
-          if (enemy.stuckFrameCount > 60) {
-            // Force re-path if stuck for ~1 second
-            enemy.path = [];
-            enemy.lastPathTime = 0; // Force immediate recalc
-            enemy.stuckFrameCount = 0;
-          }
-
-          if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y + moveEnemyY, 0.3)) {
-            enemy.x += moveEnemyX;
-            enemy.y += moveEnemyY;
-          } else if (!checkCollision(level.map, enemy.x + moveEnemyX, enemy.y, 0.3)) {
-            enemy.x += moveEnemyX;
-          } else if (!checkCollision(level.map, enemy.x, enemy.y + moveEnemyY, 0.3)) {
-            enemy.y += moveEnemyY;
-          }
+          playerRef.current.health = Math.max(0, currentPlayer.health - damage);
+          hurtFlashRef.current = 10;
+          soundManager.playHurt();
         }
 
         enemy.animFrame = (enemy.animFrame + 1) % 120;

@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-01-28
+
+### Fixed
+-   **AI Navigation**: Switched the A* Pathfinding algorithm to strict 4-way (Manhattan) movement. Enemies will no longer attempt diagonal "corner cuts" which were causing them to get stuck on wall geometry. They will now navigate corners using safe, axis-aligned turns.
+
+## [0.2.8] - 2026-01-28
+
+### Fixed
+-   **AI Corner Navigation**: Disabled aggressive "predictive smoothing" which was causing enemies to skip corner waypoints entirely. Enemies now strictly follow the A* path topology, only smoothing the *arrival* at a waypoint if the subsequent path is clear. This prevents them from cutting corners too early and hitting walls.
+
+## [0.2.7] - 2026-01-28
+
+### Fixed
+-   **Pathfinding Tuning**: Tightened corner navigation significantly. Strict arrival threshold reduced (0.2 -> 0.1) and path clearance safety buffer increased (0.3 -> 0.4). This ensures enemies effectively "hug" the center of the tile when turning, preventing them from clipping walls.
+
+## [0.2.6] - 2026-01-28
+
+### Fixed
+-   **AI Corner Cutting**: Implemented "Smart Waypoint Switching". Enemies now strictly adhere to path nodes (threshold 0.2) when navigating tight corners, but will smoothly transition (threshold 0.8) if they have a clear, width-verified path to the next node.
+
+## [0.2.5] - 2026-01-28
+
+### Fixed
+-   **Pathfinding Collision**: Implemented a "Width-Aware" raycast for path smoothing. Enemies will now only shortcut corners if their entire collision width (radius 0.3) fits through the opening, preventing them from getting stuck on geometry.
+
+## [0.2.4] - 2026-01-28
+
+### Fixed
+-   **AI Freezing Bug**: Fixed a critical issue where enemies would stop moving if the player's position mapped to a wall tile (e.g., due to clipping). The pathfinding algorithm now searches for the nearest valid node if the target is blocked.
+
 ## [0.2.3] - 2026-01-28
 
 ### Added

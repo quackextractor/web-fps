@@ -138,6 +138,18 @@ export enum EnemyType {
   CYBERDEMON = 7,
 }
 
+export function getProjectileColor(type: EnemyType): string {
+  switch (type) {
+    case EnemyType.IMP: return "#ff6600";
+    case EnemyType.SOLDIER: return "#ffff00";
+    case EnemyType.CACODEMON: return "#ff0000";
+    case EnemyType.BARON: return "#00ff00";
+    case EnemyType.HELLKNIGHT: return "#00ff00";
+    case EnemyType.CYBERDEMON: return "#ff0000";
+    default: return "#ffffff";
+  }
+}
+
 export const ENEMY_CONFIG: Record<EnemyType, {
   name: string;
   health: number;
@@ -660,6 +672,37 @@ export function hasLineOfSight(
   return true;
 }
 
+export function hasClearWalkingPath(
+  map: number[][],
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  radius: number
+): boolean {
+  // Check center line
+  if (!hasLineOfSight(map, x1, y1, x2, y2)) return false;
+
+  // Calculate perpendicular offset vector
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (dist === 0) return true;
+
+  // Normalized perpendicular vector (-y, x)
+  const px = (-dy / dist) * radius;
+  const py = (dx / dist) * radius;
+
+  // Check left edge
+  if (!hasLineOfSight(map, x1 + px, y1 + py, x2 + px, y2 + py)) return false;
+
+  // Check right edge
+  if (!hasLineOfSight(map, x1 - px, y1 - py, x2 - px, y2 - py)) return false;
+
+  return true;
+}
+
 export function getDistance(x1: number, y1: number, x2: number, y2: number): number {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
@@ -689,6 +732,37 @@ export function findPath(
     return [];
   }
 
+  // BUG FIX: If endNode is in a wall, find the nearest free node
+  if (
+    endNode.y >= 0 && endNode.y < map.length &&
+    endNode.x >= 0 && endNode.x < map[0].length &&
+    (map[endNode.y][endNode.x] > 0 && map[endNode.y][endNode.x] !== 9)
+  ) {
+    // Spiral search for nearest free node
+    let found = false;
+    for (let radius = 1; radius <= 3; radius++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          const ny = endNode.y + dy;
+          const nx = endNode.x + dx;
+          if (
+            ny >= 0 && ny < map.length &&
+            nx >= 0 && nx < map[0].length &&
+            (map[ny][nx] === 0 || map[ny][nx] === 9)
+          ) {
+            endNode.x = nx;
+            endNode.y = ny;
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      if (found) break;
+    }
+    // If still not found, we might return empty path, but at least we tried.
+  }
+
   const openList: { x: number; y: number; f: number; g: number; h: number; parent: any }[] = [];
   const closedList: boolean[][] = Array(map.length).fill(false).map(() => Array(map[0].length).fill(false));
 
@@ -706,10 +780,7 @@ export function findPath(
     { x: 0, y: 1 },  // Down
     { x: -1, y: 0 }, // Left
     { x: 1, y: 0 },  // Right
-    { x: -1, y: -1 }, // Diagonals
-    { x: 1, y: -1 },
-    { x: -1, y: 1 },
-    { x: 1, y: 1 },
+    { x: 1, y: 0 },  // Right
   ];
 
   let iterations = 0;
