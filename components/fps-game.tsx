@@ -25,7 +25,7 @@ import {
   normalizeAngle,
   findPath,
   hasClearWalkingPath,
-} from "@/lib/doom-engine";
+} from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";
 

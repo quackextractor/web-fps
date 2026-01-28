@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findPath, hasLineOfSight, Point } from '@/lib/doom-engine';
+import { findPath, hasLineOfSight, Point } from '@/lib/fps-engine';
 
 describe('Pathfinding', () => {
     // Simple 10x10 map with walls=1, floor=0

@@ -1,9 +1,9 @@
-import DoomGame from "@/components/doom-game";
+import FPSGame from "@/components/fps-game";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-black">
-      <DoomGame />
+      <FPSGame />
     </main>
   );
 }

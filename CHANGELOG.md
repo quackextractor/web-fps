@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.12] - 2026-01-28
+
+### Changed
+-   **Rebranding**: Renamed input files (`doom-game.tsx` -> `fps-game.tsx` and `doom-engine.ts` -> `fps-engine.ts`) to be more generic. Updated all internal references to "Doom" to "FPS" or "Retro FPS".
+
 ## [0.2.11] - 2026-01-28
 
 ### Fixed

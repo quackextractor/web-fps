@@ -1,4 +1,4 @@
-import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOfSight, getDistance, Projectile, EnemyType, getProjectileColor, normalizeAngle } from './doom-engine';
+import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOfSight, getDistance, Projectile, EnemyType, getProjectileColor, normalizeAngle } from './fps-engine';
 
 const ENEMY_RADIUS = 0.3;
 const SEPARATION_RADIUS = 0.8;

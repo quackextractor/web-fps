@@ -1,4 +1,4 @@
-import { WeaponType, PickupType, EnemyType } from "./doom-engine";
+import { WeaponType, PickupType, EnemyType } from "./fps-engine";
 
 export class SoundManager {
   private ctx: AudioContext | null = null;
@@ -78,14 +78,14 @@ export class SoundManager {
         noise.buffer = buffer;
         const noiseGain = this.ctx.createGain();
         const noiseFilter = this.ctx.createBiquadFilter();
-        
+
         noiseFilter.type = "lowpass";
         noiseFilter.frequency.setValueAtTime(1000, t);
         noiseFilter.frequency.exponentialRampToValueAtTime(100, t + 0.3);
-        
+
         noiseGain.gain.setValueAtTime(1, t);
         noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
-        
+
         noise.connect(noiseFilter);
         noiseFilter.connect(noiseGain);
         noiseGain.connect(this.masterGain);
@@ -102,7 +102,7 @@ export class SoundManager {
         osc.start(t);
         osc.stop(t + 0.1);
         break;
-        
+
       case WeaponType.CHAINSAW:
         // Buzzing saw
         osc.type = "sawtooth";
@@ -110,10 +110,10 @@ export class SoundManager {
         // Modulate pitch slightly for "revving" effect
         osc.frequency.linearRampToValueAtTime(150, t + 0.1);
         osc.frequency.linearRampToValueAtTime(100, t + 0.2);
-        
+
         gain.gain.setValueAtTime(0.2, t);
         gain.gain.linearRampToValueAtTime(0.1, t + 0.2);
-        
+
         osc.start(t);
         osc.stop(t + 0.25);
         break;
@@ -124,18 +124,18 @@ export class SoundManager {
     if (!this.enabled || !this.ctx || !this.masterGain) return;
     this.ctx.resume();
     const t = this.ctx.currentTime;
-    
+
     // Grunt/Pain sound
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    
+
     osc.type = "triangle";
     osc.frequency.setValueAtTime(150, t);
     osc.frequency.linearRampToValueAtTime(80, t + 0.2);
-    
+
     gain.gain.setValueAtTime(0.5, t);
     gain.gain.linearRampToValueAtTime(0.01, t + 0.3);
-    
+
     osc.connect(gain);
     gain.connect(this.masterGain);
     osc.start(t);
@@ -150,14 +150,14 @@ export class SoundManager {
     // Squelch/Scream
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    
+
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(300, t);
     osc.frequency.exponentialRampToValueAtTime(50, t + 0.4);
-    
+
     gain.gain.setValueAtTime(0.4, t);
     gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
-    
+
     osc.connect(gain);
     gain.connect(this.masterGain);
     osc.start(t);
@@ -171,9 +171,9 @@ export class SoundManager {
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    
+
     osc.type = "sine";
-    
+
     if (type === PickupType.WEAPON_SHOTGUN || type === PickupType.WEAPON_CHAINGUN || type === PickupType.WEAPON_CHAINSAW) {
       // Weapon pickup: "Click-Clack"
       osc.frequency.setValueAtTime(400, t);
@@ -191,7 +191,7 @@ export class SoundManager {
       osc.start(t);
       osc.stop(t + 0.2);
     }
-    
+
     osc.connect(gain);
     gain.connect(this.masterGain);
   }

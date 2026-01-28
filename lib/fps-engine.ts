@@ -1,4 +1,4 @@
-// DOOM-style Raycasting Engine - Enhanced Version
+// Retro FPS Raycasting Engine - Enhanced Version
 
 export interface Player {
   x: number;

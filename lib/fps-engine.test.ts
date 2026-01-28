@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from 'vitest';
-import { getDistance, normalizeAngle, checkCollision, hasLineOfSight } from './doom-engine';
+import { getDistance, normalizeAngle, checkCollision, hasLineOfSight } from './fps-engine';
 
 describe('Doom Engine Utils', () => {
     describe('getDistance', () => {
