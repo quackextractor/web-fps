@@ -173,6 +173,8 @@ export default function DoomGame() {
     const diffMult = getDifficultyMultiplier();
     enemiesRef.current = level.enemies.map((e, i) => ({
       ...e,
+      x: e.x + 0.5, // Center in tile
+      y: e.y + 0.5, // Center in tile
       id: i,
       health: e.health * diffMult.health,
       damage: e.damage * diffMult.damage,

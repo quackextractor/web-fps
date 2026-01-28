@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.10] - 2026-01-28
+
+### Fixed
+-   **Enemy Spawns**: All enemies now spawn at the exact center of their tile (x + 0.5, y + 0.5) instead of the top-left corner. This prevents enemies from spawning partially inside walls on initialization.
+
 ## [0.2.9] - 2026-01-28
 
 ### Fixed
