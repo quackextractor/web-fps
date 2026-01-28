@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.11] - 2026-01-28
+
+### Fixed
+-   **Level Design**: Fixed a Hell Knight in the "Warehouse" level that was spawning inside a wall pillar at coordinates (15, 10). Moved it to (13, 10).
+
 ## [0.2.10] - 2026-01-28
 
 ### Fixed

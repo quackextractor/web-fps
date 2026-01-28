@@ -474,7 +474,7 @@ export const LEVELS: Level[] = [
       createEnemy(EnemyType.DEMON, 12, 5),
       createEnemy(EnemyType.DEMON, 8, 10),
       createEnemy(EnemyType.CACODEMON, 10, 10),
-      createEnemy(EnemyType.HELLKNIGHT, 15, 10),
+      createEnemy(EnemyType.HELLKNIGHT, 13, 10),
     ],
     pickups: [
       { x: 10, y: 5, type: PickupType.HEALTH, collected: false },
