@@ -10,7 +10,7 @@ export interface GameSettings {
     difficulty: "easy" | "normal" | "hard";
     timeScale: number;
     debugMode: boolean;
-    resolution: "640x480" | "800x600" | "1024x768" | "1280x720";
+    resolution: "320x240" | "640x480" | "800x600" | "1024x768" | "1280x720" | "1366x768" | "1600x900" | "1920x1080" | "2560x1440";
     fullscreen: boolean;
 }
 

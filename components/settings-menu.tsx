@@ -148,10 +148,15 @@ export function SettingsMenu({
                                 onChange={(e) => updateSetting("resolution", e.target.value as any)}
                                 className="bg-gray-900 text-white p-2 rounded border border-gray-600"
                             >
-                                <option value="640x480">640x480 (Performance)</option>
+                                <option value="320x240">320x240 (Ultra Retro)</option>
+                                <option value="640x480">640x480 (Retro)</option>
                                 <option value="800x600">800x600 (Classic)</option>
-                                <option value="1024x768">1024x768 (High)</option>
+                                <option value="1024x768">1024x768 (Low)</option>
                                 <option value="1280x720">1280x720 (HD)</option>
+                                <option value="1366x768">1366x768 (Laptop)</option>
+                                <option value="1600x900">1600x900 (HD+)</option>
+                                <option value="1920x1080">1920x1080 (FHD)</option>
+                                <option value="2560x1440">2560x1440 (2K)</option>
                             </select>
                         </div>
                         <Toggle
