@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.15] - 2026-01-29
+
+### Fixed
+-   **Mouse Locking Logic**: Implemented a robust `usePointerLock` hook. The mouse now automatically unlocks when the player dies, finishes a level, or pauses, and reliably re-locks when resuming gameplay or starting a new level.
+
 ## [0.2.14] - 2026-01-29
 
 ### Fixed

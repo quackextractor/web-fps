@@ -30,6 +30,7 @@ import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";
 import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
+import { usePointerLock } from "@/hooks/use-pointer-lock";
 
 const FOV = Math.PI / 3;
 const MOVE_SPEED = 0.08;
@@ -1770,6 +1771,9 @@ export default function DoomGame() {
   }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame, settings, updateSetting]);
 
   // Mouse controls
+  const { lock, unlock, isLocked } = usePointerLock(canvasRef as React.RefObject<HTMLElement>, gameState === "playing");
+
+  // Re-lock on click if we are supposed to be playing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1777,8 +1781,8 @@ export default function DoomGame() {
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 0) { // Left click
         mouseDownRef.current = true;
-        if (gameStateRef.current === "playing") {
-          canvas.requestPointerLock();
+        if (gameStateRef.current === "playing" && !isLocked) {
+          lock();
         }
       }
     };
@@ -1813,7 +1817,7 @@ export default function DoomGame() {
       canvas.removeEventListener("wheel", handleWheel);
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [switchWeapon]);
+  }, [switchWeapon, lock, isLocked]);
 
   // Handle Resolution
   useEffect(() => {
