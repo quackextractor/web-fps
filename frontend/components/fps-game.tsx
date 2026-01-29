@@ -32,6 +32,7 @@ import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
 import * as Sprites from "@/engine/graphics/Sprites";
+import { shadeColor } from "@/engine/graphics/Sprites";
 
 const FOV = Math.PI / 3;
 const MOVE_SPEED = 0.08;
@@ -2099,10 +2100,4 @@ export default function DoomGame() {
   );
 }
 
-function shadeColor(color: string, factor: number): string {
-  const hex = color.replace("#", "");
-  const r = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(0, 2), 16) * factor)));
-  const g = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(2, 4), 16) * factor)));
-  const b = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(4, 6), 16) * factor)));
-  return `rgb(${r}, ${g}, ${b})`;
-}
+// shadeColor is now imported from @/engine/graphics/Sprites
