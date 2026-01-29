@@ -3,14 +3,6 @@
 All notable changes to this project will be documented in this file.
 
 
-## [0.2.23] - 2026-01-29
-
-### Added
--   **Frontend Testing Suite**: Implemented a comprehensive testing environment using Vitest and React Testing Library.
-    -   Added `npm test` for fast, headless test execution.
-    -   Added `npm run test:ui` for an interactive browser-based test reporter.
-    -   Added unit tests for `SettingsMenu` and `FPSGame` components.
-
 ## [0.2.22] - 2026-01-29
 
 ### Changed
