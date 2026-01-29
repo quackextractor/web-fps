@@ -488,7 +488,7 @@ export const drawWeapon = (
     flash: number,
     screenWidth: number,
     screenHeight: number,
-    unlockedWeapons?: Set<WeaponType> // Optional for now if needed
+
 ) => {
     const bob = player.isMoving ? Math.sin(player.bobPhase) * 10 : 0;
     const weaponX = screenWidth / 2;

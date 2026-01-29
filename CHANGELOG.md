@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.25] - 2026-01-29
+
+### Fixed
+-   **Critical AI Bug**: Implemented missing `SpatialGrid` update logic. The AI now correctly updates the spatial grid each physics tick, preventing enemies from freezing or using stale position data.
+-   **Input Race Condition**: Moved mouse rotation logic from `gameLoop` back to `fixedUpdate`. This ensures mouse and keyboard inputs are processed atomically, eliminating jitter and potential input overwrites.
+-   **Physics Consistency**: Verified and standardized projectile physics scaling (60Hz tick rate), removing confusing TODO comments.
+-   **Code Quality**: Fixed function signature mismatches in `canvas-renderer.ts` and `fps-game.tsx` (removed unused `unlockedWeapons` argument).
+
 ## [0.2.24] - 2026-01-29
 
 ### Changed
