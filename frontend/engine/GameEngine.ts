@@ -16,11 +16,11 @@ import {
     PickupType,
     type Enemy,
     type Projectile
-} from "@/lib/fps-engine"; // [Source 25]
-import { updateEnemyAI } from "@/lib/enemy-ai"; // [Source 25]
-import { soundManager } from "@/lib/sound-manager"; // [Source 25]
+} from "@/lib/fps-engine";
+import { updateEnemyAI } from "@/lib/enemy-ai";
+import { soundManager } from "@/lib/sound-manager";
 
-// Callback type for communicating high-level state changes to React [Source 26]
+// Callback type for communicating high-level state changes to React
 type GameEvent = "victory" | "dead" | "levelComplete";
 
 export class GameEngine {
@@ -29,17 +29,17 @@ export class GameEngine {
     renderer: Renderer;
     private onEvent: (event: GameEvent) => void;
 
-    // Loop Variables [Source 29-30]
+    // Loop Variables
     private lastTime = 0;
     private accumulator = 0;
-    private readonly TICK_RATE = 1000 / 60; // Fixed 60hz update [Source 26]
+    private readonly TICK_RATE = 1000 / 60; // Fixed 60hz update
     private animationId: number = 0;
     private isRunning = false;
-    private lastShotTime = 0; // [Source 29]
+    private lastShotTime = 0;
 
     // Settings
     mouseSensitivity = 1.0;
-    turnSpeed = 1.0; // [Source 3]
+    turnSpeed = 1.0;
 
     constructor(canvas: HTMLCanvasElement, onEvent: (event: GameEvent) => void) {
         this.state = new StateManager();
@@ -47,7 +47,7 @@ export class GameEngine {
         this.renderer = new Renderer(canvas);
         this.onEvent = onEvent;
 
-        // Attach input listeners to the canvas/window [Source 210]
+        // Attach input listeners to the canvas/window
         this.input.attach(canvas);
     }
 
@@ -70,12 +70,12 @@ export class GameEngine {
         this.input.detach(canvas);
     }
 
-    // The main loop driver [Source 57]
+    // The main loop driver
     private loop = (time: number) => {
         if (!this.isRunning) return;
 
         // Calculate delta time
-        const deltaTime = Math.min(time - this.lastTime, 100); // Cap to prevent death spiral [Source 57]
+        const deltaTime = Math.min(time - this.lastTime, 100); // Cap to prevent death spiral
         this.lastTime = time;
         this.accumulator += deltaTime;
 
@@ -92,24 +92,24 @@ export class GameEngine {
 
     // --- Core Game Logic ---
 
-    // Replaces the huge fixedUpdate function in fps-game.tsx [Source 45-56]
+    // Replaces the huge fixedUpdate function in fps-game.tsx
     private fixedUpdate(dt: number) {
         const { player } = this.state;
         const level = LEVELS[this.state.currentLevelIdx];
 
-        // 1. Movement Logic [Source 45-48]
+        // 1. Movement Logic
         let newX = player.x;
         let newY = player.y;
         let newAngle = player.angle;
         let isMoving = false;
 
-        // Mouse Rotation [Source 45]
+        // Mouse Rotation
         const mouseMove = this.input.getAndResetMouseMovement();
         if (mouseMove !== 0) {
             newAngle += mouseMove * 0.003 * this.mouseSensitivity;
         }
 
-        // Keyboard Rotation (Arrow Keys) [Source 48]
+        // Keyboard Rotation (Arrow Keys)
         if (this.input.keys.has("arrowleft")) newAngle -= 0.05 * this.turnSpeed;
         if (this.input.keys.has("arrowright")) newAngle += 0.05 * this.turnSpeed;
         if (this.input.keys.has("q")) newAngle -= 0.05 * this.turnSpeed;
@@ -119,9 +119,9 @@ export class GameEngine {
         const moveY = Math.sin(newAngle);
         const strafeX = Math.cos(newAngle - Math.PI / 2);
         const strafeY = Math.sin(newAngle - Math.PI / 2);
-        const SPEED = 0.08; // [Source 26]
+        const SPEED = 0.08;
 
-        // WASD / Arrow Movement with Collision [Source 46-48]
+        // WASD / Arrow Movement with Collision
         if (this.input.keys.has("w") || this.input.keys.has("arrowup")) {
             const testX = newX + moveX * SPEED;
             const testY = newY + moveY * SPEED;
@@ -151,12 +151,12 @@ export class GameEngine {
             isMoving = true;
         }
 
-        // 2. Attack Handling [Source 48]
+        // 2. Attack Handling
         if (this.input.keys.has(" ") || this.input.keys.has("f") || this.input.mouseDown) {
             this.handleAttack();
         }
 
-        // 3. Update Player State [Source 49]
+        // 3. Update Player State
         this.state.player.x = newX;
         this.state.player.y = newY;
         this.state.player.angle = newAngle;
@@ -165,7 +165,7 @@ export class GameEngine {
         // Bobbing logic
         if (isMoving) this.state.player.bobPhase += dt * 0.012;
 
-        // Melee Animation [Source 49]
+        // Melee Animation
         if (this.state.player.isMeleeing) {
             this.state.player.meleeFrame += dt * 0.02;
             if (this.state.player.meleeFrame > 1) {
@@ -174,14 +174,14 @@ export class GameEngine {
             }
         }
 
-        // Weapon Switching [Source 125]
+        // Weapon Switching
         if (this.input.keys.has("1")) this.switchWeapon(WeaponType.FIST);
         if (this.input.keys.has("2")) this.switchWeapon(WeaponType.CHAINSAW);
         if (this.input.keys.has("3")) this.switchWeapon(WeaponType.PISTOL);
         if (this.input.keys.has("4")) this.switchWeapon(WeaponType.SHOTGUN);
         if (this.input.keys.has("5")) this.switchWeapon(WeaponType.CHAINGUN);
 
-        // 4. Update Enemies (AI) [Source 53-54]
+        // 4. Update Enemies (AI)
         const now = performance.now();
         for (const enemy of this.state.enemies) {
             if (enemy.state === "dead") {
@@ -202,20 +202,20 @@ export class GameEngine {
                 this.state.projectileId++;
             }
 
-            enemy.animFrame = (enemy.animFrame + 1) % 120; // [Source 54]
+            enemy.animFrame = (enemy.animFrame + 1) % 120;
         }
 
-        // 5. Update Projectiles [Source 55-56]
+        // 5. Update Projectiles
         this.updateProjectiles(level);
 
-        // 6. Handle Pickups [Source 49-52]
+        // 6. Handle Pickups
         this.handlePickups();
 
-        // 7. Flash Effects Decay [Source 49]
+        // 7. Flash Effects Decay
         if (this.state.shootFlash > 0) this.state.shootFlash--;
         if (this.state.hurtFlash > 0) this.state.hurtFlash -= 0.5;
 
-        // 8. Check Level Exit [Source 52]
+        // 8. Check Level Exit
         const exitDist = getDistance(level.exitX, level.exitY, player.x, player.y);
         const aliveEnemies = this.state.enemies.filter(e => e.state !== "dead").length;
 
@@ -232,7 +232,7 @@ export class GameEngine {
         const weapon = WEAPON_CONFIG[player.weapon];
         const now = performance.now();
 
-        // Fire Rate Check [Source 39]
+        // Fire Rate Check
         if (now - this.lastShotTime < weapon.fireRate) return;
 
         // Ammo Check
@@ -242,7 +242,7 @@ export class GameEngine {
         }
 
         this.lastShotTime = now;
-        this.state.shootFlash = weapon.isMelee ? 4 : 8; // [Source 39]
+        this.state.shootFlash = weapon.isMelee ? 4 : 8;
         soundManager.playShoot(player.weapon);
 
         // Animation triggers
@@ -253,12 +253,12 @@ export class GameEngine {
 
         const level = LEVELS[this.state.currentLevelIdx];
 
-        // Pellet Loop (Shotguns shoot multiple, Pistols shoot 1) [Source 40]
+        // Pellet Loop (Shotguns shoot multiple, Pistols shoot 1)
         for (let p = 0; p < weapon.pellets; p++) {
             const spreadAngle = player.angle + (Math.random() - 0.5) * weapon.spread;
 
             if (weapon.isMelee) {
-                // Melee Hit Logic [Source 40-41]
+                // Melee Hit Logic
                 for (const enemy of this.state.enemies) {
                     if (enemy.state === "dead") continue;
 
@@ -273,7 +273,7 @@ export class GameEngine {
                     }
                 }
             } else {
-                // Raycast / Hitscan Logic [Source 41-43]
+                // Raycast / Hitscan Logic
                 const hitResult = castRay(level.map, player.x, player.y, spreadAngle);
 
                 let closestHitIndex = -1;
@@ -309,7 +309,7 @@ export class GameEngine {
     }
 
     private damageEnemy(enemy: Enemy, baseDamage: number) {
-        // Randomized damage [Source 41]
+        // Randomized damage
         const damage = baseDamage * (0.8 + Math.random() * 0.4);
         enemy.health -= damage;
 
@@ -317,7 +317,7 @@ export class GameEngine {
             enemy.state = "dead";
             enemy.animFrame = 0;
             this.state.kills++;
-            this.state.totalKills++; // [Source 37]
+            this.state.totalKills++;
             soundManager.playEnemyDeath(enemy.type);
         } else {
             enemy.state = "hurt";
@@ -325,7 +325,7 @@ export class GameEngine {
     }
 
     private damagePlayer(amount: number) {
-        // Armor reduction logic [Source 53]
+        // Armor reduction logic
         if (this.state.player.armor > 0) {
             const armorAbsorb = Math.min(this.state.player.armor, amount * 0.5);
             this.state.player.armor -= armorAbsorb;
@@ -343,7 +343,7 @@ export class GameEngine {
     }
 
     private updateProjectiles(level: any) {
-        // Filter returns true to keep, false to remove [Source 55]
+        // Filter returns true to keep, false to remove
         this.state.projectiles = this.state.projectiles.filter(proj => {
             proj.x += proj.dx;
             proj.y += proj.dy;
@@ -366,7 +366,6 @@ export class GameEngine {
     }
 
     private handlePickups() {
-        // [Source 50-52]
         for (const pickup of this.state.pickups) {
             if (pickup.collected) continue;
 
