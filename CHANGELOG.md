@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.14] - 2026-01-29
+
+### Fixed
+-   **UI Scrollbars**: Removed the global window scrollbar that was appearing on the main menu and game view.
+-   **Input Handling**: Fixed an issue where using Arrow Keys to move would cause the browser window to scroll.
+
 ## [0.2.13] - 2026-01-29
 
 ### Fixed

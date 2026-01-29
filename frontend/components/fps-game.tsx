@@ -1699,7 +1699,7 @@ export default function DoomGame() {
       const key = e.key.toLowerCase();
       keysRef.current.add(key);
 
-      if ((key === " " || key === "f") && gameStateRef.current === "playing") {
+      if ((key === " " || key === "f" || key.startsWith("arrow")) && gameStateRef.current === "playing") {
         e.preventDefault();
       }
 
@@ -1895,8 +1895,8 @@ export default function DoomGame() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4 w-full h-full">
-      <div className="relative w-full h-full max-w-[100vw] max-h-[100vh] flex items-center justify-center aspect-video">
+    <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden">
+      <div className="relative w-full h-full flex items-center justify-center aspect-video">
         <canvas
           ref={canvasRef}
           className="border-4 border-red-900 rounded-lg cursor-none w-full h-full object-contain"
