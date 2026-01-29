@@ -18,18 +18,17 @@ import {
   PICKUP_CONFIG,
   WALL_COLORS,
   LEVELS,
-  castRay,
   checkCollision,
+  castRay,
   hasLineOfSight,
   getDistance,
   normalizeAngle,
   findPath,
-  hasClearWalkingPath,
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
-import { updateEnemyAI, SpatialGrid } from "@/lib/enemy-ai";
+import { updateEnemyAI } from "@/lib/enemy-ai";
 import { GAME_CONFIG } from "@/lib/game-config";
-import { renderEnemy, renderProjectile, renderPickup, drawWeapon, drawHUD, renderDebugView, shadeColor } from "@/lib/canvas-renderer";
+import { renderScene, drawWeapon, drawHUD, renderDebugView } from "@/lib/canvas-renderer";
 import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
@@ -78,7 +77,7 @@ export default function DoomGame() {
 
   const playerRef = useRef<Player>(createInitialPlayer());
   const enemiesRef = useRef<Enemy[]>([]);
-  const spatialGridRef = useRef<SpatialGrid>(new SpatialGrid());
+
   const projectilesRef = useRef<Projectile[]>([]);
   const pickupsRef = useRef<Pickup[]>([]);
   const killsRef = useRef(0);
@@ -381,13 +380,9 @@ export default function DoomGame() {
       let newAngle = player.angle;
       let isMoving = false;
 
-      // Update spatial grid for this tick
-      spatialGridRef.current.update(enemiesRef.current);
 
-      if (mouseMovementRef.current !== 0) {
-        newAngle += mouseMovementRef.current * GAME_CONFIG.MOVEMENT.ROTATION_SPEED * settingsRef.current.mouseSensitivity;
-        mouseMovementRef.current = 0;
-      }
+
+      // Mouse input handled in gameLoop
 
       const moveX = Math.cos(newAngle);
       const moveY = Math.sin(newAngle);
@@ -527,7 +522,7 @@ export default function DoomGame() {
           enemy,
           currentPlayer,
           level.map,
-          spatialGridRef.current, // Use grid
+          enemiesRef.current,
           dt,
           now,
           projectileIdRef.current
@@ -598,6 +593,13 @@ export default function DoomGame() {
       const deltaTime = time - lastTimeRef.current;
       lastTimeRef.current = time;
 
+      // Handle mouse input per-frame for smoothness
+      if (mouseMovementRef.current !== 0 && gameStateRef.current === "playing") {
+        const rotation = mouseMovementRef.current * GAME_CONFIG.MOVEMENT.ROTATION_SPEED * settingsRef.current.mouseSensitivity;
+        playerRef.current.angle += rotation;
+        mouseMovementRef.current = 0;
+      }
+
       // Cap deltaTime to prevent spiral of death if tab is backgrounded
       const cappedDeltaTime = Math.min(deltaTime, 100);
 
@@ -667,98 +669,32 @@ export default function DoomGame() {
     flash: number,
     level: Level
   ) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-    const NUM_RAYS = numRaysRef.current;
+    const { width, height } = ctx.canvas;
 
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    const gradient = ctx.createLinearGradient(0, 0, 0, SCREEN_HEIGHT / 2);
-    gradient.addColorStop(0, "#1a0505");
-    gradient.addColorStop(1, "#3d0a0a");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-
-    const floorGradient = ctx.createLinearGradient(0, SCREEN_HEIGHT / 2, 0, SCREEN_HEIGHT);
-    floorGradient.addColorStop(0, "#2a2a2a");
-    floorGradient.addColorStop(1, "#1a1a1a");
-    ctx.fillStyle = floorGradient;
-    ctx.fillRect(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-
-    const zBuffer: number[] = [];
-    const rayWidth = SCREEN_WIDTH / NUM_RAYS;
-
-    for (let i = 0; i < NUM_RAYS; i++) {
-      const rayAngle = player.angle - FOV / 2 + (i / NUM_RAYS) * FOV;
-      const { distance, wallType, side } = castRay(level.map, player.x, player.y, rayAngle);
-
-      const correctedDist = distance * Math.cos(rayAngle - player.angle);
-      zBuffer[i] = correctedDist;
-
-      const wallHeight = Math.min((SCREEN_HEIGHT / correctedDist) * 1.2, SCREEN_HEIGHT);
-      const wallTop = (SCREEN_HEIGHT - wallHeight) / 2;
-
-      const colors = WALL_COLORS[wallType] || WALL_COLORS[1];
-      const baseColor = side === 0 ? colors.light : colors.dark;
-
-      const shade = Math.max(0.2, 1 - correctedDist / 15);
-      ctx.fillStyle = shadeColor(baseColor, shade);
-      ctx.fillRect(Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight));
-    }
-
-    const sprites: { type: 'enemy' | 'projectile' | 'pickup'; data: Enemy | Projectile | Pickup; dist: number }[] = [];
-
-    for (const enemy of enemies) {
-      if (enemy.state !== "dead" || enemy.animFrame < 30) {
-        sprites.push({
-          type: 'enemy',
-          data: enemy,
-          dist: getDistance(enemy.x, enemy.y, player.x, player.y),
-        });
-      }
-    }
-
-    for (const proj of projectiles) {
-      sprites.push({
-        type: 'projectile',
-        data: proj,
-        dist: getDistance(proj.x, proj.y, player.x, player.y),
-      });
-    }
-
-    for (const pickup of pickups) {
-      if (!pickup.collected) {
-        sprites.push({
-          type: 'pickup',
-          data: pickup,
-          dist: getDistance(pickup.x, pickup.y, player.x, player.y),
-        });
-      }
-    }
-
-    sprites.sort((a, b) => b.dist - a.dist);
-
-    for (const sprite of sprites) {
-      if (sprite.type === 'enemy') {
-        renderEnemy(ctx, player, sprite.data as Enemy, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
-      } else if (sprite.type === 'projectile') {
-        renderProjectile(ctx, player, sprite.data as Projectile, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
-      } else {
-        renderPickup(ctx, player, sprite.data as Pickup, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
-      }
-    }
+    // Use the consolidated renderScene function
+    renderScene(
+      ctx,
+      player,
+      level,
+      enemies,
+      projectiles,
+      pickups,
+      width,
+      height,
+      numRaysRef.current,
+      FOV
+    );
 
     if (flash > 0) {
       ctx.fillStyle = `rgba(255, 200, 100, ${flash / 20})`;
-      ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      ctx.fillRect(0, 0, width, height);
     }
 
-    drawWeapon(ctx, player, flash, screenWidthRef.current, screenHeightRef.current, weaponsUnlockedRef.current);
-    drawHUD(ctx, player, enemiesRef.current, LEVELS[currentLevel], pickupsRef.current, weaponsUnlockedRef.current, settingsRef.current, screenWidthRef.current, screenHeightRef.current);
+    drawWeapon(ctx, player, flash, width, height, weaponsUnlockedRef.current);
+    drawHUD(ctx, player, enemies, level, pickups, weaponsUnlockedRef.current, settingsRef.current, width, height);
 
     if (settingsRef.current.debugMode) {
-      renderDebugView(ctx, LEVELS[currentLevel], player, enemiesRef.current, screenWidthRef.current, screenHeightRef.current);
+      renderDebugView(ctx, level, player, enemies, width, height);
     }
 
     // FPS counter
