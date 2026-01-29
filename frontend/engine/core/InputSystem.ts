@@ -6,7 +6,7 @@ export class InputSystem {
     private handleKeyDown = (e: KeyboardEvent) => {
         const key = e.key.toLowerCase();
         this.keys.add(key);
-        // Prevent scrolling for game keys
+        // Prevent scrolling for game keys [Source 123]
         if ((key === " " || key === "f" || key.startsWith("arrow"))) {
             e.preventDefault();
         }
@@ -17,7 +17,7 @@ export class InputSystem {
     };
 
     private handleMouseMove = (e: MouseEvent) => {
-        // Only track movement if pointer is locked
+        // Only track movement if pointer is locked [Source 128]
         if (document.pointerLockElement) {
             this.mouseMovement += e.movementX;
         }

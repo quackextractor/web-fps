@@ -19,7 +19,7 @@ export class StateManager {
     hurtFlash = 0;
     projectileId = 0;
 
-    // Unlock Progress
+    // Unlock Progress [Source 28]
     unlockedWeapons = new Set<WeaponType>([WeaponType.FIST, WeaponType.PISTOL]);
 
     constructor() {
@@ -41,7 +41,7 @@ export class StateManager {
 
         this.currentLevelIdx = levelIndex;
 
-        // Logic from
+        // Logic from [Source 32-34]
         if (!preservePlayer) {
             this.player = this.createDefaultPlayer();
             this.kills = 0; // Reset kills if new game
@@ -51,12 +51,12 @@ export class StateManager {
         this.player.y = level.startY;
         this.player.angle = level.startAngle;
 
-        // Difficulty multipliers
+        // Difficulty multipliers [Source 32]
         let mult = { damage: 1, health: 1, speed: 1 };
         if (difficulty === "easy") mult = { damage: 0.5, health: 0.75, speed: 0.8 };
         if (difficulty === "hard") mult = { damage: 1.5, health: 1.25, speed: 1.2 };
 
-        // Initialize enemies centered in tiles
+        // Initialize enemies centered in tiles [Source 34]
         this.enemies = level.enemies.map((e, i) => ({
             ...e,
             x: e.x + 0.5,
