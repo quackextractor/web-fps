@@ -31,6 +31,7 @@ import { updateEnemyAI } from "@/lib/enemy-ai";
 import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
+import * as Sprites from "@/engine/graphics/Sprites";
 
 const FOV = Math.PI / 3;
 const MOVE_SPEED = 0.08;
@@ -1006,28 +1007,28 @@ export default function DoomGame() {
 
     switch (enemy.type) {
       case EnemyType.IMP:
-        drawImp(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawImp(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.DEMON:
-        drawDemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawDemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.SOLDIER:
-        drawSoldier(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawSoldier(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.CACODEMON:
-        drawCacodemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawCacodemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.BARON:
-        drawBaron(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawBaron(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.ZOMBIE:
-        drawZombie(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawZombie(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.HELLKNIGHT:
-        drawHellKnight(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawHellKnight(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
       case EnemyType.CYBERDEMON:
-        drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+        Sprites.drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
         break;
     }
 
@@ -1384,19 +1385,19 @@ export default function DoomGame() {
 
     switch (player.weapon) {
       case WeaponType.FIST:
-        drawFist(ctx, weaponX + meleeSwing, weaponY, flash);
+        Sprites.drawFist(ctx, weaponX + meleeSwing, weaponY, flash);
         break;
       case WeaponType.CHAINSAW:
-        drawChainsaw(ctx, weaponX + meleeSwing * 0.5, weaponY, flash);
+        Sprites.drawChainsaw(ctx, weaponX + meleeSwing * 0.5, weaponY, flash);
         break;
       case WeaponType.PISTOL:
-        drawPistol(ctx, weaponX, weaponY, flash);
+        Sprites.drawPistol(ctx, weaponX, weaponY, flash);
         break;
       case WeaponType.SHOTGUN:
-        drawShotgun(ctx, weaponX, weaponY, flash);
+        Sprites.drawShotgun(ctx, weaponX, weaponY, flash);
         break;
       case WeaponType.CHAINGUN:
-        drawChaingun(ctx, weaponX, weaponY, flash);
+        Sprites.drawChaingun(ctx, weaponX, weaponY, flash);
         break;
     }
   };
