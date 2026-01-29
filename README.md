@@ -22,6 +22,18 @@ A DOOM-style FPS game built with React, Next.js, and Canvas API.
 
 3.  Open [http://localhost:3000](http://localhost:3000) with your browser.
 
+## Testing
+
+Run the automated test suite to verify game logic and UI components:
+
+```bash
+# Run tests in headless mode (CI/CD)
+npm test
+
+# Run tests with interactive UI reporter
+npm run test:ui
+```
+
 ## Controls
 -   **WASD**: Move
 -   **Mouse**: Look
