@@ -27,16 +27,15 @@ import {
   hasClearWalkingPath,
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
-import { updateEnemyAI } from "@/lib/enemy-ai";
+import { updateEnemyAI, SpatialGrid } from "@/lib/enemy-ai";
+import { GAME_CONFIG } from "@/lib/game-config";
+import { renderEnemy, renderProjectile, renderPickup, drawWeapon, drawHUD, renderDebugView, shadeColor } from "@/lib/canvas-renderer";
 import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
 
-const FOV = Math.PI / 3;
-const MOVE_SPEED = 0.08;
-const ROTATION_SPEED = 0.003;
-const PROJECTILE_SPEED = 0.18;
-const TICK_RATE = 1000 / 60;
+const FOV = GAME_CONFIG.RENDERING.FOV;
+const TICK_RATE = GAME_CONFIG.PHYSICS.TICK_RATE;
 
 type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete";
 
@@ -61,6 +60,12 @@ export default function DoomGame() {
     previousGameStateRef.current = previousGameState;
   }, [previousGameState]);
 
+  // Fix for stale closure in game loop
+  const settingsRef = useRef(settings);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
   const [savedProgress, setSavedProgress] = useState<SavedProgress>({
     unlockedLevels: new Set([0]),
     unlockedWeapons: new Set([WeaponType.FIST, WeaponType.PISTOL]),
@@ -73,6 +78,7 @@ export default function DoomGame() {
 
   const playerRef = useRef<Player>(createInitialPlayer());
   const enemiesRef = useRef<Enemy[]>([]);
+  const spatialGridRef = useRef<SpatialGrid>(new SpatialGrid());
   const projectilesRef = useRef<Projectile[]>([]);
   const pickupsRef = useRef<Pickup[]>([]);
   const killsRef = useRef(0);
@@ -375,8 +381,11 @@ export default function DoomGame() {
       let newAngle = player.angle;
       let isMoving = false;
 
+      // Update spatial grid for this tick
+      spatialGridRef.current.update(enemiesRef.current);
+
       if (mouseMovementRef.current !== 0) {
-        newAngle += mouseMovementRef.current * ROTATION_SPEED * settings.mouseSensitivity;
+        newAngle += mouseMovementRef.current * GAME_CONFIG.MOVEMENT.ROTATION_SPEED * settingsRef.current.mouseSensitivity;
         mouseMovementRef.current = 0;
       }
 
@@ -385,38 +394,40 @@ export default function DoomGame() {
       const strafeX = Math.cos(newAngle - Math.PI / 2);
       const strafeY = Math.sin(newAngle - Math.PI / 2);
 
+      const speed = GAME_CONFIG.MOVEMENT.PLAYER_SPEED;
+
       if (keysRef.current.has("w") || keysRef.current.has("arrowup")) {
-        const testX = newX + moveX * MOVE_SPEED;
-        const testY = newY + moveY * MOVE_SPEED;
+        const testX = newX + moveX * speed;
+        const testY = newY + moveY * speed;
         if (!checkCollision(level.map, testX, newY)) newX = testX;
         if (!checkCollision(level.map, newX, testY)) newY = testY;
         isMoving = true;
       }
       if (keysRef.current.has("s") || keysRef.current.has("arrowdown")) {
-        const testX = newX - moveX * MOVE_SPEED;
-        const testY = newY - moveY * MOVE_SPEED;
+        const testX = newX - moveX * speed;
+        const testY = newY - moveY * speed;
         if (!checkCollision(level.map, testX, newY)) newX = testX;
         if (!checkCollision(level.map, newX, testY)) newY = testY;
         isMoving = true;
       }
       if (keysRef.current.has("a")) {
-        const testX = newX + strafeX * MOVE_SPEED;
-        const testY = newY + strafeY * MOVE_SPEED;
+        const testX = newX + strafeX * speed;
+        const testY = newY + strafeY * speed;
         if (!checkCollision(level.map, testX, newY)) newX = testX;
         if (!checkCollision(level.map, newX, testY)) newY = testY;
         isMoving = true;
       }
       if (keysRef.current.has("d")) {
-        const testX = newX - strafeX * MOVE_SPEED;
-        const testY = newY - strafeY * MOVE_SPEED;
+        const testX = newX - strafeX * speed;
+        const testY = newY - strafeY * speed;
         if (!checkCollision(level.map, testX, newY)) newX = testX;
         if (!checkCollision(level.map, newX, testY)) newY = testY;
         isMoving = true;
       }
 
-      if (keysRef.current.has("arrowleft")) newAngle -= 0.05 * settings.turnSpeed;
-      if (keysRef.current.has("arrowright")) newAngle += 0.05 * settings.turnSpeed;
-      if (keysRef.current.has("q")) newAngle -= 0.05 * settings.turnSpeed;
+      if (keysRef.current.has("arrowleft")) newAngle -= 0.05 * settingsRef.current.turnSpeed;
+      if (keysRef.current.has("arrowright")) newAngle += 0.05 * settingsRef.current.turnSpeed;
+      if (keysRef.current.has("q")) newAngle -= 0.05 * settingsRef.current.turnSpeed;
 
       if (keysRef.current.has(" ") || keysRef.current.has("f") || mouseDownRef.current) {
         attack();
@@ -435,7 +446,7 @@ export default function DoomGame() {
         x: newX,
         y: newY,
         angle: newAngle,
-        bobPhase: isMoving ? player.bobPhase + dt * 0.012 : 0,
+        bobPhase: isMoving ? player.bobPhase + dt * GAME_CONFIG.MOVEMENT.BOB_SPEED : 0,
         isMoving,
       };
 
@@ -502,14 +513,22 @@ export default function DoomGame() {
           continue;
         }
 
+        // Update Spatial Grid once per frame/tick
+        // Optimization: Updating grid inside the loop is bad?
+        // We should update it BEFORE the loop.
+        // But fixedUpdate might run multiple times.
+        // Let's update it at start of fixedUpdate? 
+        // Or here?
+        // Let's do it at start of fixedUpdate actually.
+
         const now = performance.now();
 
         const result = updateEnemyAI(
           enemy,
           currentPlayer,
           level.map,
-          enemiesRef.current,
-          dt, // ensure dt is available, yes fixedUpdate(dt)
+          spatialGridRef.current, // Use grid
+          dt,
           now,
           projectileIdRef.current
         );
@@ -590,7 +609,7 @@ export default function DoomGame() {
         lastFPSTimeRef.current = time;
       }
 
-      accumulatorRef.current += cappedDeltaTime * settings.timeScale;
+      accumulatorRef.current += cappedDeltaTime * settingsRef.current.timeScale;
 
       while (accumulatorRef.current >= TICK_RATE) {
         fixedUpdate(TICK_RATE);
@@ -637,90 +656,7 @@ export default function DoomGame() {
     }
   }
 
-  const renderDebugView = (
-    ctx: CanvasRenderingContext2D,
-    level: Level,
-    player: Player,
-    enemies: Enemy[]
-  ) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
 
-    // Semi-transparent background
-    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    const scale = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) / Math.max(level.map.length, level.map[0].length) * 0.8;
-    const offsetX = SCREEN_WIDTH / 2 - (level.map[0].length * scale) / 2;
-    const offsetY = SCREEN_HEIGHT / 2 - (level.map.length * scale) / 2;
-
-    // Draw Map
-    for (let y = 0; y < level.map.length; y++) {
-      for (let x = 0; x < level.map[y].length; x++) {
-        const cell = level.map[y][x];
-        if (cell > 0) {
-          ctx.fillStyle = cell === 9 ? "#0f0" : "#888";
-          ctx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
-        }
-        ctx.strokeStyle = "#333";
-        ctx.strokeRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
-      }
-    }
-
-    // Draw Player
-    ctx.fillStyle = "#0af";
-    ctx.beginPath();
-    ctx.arc(offsetX + player.x * scale, offsetY + player.y * scale, 0.3 * scale, 0, Math.PI * 2);
-    ctx.fill();
-    // Direction
-    ctx.strokeStyle = "#fff";
-    ctx.beginPath();
-    ctx.moveTo(offsetX + player.x * scale, offsetY + player.y * scale);
-    ctx.lineTo(
-      offsetX + (player.x + Math.cos(player.angle) * 2) * scale,
-      offsetY + (player.y + Math.sin(player.angle) * 2) * scale
-    );
-    ctx.stroke();
-
-    // Draw Enemies
-    for (const enemy of enemies) {
-      if (enemy.state === "dead") continue;
-
-      ctx.fillStyle = enemy.state === "chasing" ? "#f00" : "#ff0";
-      // Actual collision radius (0.3)
-      ctx.beginPath();
-      ctx.arc(offsetX + enemy.x * scale, offsetY + enemy.y * scale, 0.3 * scale, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#fff";
-      ctx.stroke();
-
-      // Stuck indicator
-      if (enemy.stuckFrameCount > 30) {
-        ctx.fillStyle = "#fff";
-        ctx.font = "12px monospace";
-        ctx.fillText("STUCK", offsetX + enemy.x * scale - 10, offsetY + enemy.y * scale - 10);
-      }
-
-      // Draw Path
-      if (enemy.path && enemy.path.length > 0) {
-        ctx.strokeStyle = "#0f0";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(offsetX + enemy.x * scale, offsetY + enemy.y * scale);
-        for (const pt of enemy.path) {
-          ctx.lineTo(offsetX + pt.x * scale, offsetY + pt.y * scale);
-        }
-        ctx.stroke();
-        ctx.lineWidth = 1;
-
-        // Draw Nodes
-        ctx.fillStyle = "#0f0";
-        for (const pt of enemy.path) {
-          ctx.fillRect(offsetX + pt.x * scale - 2, offsetY + pt.y * scale - 2, 4, 4);
-        }
-      }
-    }
-  };
 
   const render = (
     ctx: CanvasRenderingContext2D,
@@ -805,11 +741,11 @@ export default function DoomGame() {
 
     for (const sprite of sprites) {
       if (sprite.type === 'enemy') {
-        renderEnemy(ctx, player, sprite.data as Enemy, sprite.dist, zBuffer);
+        renderEnemy(ctx, player, sprite.data as Enemy, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
       } else if (sprite.type === 'projectile') {
-        renderProjectile(ctx, player, sprite.data as Projectile, sprite.dist, zBuffer);
+        renderProjectile(ctx, player, sprite.data as Projectile, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
       } else {
-        renderPickup(ctx, player, sprite.data as Pickup, sprite.dist, zBuffer);
+        renderPickup(ctx, player, sprite.data as Pickup, sprite.dist, zBuffer, screenWidthRef.current, screenHeightRef.current, numRaysRef.current, FOV);
       }
     }
 
@@ -818,11 +754,11 @@ export default function DoomGame() {
       ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
-    drawWeapon(ctx, player, flash);
-    drawHUD(ctx, player, enemies, level);
+    drawWeapon(ctx, player, flash, screenWidthRef.current, screenHeightRef.current, weaponsUnlockedRef.current);
+    drawHUD(ctx, player, enemiesRef.current, LEVELS[currentLevel], pickupsRef.current, weaponsUnlockedRef.current, settingsRef.current, screenWidthRef.current, screenHeightRef.current);
 
-    if (settings.debugMode) {
-      renderDebugView(ctx, level, player, enemies);
+    if (settingsRef.current.debugMode) {
+      renderDebugView(ctx, LEVELS[currentLevel], player, enemiesRef.current, screenWidthRef.current, screenHeightRef.current);
     }
 
     // FPS counter
@@ -833,878 +769,15 @@ export default function DoomGame() {
     }
   };
 
-  const renderProjectile = (
-    ctx: CanvasRenderingContext2D,
-    player: Player,
-    proj: Projectile,
-    dist: number,
-    zBuffer: number[]
-  ) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-    const NUM_RAYS = numRaysRef.current;
 
-    const dx = proj.x - player.x;
-    const dy = proj.y - player.y;
 
-    const angleToProj = Math.atan2(dy, dx);
-    const relAngle = normalizeAngle(angleToProj - player.angle);
 
-    if (Math.abs(relAngle) > FOV / 2 + 0.2) return;
 
-    const screenX = SCREEN_WIDTH / 2 + (relAngle / FOV) * SCREEN_WIDTH;
-    const size = Math.max(4, (SCREEN_HEIGHT / dist) * proj.size);
 
-    const spriteScreenWidth = size * 2;
-    const startRay = Math.floor(((screenX - spriteScreenWidth / 2) / SCREEN_WIDTH) * NUM_RAYS);
-    const endRay = Math.ceil(((screenX + spriteScreenWidth / 2) / SCREEN_WIDTH) * NUM_RAYS);
 
-    let visible = false;
-    for (let r = Math.max(0, startRay); r <= Math.min(NUM_RAYS - 1, endRay); r++) {
-      if (zBuffer[r] > dist - 0.3) {
-        visible = true;
-        break;
-      }
-    }
-    if (!visible) return;
 
-    ctx.save();
-    ctx.shadowColor = proj.color;
-    ctx.shadowBlur = 15;
-    ctx.fillStyle = proj.color;
-    ctx.beginPath();
-    ctx.arc(screenX, SCREEN_HEIGHT / 2, size, 0, Math.PI * 2);
-    ctx.fill();
 
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(screenX, SCREEN_HEIGHT / 2, size * 0.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  };
 
-  const renderPickup = (
-    ctx: CanvasRenderingContext2D,
-    player: Player,
-    pickup: Pickup,
-    dist: number,
-    zBuffer: number[]
-  ) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-    const NUM_RAYS = numRaysRef.current;
-
-    const dx = pickup.x - player.x;
-    const dy = pickup.y - player.y;
-
-    const angleToPickup = Math.atan2(dy, dx);
-    const relAngle = normalizeAngle(angleToPickup - player.angle);
-
-    if (Math.abs(relAngle) > FOV / 2 + 0.2) return;
-
-    const screenX = SCREEN_WIDTH / 2 + (relAngle / FOV) * SCREEN_WIDTH;
-    const size = Math.max(8, (SCREEN_HEIGHT / dist) * 0.3);
-
-    const startRay = Math.floor(((screenX - size) / SCREEN_WIDTH) * NUM_RAYS);
-    const endRay = Math.ceil(((screenX + size) / SCREEN_WIDTH) * NUM_RAYS);
-
-    let visible = false;
-    for (let r = Math.max(0, startRay); r <= Math.min(NUM_RAYS - 1, endRay); r++) {
-      if (zBuffer[r] > dist - 0.3) {
-        visible = true;
-        break;
-      }
-    }
-    if (!visible) return;
-
-    const config = PICKUP_CONFIG[pickup.type];
-    const bob = Math.sin(performance.now() * 0.003) * size * 0.2;
-    const screenY = SCREEN_HEIGHT / 2 + (SCREEN_HEIGHT / dist) * 0.2 + bob;
-
-    ctx.save();
-    ctx.shadowColor = config.color;
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = config.color;
-
-    if (pickup.type === PickupType.HEALTH || pickup.type === PickupType.MEGAHEALTH) {
-      ctx.fillRect(screenX - size / 4, screenY - size, size / 2, size * 2);
-      ctx.fillRect(screenX - size, screenY - size / 4, size * 2, size / 2);
-    } else if (pickup.type === PickupType.ARMOR) {
-      ctx.beginPath();
-      ctx.moveTo(screenX, screenY - size);
-      ctx.lineTo(screenX + size, screenY - size / 2);
-      ctx.lineTo(screenX + size * 0.8, screenY + size);
-      ctx.lineTo(screenX, screenY + size * 0.7);
-      ctx.lineTo(screenX - size * 0.8, screenY + size);
-      ctx.lineTo(screenX - size, screenY - size / 2);
-      ctx.closePath();
-      ctx.fill();
-    } else {
-      ctx.fillRect(screenX - size, screenY - size, size * 2, size * 2);
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(screenX - size * 0.3, screenY - size * 0.3, size * 0.6, size * 0.6);
-    }
-    ctx.restore();
-  };
-
-  const renderEnemy = (
-    ctx: CanvasRenderingContext2D,
-    player: Player,
-    enemy: Enemy,
-    dist: number,
-    zBuffer: number[]
-  ) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-    const NUM_RAYS = numRaysRef.current;
-
-    const dx = enemy.x - player.x;
-    const dy = enemy.y - player.y;
-
-    const angleToEnemy = Math.atan2(dy, dx);
-    const relAngle = normalizeAngle(angleToEnemy - player.angle);
-
-    if (Math.abs(relAngle) > FOV / 2 + 0.15) return;
-
-    const screenX = SCREEN_WIDTH / 2 + (relAngle / FOV) * SCREEN_WIDTH;
-    const config = ENEMY_CONFIG[enemy.type];
-    const spriteHeight = (SCREEN_HEIGHT / dist) * config.size * 1.5;
-    const spriteWidth = spriteHeight * 0.8;
-    const spriteTop = (SCREEN_HEIGHT - spriteHeight) / 2;
-
-    const spriteLeft = screenX - spriteWidth / 2;
-    const spriteRight = screenX + spriteWidth / 2;
-    const startRay = Math.floor((spriteLeft / SCREEN_WIDTH) * NUM_RAYS);
-    const endRay = Math.ceil((spriteRight / SCREEN_WIDTH) * NUM_RAYS);
-
-    let visibleRays = 0;
-    let totalRays = 0;
-    for (let r = startRay; r <= endRay; r++) {
-      if (r >= 0 && r < NUM_RAYS) {
-        totalRays++;
-        if (zBuffer[r] > dist - 0.3) {
-          visibleRays++;
-        }
-      }
-    }
-
-    if (totalRays === 0 || visibleRays === 0) return;
-
-    const shade = Math.max(0.3, 1 - dist / 12);
-
-    ctx.save();
-
-    ctx.beginPath();
-    for (let r = startRay; r <= endRay; r++) {
-      if (r >= 0 && r < NUM_RAYS && zBuffer[r] > dist - 0.3) {
-        const rayX = (r / NUM_RAYS) * SCREEN_WIDTH;
-        const rayWidth = SCREEN_WIDTH / NUM_RAYS;
-        ctx.rect(rayX, 0, rayWidth + 1, SCREEN_HEIGHT);
-      }
-    }
-    ctx.clip();
-
-    switch (enemy.type) {
-      case EnemyType.IMP:
-        drawImp(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.DEMON:
-        drawDemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.SOLDIER:
-        drawSoldier(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.CACODEMON:
-        drawCacodemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.BARON:
-        drawBaron(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.ZOMBIE:
-        drawZombie(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.HELLKNIGHT:
-        drawHellKnight(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-      case EnemyType.CYBERDEMON:
-        drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-        break;
-    }
-
-    ctx.restore();
-  };
-
-  // All enemy drawing functions remain the same
-  const drawImp = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.3) * h * 0.05 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#8B4513", shade);
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.5 + bounce, w * 0.4, h * 0.4, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.2 + bounce, w * 0.25, h * 0.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = "#ff0";
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.08, y + h * 0.15 + bounce, w * 0.06, h * 0.04, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.08, y + h * 0.15 + bounce, w * 0.06, h * 0.04, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = shadeColor("#654321", shade);
-      for (let i = -2; i <= 2; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x + i * w * 0.1, y + h * 0.05 + bounce);
-        ctx.lineTo(x + i * w * 0.1 - w * 0.03, y + h * 0.15 + bounce);
-        ctx.lineTo(x + i * w * 0.1 + w * 0.03, y + h * 0.15 + bounce);
-        ctx.fill();
-      }
-    }
-    if (enemy.state === "attacking") {
-      ctx.fillStyle = "#f80";
-      ctx.beginPath();
-      ctx.arc(x, y + h * 0.6, w * 0.15, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  };
-
-  const drawDemon = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.4) * h * 0.08 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#FF1493", shade);
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.55 + bounce, w * 0.5, h * 0.4, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.2 + bounce, w * 0.3, h * 0.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#8B0000", shade);
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.2, y + h * 0.15 + bounce);
-      ctx.lineTo(x - w * 0.35, y - h * 0.1 + bounce);
-      ctx.lineTo(x - w * 0.15, y + h * 0.1 + bounce);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.2, y + h * 0.15 + bounce);
-      ctx.lineTo(x + w * 0.35, y - h * 0.1 + bounce);
-      ctx.lineTo(x + w * 0.15, y + h * 0.1 + bounce);
-      ctx.fill();
-      ctx.fillStyle = "#0f0";
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.1, y + h * 0.15 + bounce, w * 0.07, h * 0.05, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.1, y + h * 0.15 + bounce, w * 0.07, h * 0.05, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    if (enemy.state === "melee" || enemy.state === "attacking") {
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.rect(x - w * 0.15, y + h * 0.28 + bounce, w * 0.3, h * 0.08);
-      ctx.fill();
-    }
-  };
-
-  const drawSoldier = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.25) * h * 0.03 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#556B2F", shade);
-    ctx.beginPath();
-    ctx.rect(x - w * 0.25, y + h * 0.3 + bounce, w * 0.5, h * 0.5);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.2 + bounce, w * 0.2, h * 0.18, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#2F4F2F", shade);
-      ctx.beginPath();
-      ctx.ellipse(x, y + h * 0.12 + bounce, w * 0.22, h * 0.12, 0, Math.PI, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillStyle = "#f00";
-      ctx.beginPath();
-      ctx.rect(x - w * 0.12, y + h * 0.17 + bounce, w * 0.24, h * 0.04);
-      ctx.fill();
-      ctx.fillStyle = "#222";
-      ctx.beginPath();
-      ctx.rect(x + w * 0.2, y + h * 0.4 + bounce, w * 0.3, h * 0.06);
-      ctx.fill();
-      if (enemy.state === "attacking") {
-        ctx.fillStyle = "#ff0";
-        ctx.beginPath();
-        ctx.arc(x + w * 0.5, y + h * 0.43 + bounce, w * 0.1, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-  };
-
-  const drawCacodemon = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const float = Math.sin(enemy.animFrame * 0.1) * h * 0.05;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#DC143C", shade);
-    ctx.beginPath();
-    ctx.arc(x, y + h * 0.5 + float, Math.min(w, h) * 0.45, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.ellipse(x, y + h * 0.4 + float, w * 0.2, h * 0.15, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#0f0";
-      ctx.beginPath();
-      ctx.ellipse(x, y + h * 0.4 + float, w * 0.1, h * 0.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.ellipse(x, y + h * 0.4 + float, w * 0.05, h * 0.05, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = shadeColor("#8B0000", shade);
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.3, y + h * 0.3 + float);
-      ctx.lineTo(x - w * 0.5, y + h * 0.1 + float);
-      ctx.lineTo(x - w * 0.25, y + h * 0.35 + float);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.3, y + h * 0.3 + float);
-      ctx.lineTo(x + w * 0.5, y + h * 0.1 + float);
-      ctx.lineTo(x + w * 0.25, y + h * 0.35 + float);
-      ctx.fill();
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.ellipse(x, y + h * 0.65 + float, w * 0.2, h * 0.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#fff";
-      for (let i = -3; i <= 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x + i * w * 0.05, y + h * 0.6 + float);
-        ctx.lineTo(x + i * w * 0.05 - w * 0.02, y + h * 0.7 + float);
-        ctx.lineTo(x + i * w * 0.05 + w * 0.02, y + h * 0.7 + float);
-        ctx.fill();
-      }
-    }
-    if (enemy.state === "attacking") {
-      ctx.save();
-      ctx.fillStyle = "#00f";
-      ctx.shadowColor = "#00f";
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(x, y + h * 0.85, w * 0.12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawBaron = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.2) * h * 0.04 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#228B22", shade);
-    ctx.beginPath();
-    ctx.moveTo(x - w * 0.4, y + h * 0.95 + bounce);
-    ctx.lineTo(x - w * 0.5, y + h * 0.4 + bounce);
-    ctx.lineTo(x - w * 0.3, y + h * 0.25 + bounce);
-    ctx.lineTo(x + w * 0.3, y + h * 0.25 + bounce);
-    ctx.lineTo(x + w * 0.5, y + h * 0.4 + bounce);
-    ctx.lineTo(x + w * 0.4, y + h * 0.95 + bounce);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.15 + bounce, w * 0.25, h * 0.15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#8B4513", shade);
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.15, y + h * 0.1 + bounce);
-      ctx.lineTo(x - w * 0.45, y - h * 0.15 + bounce);
-      ctx.lineTo(x - w * 0.1, y + h * 0.05 + bounce);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.15, y + h * 0.1 + bounce);
-      ctx.lineTo(x + w * 0.45, y - h * 0.15 + bounce);
-      ctx.lineTo(x + w * 0.1, y + h * 0.05 + bounce);
-      ctx.fill();
-      ctx.save();
-      ctx.fillStyle = "#f00";
-      ctx.shadowColor = "#f00";
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.1, y + h * 0.12 + bounce, w * 0.06, h * 0.04, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.1, y + h * 0.12 + bounce, w * 0.06, h * 0.04, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    ctx.fillStyle = enemy.state === "dead" ? "#222" : shadeColor("#1a1a1a", shade);
-    ctx.beginPath();
-    ctx.ellipse(x - w * 0.25, y + h * 0.95 + bounce, w * 0.15, h * 0.06, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + w * 0.25, y + h * 0.95 + bounce, w * 0.15, h * 0.06, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state === "attacking") {
-      ctx.save();
-      ctx.fillStyle = "#0f0";
-      ctx.shadowColor = "#0f0";
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(x - w * 0.4, y + h * 0.5, w * 0.12, 0, Math.PI * 2);
-      ctx.arc(x + w * 0.4, y + h * 0.5, w * 0.12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawZombie = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const shamble = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.15) * h * 0.04 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#222" : enemy.state === "hurt" ? "#fff" : shadeColor("#4a4a2a", shade);
-    ctx.beginPath();
-    ctx.rect(x - w * 0.2, y + h * 0.35 + shamble, w * 0.4, h * 0.45);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.22 + shamble, w * 0.18, h * 0.18, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#3a3a1a", shade);
-      ctx.beginPath();
-      ctx.rect(x - w * 0.15, y + h * 0.4 + shamble, w * 0.3, h * 0.15);
-      ctx.fill();
-      ctx.fillStyle = "#ff6600";
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.06, y + h * 0.18 + shamble, w * 0.04, h * 0.03, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.06, y + h * 0.18 + shamble, w * 0.04, h * 0.03, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = shadeColor("#4a4a2a", shade);
-      const armReach = enemy.state === "melee" ? w * 0.15 : 0;
-      ctx.beginPath();
-      ctx.rect(x - w * 0.35 - armReach, y + h * 0.4 + shamble, w * 0.15, h * 0.1);
-      ctx.rect(x + w * 0.2 + armReach, y + h * 0.4 + shamble, w * 0.15, h * 0.1);
-      ctx.fill();
-    }
-  };
-
-  const drawHellKnight = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.25) * h * 0.05 : 0;
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#8B7355", shade);
-    ctx.beginPath();
-    ctx.moveTo(x - w * 0.35, y + h * 0.95 + bounce);
-    ctx.lineTo(x - w * 0.45, y + h * 0.4 + bounce);
-    ctx.lineTo(x - w * 0.25, y + h * 0.25 + bounce);
-    ctx.lineTo(x + w * 0.25, y + h * 0.25 + bounce);
-    ctx.lineTo(x + w * 0.45, y + h * 0.4 + bounce);
-    ctx.lineTo(x + w * 0.35, y + h * 0.95 + bounce);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.15 + bounce, w * 0.22, h * 0.14, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#654321", shade);
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.12, y + h * 0.1 + bounce);
-      ctx.lineTo(x - w * 0.35, y - h * 0.1 + bounce);
-      ctx.lineTo(x - w * 0.08, y + h * 0.05 + bounce);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.12, y + h * 0.1 + bounce);
-      ctx.lineTo(x + w * 0.35, y - h * 0.1 + bounce);
-      ctx.lineTo(x + w * 0.08, y + h * 0.05 + bounce);
-      ctx.fill();
-      ctx.save();
-      ctx.fillStyle = "#0f0";
-      ctx.shadowColor = "#0f0";
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.08, y + h * 0.12 + bounce, w * 0.05, h * 0.03, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.08, y + h * 0.12 + bounce, w * 0.05, h * 0.03, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    if (enemy.state === "attacking") {
-      ctx.save();
-      ctx.fillStyle = "#00ff66";
-      ctx.shadowColor = "#00ff66";
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(x, y + h * 0.5, w * 0.15, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawCyberdemon = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
-    ctx.fillStyle = enemy.state === "dead" ? "#333" : enemy.state === "hurt" ? "#fff" : shadeColor("#8B0000", shade);
-    ctx.beginPath();
-    ctx.ellipse(x, y + h * 0.12, w * 0.2, h * 0.12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(x - w * 0.35, y + h * 0.95);
-    ctx.lineTo(x - w * 0.4, y + h * 0.25);
-    ctx.lineTo(x + w * 0.4, y + h * 0.25);
-    ctx.lineTo(x + w * 0.35, y + h * 0.95);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = shadeColor("#4a4a4a", shade);
-    ctx.fillRect(x + w * 0.3, y + h * 0.3, w * 0.3, h * 0.15);
-    ctx.fillRect(x - w * 0.15, y + h * 0.7, w * 0.12, h * 0.25);
-    if (enemy.state !== "dead") {
-      ctx.fillStyle = shadeColor("#4a4a4a", shade);
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.1, y + h * 0.05);
-      ctx.lineTo(x - w * 0.3, y - h * 0.15);
-      ctx.lineTo(x - w * 0.05, y);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.1, y + h * 0.05);
-      ctx.lineTo(x + w * 0.3, y - h * 0.15);
-      ctx.lineTo(x + w * 0.05, y);
-      ctx.fill();
-      ctx.save();
-      ctx.fillStyle = "#f00";
-      ctx.shadowColor = "#f00";
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.ellipse(x - w * 0.06, y + h * 0.08, w * 0.04, h * 0.025, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + w * 0.06, y + h * 0.08, w * 0.04, h * 0.025, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-    if (enemy.state === "attacking") {
-      ctx.save();
-      ctx.fillStyle = "#ff0";
-      ctx.shadowColor = "#ff0";
-      ctx.shadowBlur = 25;
-      ctx.beginPath();
-      ctx.arc(x + w * 0.6, y + h * 0.35, w * 0.15, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#f00";
-      ctx.beginPath();
-      ctx.arc(x + w * 0.6, y + h * 0.35, w * 0.08, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawWeapon = (ctx: CanvasRenderingContext2D, player: Player, flash: number) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-
-    const bob = player.isMoving ? Math.sin(player.bobPhase) * 10 : 0;
-    const weaponX = SCREEN_WIDTH / 2;
-    const weaponY = SCREEN_HEIGHT - 150 + bob;
-    const meleeSwing = player.isMeleeing ? Math.sin(player.meleeFrame * Math.PI) * 50 : 0;
-
-    switch (player.weapon) {
-      case WeaponType.FIST:
-        drawFist(ctx, weaponX + meleeSwing, weaponY, flash);
-        break;
-      case WeaponType.CHAINSAW:
-        drawChainsaw(ctx, weaponX + meleeSwing * 0.5, weaponY, flash);
-        break;
-      case WeaponType.PISTOL:
-        drawPistol(ctx, weaponX, weaponY, flash);
-        break;
-      case WeaponType.SHOTGUN:
-        drawShotgun(ctx, weaponX, weaponY, flash);
-        break;
-      case WeaponType.CHAINGUN:
-        drawChaingun(ctx, weaponX, weaponY, flash);
-        break;
-    }
-  };
-
-  const drawFist = (ctx: CanvasRenderingContext2D, x: number, y: number, flash: number) => {
-    ctx.fillStyle = "#c9a67a";
-    ctx.beginPath();
-    ctx.ellipse(x + 30, y + 80, 40, 60, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#c9a67a";
-    ctx.beginPath();
-    ctx.ellipse(x + 50, y + 30, 35, 40, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#b8956a";
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      ctx.arc(x + 35 + i * 12, y + 10, 8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    if (flash > 4) {
-      ctx.fillStyle = "rgba(255, 255, 200, 0.3)";
-      ctx.beginPath();
-      ctx.arc(x + 50, y + 20, 30, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  };
-
-  const drawChainsaw = (ctx: CanvasRenderingContext2D, x: number, y: number, flash: number) => {
-    ctx.fillStyle = "#8B4513";
-    ctx.fillRect(x - 20, y + 40, 60, 100);
-    ctx.fillStyle = "#ff6600";
-    ctx.fillRect(x - 30, y - 20, 80, 70);
-    ctx.fillStyle = "#aaa";
-    ctx.fillRect(x - 10, y - 100, 30, 90);
-    ctx.fillStyle = "#666";
-    const teethOffset = (performance.now() * 0.05) % 10;
-    for (let i = 0; i < 8; i++) {
-      const ty = y - 90 + i * 10 + teethOffset;
-      ctx.beginPath();
-      ctx.moveTo(x - 10, ty);
-      ctx.lineTo(x - 20, ty + 5);
-      ctx.lineTo(x - 10, ty + 10);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x + 20, ty);
-      ctx.lineTo(x + 30, ty + 5);
-      ctx.lineTo(x + 20, ty + 10);
-      ctx.fill();
-    }
-    if (flash > 0) {
-      ctx.fillStyle = "rgba(255, 100, 100, 0.4)";
-      ctx.fillRect(x - 15, y - 105, 40, 100);
-    }
-  };
-
-  const drawPistol = (ctx: CanvasRenderingContext2D, x: number, y: number, flash: number) => {
-    ctx.fillStyle = "#4a3020";
-    ctx.fillRect(x - 12, y + 50, 24, 80);
-    ctx.fillStyle = "#2a2a2a";
-    ctx.fillRect(x - 15, y + 20, 30, 40);
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(x - 8, y - 40, 16, 70);
-    ctx.strokeStyle = "#2a2a2a";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(x, y + 55, 12, 0, Math.PI);
-    ctx.stroke();
-    if (flash > 4) {
-      ctx.save();
-      ctx.fillStyle = "#ff0";
-      ctx.shadowColor = "#ff0";
-      ctx.shadowBlur = 20;
-      ctx.beginPath();
-      ctx.arc(x, y - 50, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawShotgun = (ctx: CanvasRenderingContext2D, x: number, y: number, flash: number) => {
-    ctx.fillStyle = "#5a4030";
-    ctx.fillRect(x - 15, y + 60, 30, 100);
-    ctx.fillStyle = "#4a3525";
-    ctx.fillRect(x - 20, y + 20, 40, 25);
-    ctx.fillStyle = "#3a3a3a";
-    ctx.fillRect(x - 18, y - 10, 36, 40);
-    ctx.fillStyle = "#2a2a2a";
-    ctx.fillRect(x - 12, y - 80, 24, 80);
-    ctx.fillStyle = "#111";
-    ctx.beginPath();
-    ctx.arc(x - 4, y - 82, 6, 0, Math.PI * 2);
-    ctx.arc(x + 4, y - 82, 6, 0, Math.PI * 2);
-    ctx.fill();
-    if (flash > 4) {
-      ctx.save();
-      ctx.fillStyle = "#f80";
-      ctx.shadowColor = "#f80";
-      ctx.shadowBlur = 30;
-      ctx.beginPath();
-      ctx.arc(x, y - 95, 35, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ff0";
-      ctx.beginPath();
-      ctx.arc(x, y - 95, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawChaingun = (ctx: CanvasRenderingContext2D, x: number, y: number, flash: number) => {
-    const rotation = (performance.now() * 0.01) % (Math.PI * 2);
-    ctx.fillStyle = "#3a3a3a";
-    ctx.fillRect(x - 30, y + 20, 60, 80);
-    ctx.fillStyle = "#4a3020";
-    ctx.fillRect(x - 15, y + 90, 30, 60);
-    ctx.save();
-    ctx.translate(x, y - 20);
-    ctx.rotate(flash > 0 ? rotation : 0);
-    ctx.fillStyle = "#2a2a2a";
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
-      const bx = Math.cos(angle) * 15;
-      const by = Math.sin(angle) * 15;
-      ctx.fillRect(bx - 4, by - 80, 8, 80);
-    }
-    ctx.restore();
-    ctx.fillStyle = "#4a4a4a";
-    ctx.beginPath();
-    ctx.arc(x, y - 20, 20, 0, Math.PI * 2);
-    ctx.fill();
-    if (flash > 2) {
-      ctx.save();
-      ctx.fillStyle = "#ff0";
-      ctx.shadowColor = "#ff0";
-      ctx.shadowBlur = 25;
-      ctx.beginPath();
-      ctx.arc(x, y - 100, 25, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  const drawHUD = (ctx: CanvasRenderingContext2D, player: Player, enemies: Enemy[], level: Level) => {
-    const SCREEN_WIDTH = screenWidthRef.current;
-    const SCREEN_HEIGHT = screenHeightRef.current;
-
-    const deadEnemies = enemies.filter((e) => e.state === "dead").length;
-    const totalEnemies = enemies.length;
-
-    ctx.fillStyle = "rgba(40, 40, 40, 0.9)";
-    ctx.fillRect(0, SCREEN_HEIGHT - 70, SCREEN_WIDTH, 70);
-
-    ctx.fillStyle = "#333";
-    ctx.fillRect(15, SCREEN_HEIGHT - 55, 180, 22);
-    const healthColor = player.health > 50 ? "#00aa00" : player.health > 25 ? "#ffaa00" : "#ff0000";
-    ctx.fillStyle = healthColor;
-    ctx.fillRect(15, SCREEN_HEIGHT - 55, (player.health / player.maxHealth) * 180, 22);
-    ctx.strokeStyle = "#666";
-    ctx.strokeRect(15, SCREEN_HEIGHT - 55, 180, 22);
-
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 14px monospace";
-    ctx.fillText(`HP: ${Math.ceil(player.health)}`, 20, SCREEN_HEIGHT - 40);
-
-    if (player.armor > 0) {
-      ctx.fillStyle = "#333";
-      ctx.fillRect(15, SCREEN_HEIGHT - 28, 180, 12);
-      ctx.fillStyle = "#0088ff";
-      ctx.fillRect(15, SCREEN_HEIGHT - 28, (player.armor / 100) * 180, 12);
-      ctx.strokeStyle = "#666";
-      ctx.strokeRect(15, SCREEN_HEIGHT - 28, 180, 12);
-      ctx.fillStyle = "#88ccff";
-      ctx.font = "bold 10px monospace";
-      ctx.fillText(`ARMOR: ${Math.ceil(player.armor)}`, 20, SCREEN_HEIGHT - 19);
-    }
-
-    const weapon = WEAPON_CONFIG[player.weapon];
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 16px monospace";
-    ctx.fillText(weapon.name.toUpperCase(), 220, SCREEN_HEIGHT - 45);
-
-    if (weapon.ammoType) {
-      ctx.fillStyle = "#ffcc00";
-      ctx.font = "bold 24px monospace";
-      ctx.fillText(`${player.ammo[weapon.ammoType]}`, 220, SCREEN_HEIGHT - 18);
-      ctx.fillStyle = "#888";
-      ctx.font = "12px monospace";
-      ctx.fillText(weapon.ammoType.toUpperCase(), 280, SCREEN_HEIGHT - 20);
-    } else {
-      ctx.fillStyle = "#888";
-      ctx.font = "14px monospace";
-      ctx.fillText("MELEE", 220, SCREEN_HEIGHT - 20);
-    }
-
-    ctx.fillStyle = "#ff4444";
-    ctx.font = "bold 16px monospace";
-    ctx.fillText(`KILLS: ${deadEnemies}/${totalEnemies}`, 380, SCREEN_HEIGHT - 35);
-
-    ctx.fillStyle = "#aaa";
-    ctx.font = "12px monospace";
-    ctx.fillText(level.name, 380, SCREEN_HEIGHT - 18);
-
-    ctx.fillStyle = "#222";
-    ctx.fillRect(520, SCREEN_HEIGHT - 60, 130, 45);
-    ctx.strokeStyle = "#444";
-    ctx.strokeRect(520, SCREEN_HEIGHT - 60, 130, 45);
-
-    const weapons = [WeaponType.FIST, WeaponType.CHAINSAW, WeaponType.PISTOL, WeaponType.SHOTGUN, WeaponType.CHAINGUN];
-    weapons.forEach((w, i) => {
-      const hasWeapon = weaponsUnlockedRef.current.has(w);
-      const isActive = player.weapon === w;
-      const slotX = 525 + i * 25;
-      const slotY = SCREEN_HEIGHT - 55;
-
-      ctx.fillStyle = isActive ? "#ff6600" : hasWeapon ? "#444" : "#222";
-      ctx.fillRect(slotX, slotY, 22, 35);
-
-      if (hasWeapon) {
-        ctx.fillStyle = isActive ? "#fff" : "#888";
-        ctx.font = "bold 10px monospace";
-        ctx.fillText(`${i + 1}`, slotX + 7, slotY + 22);
-      }
-    });
-
-    // Crosshair based on settings
-    ctx.strokeStyle = "#0f0";
-    ctx.fillStyle = "#0f0";
-    ctx.lineWidth = 2;
-
-    if (settings.crosshairStyle === "cross") {
-      ctx.beginPath();
-      ctx.moveTo(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT / 2);
-      ctx.lineTo(SCREEN_WIDTH / 2 - 5, SCREEN_HEIGHT / 2);
-      ctx.moveTo(SCREEN_WIDTH / 2 + 5, SCREEN_HEIGHT / 2);
-      ctx.lineTo(SCREEN_WIDTH / 2 + 15, SCREEN_HEIGHT / 2);
-      ctx.moveTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 15);
-      ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 5);
-      ctx.moveTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 5);
-      ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 15);
-      ctx.stroke();
-    } else if (settings.crosshairStyle === "dot") {
-      ctx.beginPath();
-      ctx.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.lineWidth = 1;
-
-    // Minimap
-    const mapSize = 90;
-    const mapX = SCREEN_WIDTH - mapSize - 15;
-    const mapY = SCREEN_HEIGHT - mapSize - 80;
-    const cellWidth = mapSize / level.map[0].length;
-    const cellHeight = mapSize / level.map.length;
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-    ctx.fillRect(mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
-
-    for (let row = 0; row < level.map.length; row++) {
-      for (let col = 0; col < level.map[row].length; col++) {
-        const cell = level.map[row][col];
-        if (cell > 0) {
-          ctx.fillStyle = cell === 9 ? "#ffaa00" : "#555";
-          ctx.fillRect(
-            Math.floor(mapX + col * cellWidth),
-            Math.floor(mapY + row * cellHeight),
-            Math.ceil(cellWidth) + 1,
-            Math.ceil(cellHeight) + 1
-          );
-        }
-      }
-    }
-
-    ctx.fillStyle = "#0f0";
-    ctx.beginPath();
-    ctx.arc(mapX + player.x * cellWidth, mapY + player.y * cellHeight, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = "#0f0";
-    ctx.beginPath();
-    ctx.moveTo(mapX + player.x * cellWidth, mapY + player.y * cellHeight);
-    ctx.lineTo(
-      mapX + player.x * cellWidth + Math.cos(player.angle) * 8,
-      mapY + player.y * cellHeight + Math.sin(player.angle) * 8
-    );
-    ctx.stroke();
-
-    enemies.forEach((enemy) => {
-      if (enemy.state !== "dead") {
-        ctx.fillStyle = "#f00";
-        ctx.beginPath();
-        ctx.arc(mapX + enemy.x * cellWidth, mapY + enemy.y * cellHeight, 2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    });
-
-    pickupsRef.current.forEach((pickup) => {
-      if (!pickup.collected) {
-        ctx.fillStyle = PICKUP_CONFIG[pickup.type].color;
-        ctx.beginPath();
-        ctx.rect(mapX + pickup.x * cellWidth - 1, mapY + pickup.y * cellHeight - 1, 3, 3);
-        ctx.fill();
-      }
-    });
-  };
 
   // Keyboard controls
   useEffect(() => {
@@ -1781,6 +854,7 @@ export default function DoomGame() {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame, settings, updateSetting]);
 
@@ -2098,10 +1172,4 @@ export default function DoomGame() {
   );
 }
 
-function shadeColor(color: string, factor: number): string {
-  const hex = color.replace("#", "");
-  const r = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(0, 2), 16) * factor)));
-  const g = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(2, 4), 16) * factor)));
-  const b = Math.min(255, Math.max(0, Math.floor(Number.parseInt(hex.slice(4, 6), 16) * factor)));
-  return `rgb(${r}, ${g}, ${b})`;
-}
+

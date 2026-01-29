@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.22] - 2026-01-29
+
+### Changed
+-   **Rendering Engine**: Extracted all rendering logic (Enemy, Weapon, Projectile, HUD, Debug View) from `fps-game.tsx` into a dedicated `lib/canvas-renderer.ts` module. This significantly improves code maintainability and separation of concerns.
+-   **Performance**: Optimized variable access in rendering loops by using refs explicitly, resolving potential stale closure issues.
+-   **Project Structure**: Centralized all hardcoded asset configurations (textures, colors, sizes) into `lib/game-config.ts`.
+
+### Fixed
+-   **Memory Leak**: Fixed a memory leak where event listeners (keydown/up, mousemove, pointerlock) were not properly cleaned up when the component unmounted.
+-   **State Management**: Fixed a "stale closure" bug in the game loop where the render function would sometimes access outdated state values.
+-   **Wall Rendering**: Fixed a bug where wall colors were not shading correctly due to missing helper functions in scope.
+
 ## [0.2.21] - 2026-01-29
 
 ### Fixed
@@ -74,7 +86,7 @@ All notable changes to this project will be documented in this file.
 ## [0.2.8] - 2026-01-28
 
 ### Fixed
--   **AI Corner Navigation**: Disabled aggressive "predictive smoothing" which was causing enemies to skip corner waypoints entirely. Enemies now strictly follow the A* path topology, only smoothing the *arrival* at a waypoint if the subsequent path is clear. This prevents them from cutting corners too early and hitting walls.
+-   **AI Corner Navigation**: Disabled aggressive "predictive smoothing" which was causing enemies to skip corner waypoints entirely. Enemies now strictly adhere to the A* path topology, only smoothing the *arrival* at a waypoint if the subsequent path is clear. This prevents them from cutting corners too early and hitting walls.
 
 ## [0.2.7] - 2026-01-28
 

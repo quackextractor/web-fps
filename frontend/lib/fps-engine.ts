@@ -714,6 +714,28 @@ export function normalizeAngle(angle: number): number {
 }
 
 // A* Pathfinding
+// Helper to get cost multiplier based on open space
+function getOpenSpaceCost(map: number[][], x: number, y: number): number {
+  let openNeighbors = 0;
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      const nx = x + dx;
+      const ny = y + dy;
+      if (ny >= 0 && ny < map.length && nx >= 0 && nx < map[0].length) {
+        if (map[ny][nx] === 0 || map[ny][nx] === 9) {
+          openNeighbors++;
+        }
+      }
+    }
+  }
+  // Prefer spaces with more open neighbors (central paths)
+  // Max 8 neighbors. Return 1.0 for cramped, 0.9 for open?
+  // Let's say: 1.0 - (openNeighbors / 80). Tiny bias.
+  return 1.0 - (openNeighbors * 0.02);
+}
+
+// A* Pathfinding (Hybrid 8-directional)
 export function findPath(
   map: number[][],
   startX: number,
@@ -724,21 +746,16 @@ export function findPath(
   const startNode = { x: Math.floor(startX), y: Math.floor(startY) };
   const endNode = { x: Math.floor(endX), y: Math.floor(endY) };
 
-  // Optimization: If end is wall, look for closest free spot? 
-  // For now, if end is wall, we might fail. But enemies chase player, 
-  // and player is usually not IN a wall.
-
   if (startNode.x === endNode.x && startNode.y === endNode.y) {
     return [];
   }
 
-  // BUG FIX: If endNode is in a wall, find the nearest free node
+  // Handle end node in wall
   if (
     endNode.y >= 0 && endNode.y < map.length &&
     endNode.x >= 0 && endNode.x < map[0].length &&
     (map[endNode.y][endNode.x] > 0 && map[endNode.y][endNode.x] !== 9)
   ) {
-    // Spiral search for nearest free node
     let found = false;
     for (let radius = 1; radius <= 3; radius++) {
       for (let dy = -radius; dy <= radius; dy++) {
@@ -760,18 +777,19 @@ export function findPath(
       }
       if (found) break;
     }
-    // If still not found, we might return empty path, but at least we tried.
   }
 
   const openList: { x: number; y: number; f: number; g: number; h: number; parent: any }[] = [];
   const closedList: boolean[][] = Array(map.length).fill(false).map(() => Array(map[0].length).fill(false));
 
+  const startH = Math.sqrt(Math.pow(startNode.x - endNode.x, 2) + Math.pow(startNode.y - endNode.y, 2));
+
   openList.push({
     x: startNode.x,
     y: startNode.y,
-    f: 0,
+    f: startH,
     g: 0,
-    h: 0,
+    h: startH,
     parent: null,
   });
 
@@ -780,49 +798,45 @@ export function findPath(
     { x: 0, y: 1 },  // Down
     { x: -1, y: 0 }, // Left
     { x: 1, y: 0 },  // Right
-    { x: 1, y: 0 },  // Right
+    { x: -1, y: -1 }, // UL
+    { x: 1, y: -1 },  // UR
+    { x: -1, y: 1 },  // DL
+    { x: 1, y: 1 },   // DR
   ];
 
   let iterations = 0;
-  // Limit iterations to prevent freezing on large maps
-  while (openList.length > 0 && iterations < 500) {
+  while (openList.length > 0 && iterations < 1000) {
     iterations++;
 
-    // Find node with lowest f
     let lowInd = 0;
-    for (let i = 0; i < openList.length; i++) {
+    for (let i = 1; i < openList.length; i++) {
       if (openList[i].f < openList[lowInd].f) {
         lowInd = i;
       }
     }
     const currentNode = openList[lowInd];
 
-    // End case
     if (currentNode.x === endNode.x && currentNode.y === endNode.y) {
       let curr = currentNode;
       const path: Point[] = [];
       while (curr.parent) {
-        // We want the center of the tile
         path.push({ x: curr.x + 0.5, y: curr.y + 0.5 });
         curr = curr.parent;
       }
       return path.reverse();
     }
 
-    // Move from open to closed
     openList.splice(lowInd, 1);
 
-    // Bounds check before accessing closedList
     if (currentNode.y >= 0 && currentNode.y < map.length && currentNode.x >= 0 && currentNode.x < map[0].length) {
       closedList[currentNode.y][currentNode.x] = true;
     }
 
-    // Neighbors
     for (const neighbor of neighbors) {
       const neighborX = currentNode.x + neighbor.x;
       const neighborY = currentNode.y + neighbor.y;
 
-      // Check bounds
+      // Bounds
       if (
         neighborY < 0 ||
         neighborY >= map.length ||
@@ -832,33 +846,35 @@ export function findPath(
         continue;
       }
 
-      // Check blocked
+      // Blocked
       if (map[neighborY][neighborX] > 0 && map[neighborY][neighborX] !== 9) {
         continue;
       }
 
-      // Check closed
+      // Closed
       if (closedList[neighborY][neighborX]) {
         continue;
       }
 
-      // Corner cutting check for diagonals
+      // Diagonal check (Corner Cutting)
       if (neighbor.x !== 0 && neighbor.y !== 0) {
         if (
           (map[currentNode.y][neighborX] > 0 && map[currentNode.y][neighborX] !== 9) ||
           (map[neighborY][currentNode.x] > 0 && map[neighborY][currentNode.x] !== 9)
         ) {
-          continue; // Blocked by corner
+          continue;
         }
       }
 
-      const gScore = currentNode.g + (neighbor.x !== 0 && neighbor.y !== 0 ? 1.414 : 1);
-      let gScoreIsBest = false;
+      const isDiagonal = neighbor.x !== 0 && neighbor.y !== 0;
+      const moveCost = isDiagonal ? 1.414 : 1.0;
+      const spaceCost = getOpenSpaceCost(map, neighborX, neighborY);
+
+      const gScore = currentNode.g + (moveCost * spaceCost);
 
       const existingNode = openList.find(n => n.x === neighborX && n.y === neighborY);
 
       if (!existingNode) {
-        gScoreIsBest = true;
         const h = Math.sqrt(Math.pow(neighborX - endNode.x, 2) + Math.pow(neighborY - endNode.y, 2));
         openList.push({
           x: neighborX,
@@ -869,7 +885,6 @@ export function findPath(
           parent: currentNode,
         });
       } else if (gScore < existingNode.g) {
-        gScoreIsBest = true;
         existingNode.g = gScore;
         existingNode.f = existingNode.g + existingNode.h;
         existingNode.parent = currentNode;

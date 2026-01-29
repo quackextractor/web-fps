@@ -20,7 +20,7 @@ describe('Pathfinding', () => {
         const end = { x: 8, y: 8 };
         const path = findPath(emptyMap, start.x, start.y, end.x, end.y);
         expect(path.length).toBeGreaterThan(0);
-        expect(path[0].x).toBeCloseTo(1.5); // Center of first node
+        expect(path[0].x).toBeCloseTo(2.5); // Center of second node (start node excluded)
     });
 
     it('navigates around a wall', () => {
