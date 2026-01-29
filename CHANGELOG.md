@@ -3,16 +3,6 @@
 All notable changes to this project will be documented in this file.
 
 
-## [0.2.24] - 2026-01-29
-
-### Changed
--   **Rendering Architecture**: Moved `renderEnemy` and other rendering functions to the bottom of `lib/canvas-renderer.ts` to fix hoisting issues and ensure all helper functions differ correctly.
--   **Input Handling**: Moved mouse input processing from the physics tick (`fixedUpdate`) to the per-frame `gameLoop` to ensure smooth mouse look and prevent input loss.
-
-### Fixed
--   **Missing Functions**: Restored missing `drawZombie` and `drawHellKnight` functions in `canvas-renderer.ts` that were accidentally removed during refactoring.
--   **Refactoring Bugs**: Fixed imports and `SpatialGrid` references in `fps-game.tsx` to match the new architecture.
-
 ## [0.2.23] - 2026-01-29
 
 ### Added

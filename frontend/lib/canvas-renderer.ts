@@ -2,7 +2,7 @@ import {
     Enemy, Player, Projectile, Pickup, Level,
     EnemyType, WeaponType, AmmoType, PickupType,
     ENEMY_CONFIG, WEAPON_CONFIG, PICKUP_CONFIG,
-    normalizeAngle, castRay, WALL_COLORS, getDistance
+    normalizeAngle
 } from './fps-engine';
 import { GAME_CONFIG } from './game-config';
 
@@ -142,7 +142,91 @@ export const renderPickup = (
     ctx.restore();
 };
 
+export const renderEnemy = (
+    ctx: CanvasRenderingContext2D,
+    player: Player,
+    enemy: Enemy,
+    dist: number,
+    zBuffer: number[],
+    screenWidth: number,
+    screenHeight: number,
+    numRays: number,
+    fov: number
+) => {
+    const dx = enemy.x - player.x;
+    const dy = enemy.y - player.y;
 
+    const angleToEnemy = Math.atan2(dy, dx);
+    const relAngle = normalizeAngle(angleToEnemy - player.angle);
+
+    if (Math.abs(relAngle) > fov / 2 + 0.15) return;
+
+    const screenX = screenWidth / 2 + (relAngle / fov) * screenWidth;
+    const config = ENEMY_CONFIG[enemy.type];
+    const spriteHeight = (screenHeight / dist) * config.size * 1.5;
+    const spriteWidth = spriteHeight * 0.8;
+    const spriteTop = (screenHeight - spriteHeight) / 2;
+
+    const spriteLeft = screenX - spriteWidth / 2;
+    const spriteRight = screenX + spriteWidth / 2;
+    const startRay = Math.floor((spriteLeft / screenWidth) * numRays);
+    const endRay = Math.ceil((spriteRight / screenWidth) * numRays);
+
+    let visibleRays = 0;
+    let totalRays = 0;
+    for (let r = startRay; r <= endRay; r++) {
+        if (r >= 0 && r < numRays) {
+            totalRays++;
+            if (zBuffer[r] > dist - 0.3) {
+                visibleRays++;
+            }
+        }
+    }
+
+    if (totalRays === 0 || visibleRays === 0) return;
+
+    const shade = Math.max(0.3, 1 - dist / 12);
+
+    ctx.save();
+    ctx.beginPath();
+    for (let r = startRay; r <= endRay; r++) {
+        if (r >= 0 && r < numRays && zBuffer[r] > dist - 0.3) {
+            const rayX = (r / numRays) * screenWidth;
+            const rayWidth = screenWidth / numRays;
+            ctx.rect(rayX, 0, rayWidth + 1, screenHeight);
+        }
+    }
+    ctx.clip();
+
+    switch (enemy.type) {
+        case EnemyType.IMP:
+            drawImp(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.DEMON:
+            drawDemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.SOLDIER:
+            drawSoldier(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.CACODEMON:
+            drawCacodemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.BARON:
+            drawBaron(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.ZOMBIE:
+            drawZombie(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.HELLKNIGHT:
+            drawHellKnight(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+        case EnemyType.CYBERDEMON:
+            drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
+            break;
+    }
+
+    ctx.restore();
+};
 
 const drawImp = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, enemy: Enemy, shade: number) => {
     const bounce = enemy.state === "chasing" ? Math.sin(enemy.animFrame * 0.3) * h * 0.05 : 0;
@@ -828,93 +912,6 @@ export const drawHUD = (
     });
 };
 
-
-export const renderEnemy = (
-    ctx: CanvasRenderingContext2D,
-    player: Player,
-    enemy: Enemy,
-    dist: number,
-    zBuffer: number[],
-    screenWidth: number,
-    screenHeight: number,
-    numRays: number,
-    fov: number
-) => {
-    const dx = enemy.x - player.x;
-    const dy = enemy.y - player.y;
-
-    const angleToEnemy = Math.atan2(dy, dx);
-    const relAngle = normalizeAngle(angleToEnemy - player.angle);
-
-    if (Math.abs(relAngle) > fov / 2 + 0.15) return;
-
-    const screenX = screenWidth / 2 + (relAngle / fov) * screenWidth;
-    const config = ENEMY_CONFIG[enemy.type];
-    const spriteHeight = (screenHeight / dist) * config.size * 1.5;
-    const spriteWidth = spriteHeight * 0.8;
-    const spriteTop = (screenHeight - spriteHeight) / 2;
-
-    const spriteLeft = screenX - spriteWidth / 2;
-    const spriteRight = screenX + spriteWidth / 2;
-    const startRay = Math.floor((spriteLeft / screenWidth) * numRays);
-    const endRay = Math.ceil((spriteRight / screenWidth) * numRays);
-
-    let visibleRays = 0;
-    let totalRays = 0;
-    for (let r = startRay; r <= endRay; r++) {
-        if (r >= 0 && r < numRays) {
-            totalRays++;
-            if (zBuffer[r] > dist - 0.3) {
-                visibleRays++;
-            }
-        }
-    }
-
-    if (totalRays === 0 || visibleRays === 0) return;
-
-    const shade = Math.max(0.3, 1 - dist / 12);
-
-    ctx.save();
-    ctx.beginPath();
-    for (let r = startRay; r <= endRay; r++) {
-        if (r >= 0 && r < numRays && zBuffer[r] > dist - 0.3) {
-            const rayX = (r / numRays) * screenWidth;
-            const rayWidth = screenWidth / numRays;
-            ctx.rect(rayX, 0, rayWidth + 1, screenHeight);
-        }
-    }
-    ctx.clip();
-
-    switch (enemy.type) {
-        case EnemyType.IMP:
-            drawImp(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.DEMON:
-            drawDemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.SOLDIER:
-            drawSoldier(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.CACODEMON:
-            drawCacodemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.BARON:
-            drawBaron(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.ZOMBIE:
-            drawZombie(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.HELLKNIGHT:
-            drawHellKnight(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-        case EnemyType.CYBERDEMON:
-            drawCyberdemon(ctx, screenX, spriteTop, spriteWidth, spriteHeight, enemy, shade);
-            break;
-    }
-
-    ctx.restore();
-};
-
 export const renderDebugView = (ctx: CanvasRenderingContext2D, level: Level, player: Player, enemies: Enemy[], screenWidth: number, screenHeight: number) => {
     // Basic top-down debug view
     const scale = 20;
@@ -969,95 +966,4 @@ export const renderDebugView = (ctx: CanvasRenderingContext2D, level: Level, pla
     });
 
     ctx.restore();
-};
-
-export const renderScene = (
-    ctx: CanvasRenderingContext2D,
-    player: Player,
-    level: Level,
-    enemies: Enemy[],
-    projectiles: Projectile[],
-    pickups: Pickup[],
-    screenWidth: number,
-    screenHeight: number,
-    numRays: number,
-    fov: number
-) => {
-    // 1. Background (Floor & Ceiling)
-    const gradient = ctx.createLinearGradient(0, 0, 0, screenHeight / 2);
-    gradient.addColorStop(0, "#1a0505");
-    gradient.addColorStop(1, "#3d0a0a");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, screenWidth, screenHeight / 2);
-
-    const floorGradient = ctx.createLinearGradient(0, screenHeight / 2, 0, screenHeight);
-    floorGradient.addColorStop(0, "#2a2a2a");
-    floorGradient.addColorStop(1, "#1a1a1a");
-    ctx.fillStyle = floorGradient;
-    ctx.fillRect(0, screenHeight / 2, screenWidth, screenHeight / 2);
-
-    // 2. Raycasting (Walls)
-    const zBuffer: number[] = new Array(numRays).fill(0);
-    const rayWidth = screenWidth / numRays;
-
-    for (let i = 0; i < numRays; i++) {
-        const rayAngle = player.angle - fov / 2 + (i / numRays) * fov;
-        const { distance, wallType, side } = castRay(level.map, player.x, player.y, rayAngle);
-
-        const correctedDist = distance * Math.cos(rayAngle - player.angle);
-        zBuffer[i] = correctedDist;
-
-        const wallHeight = Math.min((screenHeight / correctedDist) * 1.2, screenHeight);
-        const wallTop = (screenHeight - wallHeight) / 2;
-
-        const colors = WALL_COLORS[wallType] || WALL_COLORS[1];
-        const baseColor = side === 0 ? colors.light : colors.dark;
-
-        const shade = Math.max(0.2, 1 - correctedDist / 15);
-        ctx.fillStyle = shadeColor(baseColor, shade);
-        ctx.fillRect(Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight));
-    }
-
-    // 3. Sprites (Enemies, Projectiles, Pickups)
-    const sprites: { type: 'enemy' | 'projectile' | 'pickup'; data: Enemy | Projectile | Pickup; dist: number }[] = [];
-
-    for (const enemy of enemies) {
-        if (enemy.state !== "dead" || enemy.animFrame < 30) {
-            sprites.push({
-                type: 'enemy',
-                data: enemy,
-                dist: getDistance(enemy.x, enemy.y, player.x, player.y),
-            });
-        }
-    }
-
-    for (const proj of projectiles) {
-        sprites.push({
-            type: 'projectile',
-            data: proj,
-            dist: getDistance(proj.x, proj.y, player.x, player.y),
-        });
-    }
-
-    for (const pickup of pickups) {
-        if (!pickup.collected) {
-            sprites.push({
-                type: 'pickup',
-                data: pickup,
-                dist: getDistance(pickup.x, pickup.y, player.x, player.y),
-            });
-        }
-    }
-
-    sprites.sort((a, b) => b.dist - a.dist);
-
-    for (const sprite of sprites) {
-        if (sprite.type === 'enemy') {
-            renderEnemy(ctx, player, sprite.data as Enemy, sprite.dist, zBuffer, screenWidth, screenHeight, numRays, fov);
-        } else if (sprite.type === 'projectile') {
-            renderProjectile(ctx, player, sprite.data as Projectile, sprite.dist, zBuffer, screenWidth, screenHeight, numRays, fov);
-        } else {
-            renderPickup(ctx, player, sprite.data as Pickup, sprite.dist, zBuffer, screenWidth, screenHeight, numRays, fov);
-        }
-    }
 };

@@ -2,7 +2,52 @@ import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOf
 import { GAME_CONFIG } from './game-config';
 
 // Spatial Grid for optimized queries
+export class SpatialGrid {
+    private grid: Map<string, Enemy[]> = new Map();
+    private cellSize: number;
 
+    constructor(cellSize: number = GAME_CONFIG.AI.SPATIAL_GRID_SIZE) {
+        this.cellSize = cellSize;
+    }
+
+    clear() {
+        this.grid.clear();
+    }
+
+    update(enemies: Enemy[]) {
+        this.clear();
+        for (const enemy of enemies) {
+            if (enemy.state === 'dead') continue;
+            const cellX = Math.floor(enemy.x / this.cellSize);
+            const cellY = Math.floor(enemy.y / this.cellSize);
+            const key = `${cellX},${cellY}`;
+
+            if (!this.grid.has(key)) {
+                this.grid.set(key, []);
+            }
+            this.grid.get(key)!.push(enemy);
+        }
+    }
+
+    getNearby(x: number, y: number, radius: number): Enemy[] {
+        const enemies: Enemy[] = [];
+        const startX = Math.floor((x - radius) / this.cellSize);
+        const endX = Math.floor((x + radius) / this.cellSize);
+        const startY = Math.floor((y - radius) / this.cellSize);
+        const endY = Math.floor((y + radius) / this.cellSize);
+
+        for (let gridY = startY; gridY <= endY; gridY++) {
+            for (let gridX = startX; gridX <= endX; gridX++) {
+                const key = `${gridX},${gridY}`;
+                const cellEnemies = this.grid.get(key);
+                if (cellEnemies) {
+                    enemies.push(...cellEnemies);
+                }
+            }
+        }
+        return enemies;
+    }
+}
 
 export interface AIResult {
     spawnProjectile?: Projectile;
@@ -14,7 +59,7 @@ export function updateEnemyAI(
     enemy: Enemy,
     player: Player,
     map: number[][],
-    allEnemies: Enemy[], // Reverted from SpatialGrid to simple array
+    spatialGrid: SpatialGrid, // Changed from allEnemies
     dt: number,
     time: number,
     nextProjectileId: number
@@ -152,8 +197,11 @@ export function updateEnemyAI(
         }
     }
 
-    // B. Separation Behavior (Simple Loop)
-    for (const other of allEnemies) {
+    // B. Separation Behavior (Optimized using Spatial Grid)
+    // Only check enemies in nearby cells
+    const nearbyEnemies = spatialGrid.getNearby(enemy.x, enemy.y, GAME_CONFIG.AI.SEPARATION_RADIUS);
+
+    for (const other of nearbyEnemies) {
         if (other === enemy || other.state === 'dead') continue;
 
         const sdx = enemy.x - other.x;
