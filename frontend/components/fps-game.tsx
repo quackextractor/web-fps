@@ -111,6 +111,9 @@ export default function DoomGame() {
   const screenHeightRef = useRef(600);
   const numRaysRef = useRef(200);
 
+  // Mouse controls hook - moved up so it can be used in callbacks
+  const { lock, unlock, isLocked } = usePointerLock(canvasRef as React.RefObject<HTMLElement>, gameState === "playing");
+
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
@@ -194,13 +197,15 @@ export default function DoomGame() {
 
     loadLevel(currentLevelRef.current, false);
     setGameState("playing");
-  }, [loadLevel]);
+    lock(true);
+  }, [loadLevel, lock]);
 
   const startGame = useCallback((levelIndex: number) => {
     setCurrentLevel(levelIndex);
     loadLevel(levelIndex, false);
     setGameState("playing");
-  }, [loadLevel]);
+    lock(true);
+  }, [loadLevel, lock]);
 
   const nextLevel = useCallback(() => {
     const next = currentLevelRef.current + 1;
@@ -1780,7 +1785,8 @@ export default function DoomGame() {
   }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame, settings, updateSetting]);
 
   // Mouse controls
-  const { lock, unlock, isLocked } = usePointerLock(canvasRef as React.RefObject<HTMLElement>, gameState === "playing");
+  // const { lock, unlock, isLocked } = usePointerLock(canvasRef as React.RefObject<HTMLElement>, gameState === "playing");
+  // Hook moved to top of component
 
   // Re-lock on click if we are supposed to be playing
   useEffect(() => {

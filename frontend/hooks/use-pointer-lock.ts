@@ -16,8 +16,8 @@ export function usePointerLock(
         }
     }, [isEnabled, isLocked]);
 
-    const lock = useCallback(() => {
-        if (!elementRef.current || !shouldBeLockedRef.current) return;
+    const lock = useCallback((force = false) => {
+        if (!elementRef.current || (!shouldBeLockedRef.current && !force)) return;
         try {
             elementRef.current.requestPointerLock();
         } catch (e) {

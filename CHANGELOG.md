@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.21] - 2026-01-29
+
+### Fixed
+-   **Cursor Lock**: Fixed an issue where the cursor would not re-lock when restarting the level (via button or 'R' key) from the death screen.
+
 ## [0.2.20] - 2026-01-29
 
 ### Fixed
