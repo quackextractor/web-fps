@@ -26,7 +26,7 @@ import {
   findPath,
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
-import { updateEnemyAI, updateSpatialGrid } from "@/lib/enemy-ai";
+import { updateEnemyAI } from "@/lib/enemy-ai";
 import { GAME_CONFIG } from "@/lib/game-config";
 import { renderScene, drawWeapon, drawHUD, renderDebugView } from "@/lib/canvas-renderer";
 import { SettingsMenu } from "./settings-menu";
@@ -382,12 +382,7 @@ export default function DoomGame() {
 
 
 
-      // Mouse input handled here to be atomic with physics/movement
-      if (mouseMovementRef.current !== 0) {
-        const rotation = mouseMovementRef.current * GAME_CONFIG.MOVEMENT.ROTATION_SPEED * settingsRef.current.mouseSensitivity;
-        newAngle += rotation;
-        mouseMovementRef.current = 0;
-      }
+      // Mouse input handled in gameLoop
 
       const moveX = Math.cos(newAngle);
       const moveY = Math.sin(newAngle);
@@ -505,10 +500,7 @@ export default function DoomGame() {
         return;
       }
 
-
-      // Update Spatial Grid once per tick
-      updateSpatialGrid(enemiesRef.current);
-
+      // Update enemies AI
       const currentPlayer = playerRef.current;
       for (const enemy of enemiesRef.current) {
         if (enemy.state === "dead") {
@@ -559,7 +551,13 @@ export default function DoomGame() {
 
       // Update projectiles
       projectilesRef.current = projectilesRef.current.filter((proj) => {
-        proj.x += proj.dx;
+        proj.x += proj.dx; // Projectile speed is per-tick currently? No, previously per frame? 
+        // Wait, previously: proj.x += proj.dx;
+        // proj.dx was calculated as: Math.cos(angle) * PROJECTILE_SPEED
+        // PROJECTILE_SPEED = 0.18
+        // This was running once per frame. 
+        // Now it runs once per tick (16ms).
+        // If previous frame rate was 60fps, it's consistent.
         proj.y += proj.dy;
 
         if (checkCollision(level.map, proj.x, proj.y, 0.1)) return false;
@@ -596,10 +594,10 @@ export default function DoomGame() {
       lastTimeRef.current = time;
 
       // Handle mouse input per-frame for smoothness
-      // Mouse Input is now handled in fixedUpdate to prevent race conditions
-      // We just accumulate it here
       if (mouseMovementRef.current !== 0 && gameStateRef.current === "playing") {
-        // Intentionally empty: Logic moved to fixedUpdate
+        const rotation = mouseMovementRef.current * GAME_CONFIG.MOVEMENT.ROTATION_SPEED * settingsRef.current.mouseSensitivity;
+        playerRef.current.angle += rotation;
+        mouseMovementRef.current = 0;
       }
 
       // Cap deltaTime to prevent spiral of death if tab is backgrounded
@@ -692,7 +690,7 @@ export default function DoomGame() {
       ctx.fillRect(0, 0, width, height);
     }
 
-    drawWeapon(ctx, player, flash, width, height);
+    drawWeapon(ctx, player, flash, width, height, weaponsUnlockedRef.current);
     drawHUD(ctx, player, enemies, level, pickups, weaponsUnlockedRef.current, settingsRef.current, width, height);
 
     if (settingsRef.current.debugMode) {

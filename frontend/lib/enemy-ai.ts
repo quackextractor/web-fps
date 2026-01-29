@@ -2,66 +2,7 @@ import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOf
 import { GAME_CONFIG } from './game-config';
 
 // Spatial Grid for optimized queries
-// Spatial Grid for optimized queries
-export class SpatialGrid {
-    private grid: Map<string, Enemy[]> = new Map();
-    private cellSize: number;
 
-    constructor(cellSize: number = GAME_CONFIG.AI.SPATIAL_GRID_SIZE) {
-        this.cellSize = cellSize;
-    }
-
-    clear() {
-        this.grid.clear();
-    }
-
-    update(enemies: Enemy[]) {
-        this.clear();
-        for (const enemy of enemies) {
-            if (enemy.state === 'dead') continue;
-            const key = this.getKey(enemy.x, enemy.y);
-            if (!this.grid.has(key)) {
-                this.grid.set(key, []);
-            }
-            this.grid.get(key)!.push(enemy);
-        }
-    }
-
-    getNearby(x: number, y: number): Enemy[] {
-        const keys = [
-            this.getKey(x, y),
-            this.getKey(x + this.cellSize, y),
-            this.getKey(x - this.cellSize, y),
-            this.getKey(x, y + this.cellSize),
-            this.getKey(x, y - this.cellSize),
-            this.getKey(x + this.cellSize, y + this.cellSize),
-            this.getKey(x - this.cellSize, y - this.cellSize),
-            this.getKey(x + this.cellSize, y - this.cellSize),
-            this.getKey(x - this.cellSize, y + this.cellSize)
-        ];
-
-        const result: Enemy[] = [];
-        for (const key of keys) {
-            const cell = this.grid.get(key);
-            if (cell) {
-                result.push(...cell);
-            }
-        }
-        return result;
-    }
-
-    private getKey(x: number, y: number): string {
-        const cx = Math.floor(x / this.cellSize);
-        const cy = Math.floor(y / this.cellSize);
-        return `${cx},${cy}`;
-    }
-}
-
-export const spatialGrid = new SpatialGrid();
-
-export function updateSpatialGrid(enemies: Enemy[]) {
-    spatialGrid.update(enemies);
-}
 
 export interface AIResult {
     spawnProjectile?: Projectile;
@@ -73,7 +14,7 @@ export function updateEnemyAI(
     enemy: Enemy,
     player: Player,
     map: number[][],
-    _allEnemies: Enemy[], // Deprecated in favor of SpatialGrid
+    allEnemies: Enemy[], // Reverted from SpatialGrid to simple array
     dt: number,
     time: number,
     nextProjectileId: number
@@ -211,9 +152,8 @@ export function updateEnemyAI(
         }
     }
 
-    // B. Separation Behavior (Optimized Spatial Grid)
-    const neighbors = spatialGrid.getNearby(enemy.x, enemy.y);
-    for (const other of neighbors) {
+    // B. Separation Behavior (Simple Loop)
+    for (const other of allEnemies) {
         if (other === enemy || other.state === 'dead') continue;
 
         const sdx = enemy.x - other.x;
