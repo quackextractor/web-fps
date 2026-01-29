@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.2.13] - 2026-01-29
+
+### Fixed
+-   **Debug Mode**: Fixed an issue where the Debug Mode (key 'P') could be enabled but not disabled. It now toggles correctly on and off.
+
 ## [0.2.12] - 2026-01-28
 
 ### Changed

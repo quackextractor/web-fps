@@ -1767,7 +1767,7 @@ export default function DoomGame() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame]);
+  }, [attack, restartCurrentLevel, nextLevel, switchWeapon, startGame, settings, updateSetting]);
 
   // Mouse controls
   useEffect(() => {
