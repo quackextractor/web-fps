@@ -2099,5 +2099,3 @@ export default function DoomGame() {
     </div>
   );
 }
-
-// shadeColor is now imported from @/engine/graphics/Sprites
