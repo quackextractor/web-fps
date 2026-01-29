@@ -1,53 +1,9 @@
 import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOfSight, getDistance, Projectile, EnemyType, getProjectileColor, normalizeAngle } from './fps-engine';
-import { GAME_CONFIG } from './game-config';
 
-// Spatial Grid for optimized queries
-export class SpatialGrid {
-    private grid: Map<string, Enemy[]> = new Map();
-    private cellSize: number;
-
-    constructor(cellSize: number = GAME_CONFIG.AI.SPATIAL_GRID_SIZE) {
-        this.cellSize = cellSize;
-    }
-
-    clear() {
-        this.grid.clear();
-    }
-
-    update(enemies: Enemy[]) {
-        this.clear();
-        for (const enemy of enemies) {
-            if (enemy.state === 'dead') continue;
-            const cellX = Math.floor(enemy.x / this.cellSize);
-            const cellY = Math.floor(enemy.y / this.cellSize);
-            const key = `${cellX},${cellY}`;
-
-            if (!this.grid.has(key)) {
-                this.grid.set(key, []);
-            }
-            this.grid.get(key)!.push(enemy);
-        }
-    }
-
-    getNearby(x: number, y: number, radius: number): Enemy[] {
-        const enemies: Enemy[] = [];
-        const startX = Math.floor((x - radius) / this.cellSize);
-        const endX = Math.floor((x + radius) / this.cellSize);
-        const startY = Math.floor((y - radius) / this.cellSize);
-        const endY = Math.floor((y + radius) / this.cellSize);
-
-        for (let gridY = startY; gridY <= endY; gridY++) {
-            for (let gridX = startX; gridX <= endX; gridX++) {
-                const key = `${gridX},${gridY}`;
-                const cellEnemies = this.grid.get(key);
-                if (cellEnemies) {
-                    enemies.push(...cellEnemies);
-                }
-            }
-        }
-        return enemies;
-    }
-}
+const ENEMY_RADIUS = 0.3;
+const SEPARATION_RADIUS = 0.8;
+const SEPARATION_FORCE = 2.0; // Stronger separation
+const PATH_RECALC_INTERVAL = 1000;
 
 export interface AIResult {
     spawnProjectile?: Projectile;
@@ -59,7 +15,7 @@ export function updateEnemyAI(
     enemy: Enemy,
     player: Player,
     map: number[][],
-    spatialGrid: SpatialGrid, // Changed from allEnemies
+    allEnemies: Enemy[],
     dt: number,
     time: number,
     nextProjectileId: number
@@ -112,28 +68,30 @@ export function updateEnemyAI(
                 enemy.state = 'attacking';
 
                 const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                // hardcoded speed 0.18
+                const projSpeed = 0.18;
                 const projectile: Projectile = {
                     id: nextProjectileId,
                     x: enemy.x,
                     y: enemy.y,
-                    dx: Math.cos(angle) * GAME_CONFIG.MOVEMENT.PROJECTILE_SPEED,
-                    dy: Math.sin(angle) * GAME_CONFIG.MOVEMENT.PROJECTILE_SPEED,
+                    dx: Math.cos(angle) * projSpeed,
+                    dy: Math.sin(angle) * projSpeed,
                     damage: config.damage,
                     fromEnemy: true,
                     color: config.color,
-                    size: enemy.type === EnemyType.CYBERDEMON ? 0.4 : 0.2,
+                    size: enemy.type === EnemyType.CYBERDEMON ? 0.4 : 0.2, // Simple size logic
                 };
 
                 result.spawnProjectile = projectile;
-                return result;
+                return result; // Stop moving to shoot
             }
         }
     }
 
-    // Animation for attacking/melee
+    // Animation for attacking/melee (simple frame counter)
     if (enemy.state === 'attacking' || enemy.state === 'melee') {
         enemy.animFrame++;
-        if (enemy.animFrame > 20) {
+        if (enemy.animFrame > 20) { // arbitrary animation length
             enemy.state = 'chasing';
             enemy.animFrame = 0;
         }
@@ -143,19 +101,28 @@ export function updateEnemyAI(
     if (enemy.state !== 'chasing') return result;
 
     // 5. Pathfinding Update
-    const shouldRecalc = (time - enemy.lastPathTime > GAME_CONFIG.AI.PATH_RECALC_INTERVAL) || (enemy.path.length === 0);
+    // Only recalc path if: 
+    // a) Enough time passed
+    // b) Target moved significantly (optimization, optional)
+    // c) No current path
+    // d) We can't see the player (if we can see, we might DIRECT seek, but careful of walls)
+
+    const shouldRecalc = (time - enemy.lastPathTime > PATH_RECALC_INTERVAL) || (enemy.path.length === 0);
 
     if (shouldRecalc) {
         const startNode = { x: Math.floor(enemy.x), y: Math.floor(enemy.y) };
         const endNode = { x: Math.floor(player.x), y: Math.floor(player.y) };
 
+        // Only A* if start/end different
         if (startNode.x !== endNode.x || startNode.y !== endNode.y) {
+            // Passing map, start, end. Ensure findPath signature is correct.
             enemy.path = findPath(map, startNode.x, startNode.y, endNode.x, endNode.y);
             enemy.lastPathTime = time;
         }
     }
 
     // 6. Movement (Steering Behaviors)
+
     let moveX = 0;
     let moveY = 0;
     let targetX = player.x;
@@ -164,13 +131,21 @@ export function updateEnemyAI(
 
     // A. Seek Behavior
     if (enemy.path.length > 0) {
+        // Follow path
         const nextNode = enemy.path[0];
-        targetX = nextNode.x;
-        targetY = nextNode.y;
+        targetX = nextNode.x; // + 0.5? findPath typically returns center points now?
+        targetY = nextNode.y; // + 0.5?
+
+        // Check if findPath return integers or float centers.
+        // If our findPath implementation returns simple integers, we should aim for +0.5 to be in center.
+        // In doom-engine.ts, lines 797: `path.push({ x: curr.x + 0.5, y: curr.y + 0.5 });`
+        // So it ALREADY returns centers. Good.
+
         hasTarget = true;
 
-        const distToNode = getDistance(enemy.x, enemy.y, nextNode.x, nextNode.y);
-        if (distToNode < 0.2) {
+        // Arrival Logic
+        const distToNode = getDistance(enemy.x, enemy.y, nextNode.x, nextNode.y); // Euclidean distance
+        if (distToNode < 0.2) { // Strict arrival for nodes
             enemy.path.shift();
             if (enemy.path.length > 0) {
                 targetX = enemy.path[0].x;
@@ -178,6 +153,7 @@ export function updateEnemyAI(
             }
         }
     } else if (canSeePlayer) {
+        // Direct seek if no path but visible
         targetX = player.x;
         targetY = player.y;
         hasTarget = true;
@@ -189,6 +165,7 @@ export function updateEnemyAI(
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist > 0.01) {
+            // Simple normalize
             const dirX = dx / dist;
             const dirY = dy / dist;
 
@@ -197,32 +174,32 @@ export function updateEnemyAI(
         }
     }
 
-    // B. Separation Behavior (Optimized using Spatial Grid)
-    // Only check enemies in nearby cells
-    const nearbyEnemies = spatialGrid.getNearby(enemy.x, enemy.y, GAME_CONFIG.AI.SEPARATION_RADIUS);
-
-    for (const other of nearbyEnemies) {
+    // B. Separation Behavior
+    for (const other of allEnemies) {
         if (other === enemy || other.state === 'dead') continue;
 
         const sdx = enemy.x - other.x;
         const sdy = enemy.y - other.y;
         const sdist = Math.sqrt(sdx * sdx + sdy * sdy);
 
-        if (sdist < GAME_CONFIG.AI.SEPARATION_RADIUS && sdist > 0.01) {
-            const forceStr = (GAME_CONFIG.AI.SEPARATION_RADIUS - sdist) / GAME_CONFIG.AI.SEPARATION_RADIUS;
-            moveX += (sdx / sdist) * forceStr * enemy.speed * (dt / 16) * GAME_CONFIG.AI.SEPARATION_FORCE;
-            moveY += (sdy / sdist) * forceStr * enemy.speed * (dt / 16) * GAME_CONFIG.AI.SEPARATION_FORCE;
+        if (sdist < SEPARATION_RADIUS && sdist > 0.01) {
+            const forceStr = (SEPARATION_RADIUS - sdist) / SEPARATION_RADIUS;
+            // Push away!
+            moveX += (sdx / sdist) * forceStr * enemy.speed * (dt / 16) * SEPARATION_FORCE;
+            moveY += (sdy / sdist) * forceStr * enemy.speed * (dt / 16) * SEPARATION_FORCE;
         }
     }
 
-    // 7. Collision Resolution
+    // 7. Collision Resolution (Slide)
     const nextX = enemy.x + moveX;
     const nextY = enemy.y + moveY;
 
-    if (!checkCollision(map, nextX, enemy.y, GAME_CONFIG.AI.ENEMY_RADIUS)) {
+    // Try moving X
+    if (!checkCollision(map, nextX, enemy.y, ENEMY_RADIUS)) {
         enemy.x = nextX;
     }
-    if (!checkCollision(map, enemy.x, nextY, GAME_CONFIG.AI.ENEMY_RADIUS)) {
+    // Try moving Y
+    if (!checkCollision(map, enemy.x, nextY, ENEMY_RADIUS)) {
         enemy.y = nextY;
     }
 
