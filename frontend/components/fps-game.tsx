@@ -51,6 +51,7 @@ export default function DoomGame() {
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
   const [currentLevel, setCurrentLevel] = useState(0);
+  const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
 
   const { settings, setSettings, updateSetting, isLoaded } = useSettings();
 
@@ -1925,7 +1926,10 @@ export default function DoomGame() {
                 <MenuButton onClick={() => setGameState("levelSelect")} variant="secondary">
                   SELECT LEVEL
                 </MenuButton>
-                <MenuButton onClick={() => setGameState("settings")} variant="secondary">
+                <MenuButton onClick={() => {
+                  setPreviousGameState("mainMenu");
+                  setGameState("settings");
+                }} variant="secondary">
                   OPTIONS
                 </MenuButton>
               </div>
@@ -1977,7 +1981,7 @@ export default function DoomGame() {
         {/* Settings */}
         {gameState === "settings" && (
           <SettingsMenu
-            onBack={() => setGameState("mainMenu")}
+            onBack={() => setGameState(previousGameState)}
             settings={settings}
             setSettings={setSettings}
             unlockAllLevels={unlockAllLevels}
@@ -1995,11 +1999,17 @@ export default function DoomGame() {
               <MenuButton onClick={() => setGameState("playing")}>
                 RESUME
               </MenuButton>
+              <MenuButton onClick={() => {
+                setPreviousGameState("paused");
+                setGameState("settings");
+              }} variant="secondary">
+                OPTIONS
+              </MenuButton>
               <MenuButton onClick={restartCurrentLevel} variant="secondary">
                 RESTART LEVEL
               </MenuButton>
               <MenuButton onClick={() => setGameState("mainMenu")} variant="danger">
-                MAIN MENU
+                EXIT TO MAIN MENU
               </MenuButton>
             </div>
             <p className="mt-6 text-gray-500">Press ESC to resume</p>

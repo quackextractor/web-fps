@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.17] - 2026-01-29
+
+### Added
+-   **Pause Menu**: Added an "OPTIONS" button to the Pause Menu.
+-   **Navigation Logic**: Implemented smart navigation for the Settings menu. "Back" now correctly returns to the Pause Menu if accessed from there, or the Main Menu if accessed from the title screen.
+
+## [0.2.16] - 2026-01-29
+
+### Changed
+-   **Pause Menu**: Renamed the "Main Menu" button to "Exit to Main Menu" for better clarity.
+
 ## [0.2.15] - 2026-01-29
 
 ### Fixed
