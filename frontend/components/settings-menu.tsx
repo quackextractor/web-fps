@@ -15,7 +15,8 @@ export function SettingsMenu({
     setSettings,
     unlockAllLevels,
     unlockAllWeapons,
-}: SettingsMenuProps) {
+    resetSettings,
+}: SettingsMenuProps & { resetSettings: () => void }) {
     const updateSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
         setSettings({ ...settings, [key]: value });
     };
@@ -118,6 +119,15 @@ export function SettingsMenu({
                             onChange={(v) => updateSetting("timeScale", v)}
                             format={(v) => `${v.toFixed(1)}x`}
                         />
+                        <Slider
+                            label="Turn Speed (Keys)"
+                            value={settings.turnSpeed}
+                            min={0.1}
+                            max={3.0}
+                            step={0.1}
+                            onChange={(v) => updateSetting("turnSpeed", v)}
+                            format={(v) => `${v.toFixed(1)}x`}
+                        />
                         <div className="flex flex-col gap-2 bg-gray-800 p-3 rounded border border-gray-700">
                             <label className="text-white font-bold">Difficulty</label>
                             <div className="flex gap-2">
@@ -214,7 +224,12 @@ export function SettingsMenu({
                     </div>
                 </div>
 
-                <div className="mt-8 flex justify-center">
+                <div className="mt-8 flex flex-col items-center gap-4">
+                    <div className="w-1/2">
+                        <MenuButton onClick={resetSettings} variant="danger">
+                            RESET TO DEFAULTS
+                        </MenuButton>
+                    </div>
                     <div className="w-1/2">
                         <MenuButton onClick={onBack} variant="secondary">
                             BACK TO MENU

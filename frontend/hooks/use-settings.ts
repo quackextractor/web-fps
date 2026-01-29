@@ -12,6 +12,7 @@ export interface GameSettings {
     debugMode: boolean;
     resolution: "320x240" | "640x480" | "800x600" | "1024x768" | "1280x720" | "1366x768" | "1600x900" | "1920x1080" | "2560x1440";
     fullscreen: boolean;
+    turnSpeed: number;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
     debugMode: false,
     resolution: "800x600",
     fullscreen: false,
+    turnSpeed: 1.0,
 };
 
 const STORAGE_KEY = "doom-settings";

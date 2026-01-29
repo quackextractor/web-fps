@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.20] - 2026-01-29
+
+### Fixed
+-   **Critical Bug**: Fixed a runtime error where settings were undefined due to a missing hook call (regression in 0.2.19).
+
+## [0.2.19] - 2026-01-29
+
+### Fixed
+-   **Settings Navigation**: Fixed an issue where pressing ESC in the Settings menu would always return to the Main Menu. It now correctly returns to the Pause Menu if the game was paused.
+
+## [0.2.18] - 2026-01-29
+
+### Added
+-   **Settings**: Added "Reset to Defaults" button to restore all settings to their initial values.
+-   **Controls**: Added "Turn Speed (Keys)" slider in Settings to adjust rotation sensitivity when using Arrow Keys (default: 1.0x).
+
 ## [0.2.17] - 2026-01-29
 
 ### Added

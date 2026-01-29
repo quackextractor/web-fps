@@ -53,7 +53,13 @@ export default function DoomGame() {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
 
-  const { settings, setSettings, updateSetting, isLoaded } = useSettings();
+  const previousGameStateRef = useRef<GameState>("mainMenu");
+  const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
+
+  // Sync ref with state for event listeners
+  useEffect(() => {
+    previousGameStateRef.current = previousGameState;
+  }, [previousGameState]);
 
   const [savedProgress, setSavedProgress] = useState<SavedProgress>({
     unlockedLevels: new Set([0]),
@@ -403,9 +409,9 @@ export default function DoomGame() {
         isMoving = true;
       }
 
-      if (keysRef.current.has("arrowleft")) newAngle -= 0.05;
-      if (keysRef.current.has("arrowright")) newAngle += 0.05;
-      if (keysRef.current.has("q")) newAngle -= 0.05;
+      if (keysRef.current.has("arrowleft")) newAngle -= 0.05 * settings.turnSpeed;
+      if (keysRef.current.has("arrowright")) newAngle += 0.05 * settings.turnSpeed;
+      if (keysRef.current.has("q")) newAngle -= 0.05 * settings.turnSpeed;
 
       if (keysRef.current.has(" ") || keysRef.current.has("f") || mouseDownRef.current) {
         attack();
@@ -1725,7 +1731,9 @@ export default function DoomGame() {
           setGameState("paused");
         } else if (gameStateRef.current === "paused") {
           setGameState("playing");
-        } else if (gameStateRef.current === "settings" || gameStateRef.current === "levelSelect") {
+        } else if (gameStateRef.current === "settings") {
+          setGameState(previousGameStateRef.current);
+        } else if (gameStateRef.current === "levelSelect") {
           setGameState("mainMenu");
         }
       }
@@ -1986,6 +1994,7 @@ export default function DoomGame() {
             setSettings={setSettings}
             unlockAllLevels={unlockAllLevels}
             unlockAllWeapons={unlockAllWeapons}
+            resetSettings={resetSettings}
           />
         )}
 
