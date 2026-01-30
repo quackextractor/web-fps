@@ -16,6 +16,7 @@ import {
     getDistance,
     normalizeAngle,
 } from "@/lib/fps-engine";
+import { type RagdollPart } from "@/lib/Ragdoll";
 import { shadeColor } from "@/engine/graphics/Sprites";
 import * as Sprites from "@/engine/graphics/Sprites";
 
@@ -26,6 +27,7 @@ export interface RenderState {
     enemies: Enemy[];
     projectiles: Projectile[];
     pickups: Pickup[];
+    ragdollParts: RagdollPart[];
     level: Level;
     shootFlash: number;
     hurtFlash: number;
@@ -253,16 +255,17 @@ export class GameRenderer {
         }
 
         // Sprites
-        const sprites: { type: 'enemy' | 'projectile' | 'pickup'; data: Enemy | Projectile | Pickup; dist: number }[] = [];
+        const sprites: { type: 'enemy' | 'projectile' | 'pickup' | 'ragdoll'; data: Enemy | Projectile | Pickup | RagdollPart; dist: number }[] = [];
 
         for (const enemy of enemies) {
-            if (enemy.state !== "dead" || enemy.animFrame < 30) {
-                sprites.push({
-                    type: 'enemy',
-                    data: enemy,
-                    dist: getDistance(enemy.x, enemy.y, player.x, player.y),
-                });
-            }
+            // Skip dead enemies - ragdoll parts replace the corpse
+            if (enemy.state === "dead") continue;
+
+            sprites.push({
+                type: 'enemy',
+                data: enemy,
+                dist: getDistance(enemy.x, enemy.y, player.x, player.y),
+            });
         }
 
         for (const proj of projectiles) {
@@ -283,6 +286,15 @@ export class GameRenderer {
             }
         }
 
+        // Add ragdoll parts
+        for (const part of state.ragdollParts) {
+            sprites.push({
+                type: 'ragdoll',
+                data: part,
+                dist: getDistance(part.x, part.y, player.x, player.y),
+            });
+        }
+
         sprites.sort((a, b) => b.dist - a.dist);
 
         for (const sprite of sprites) {
@@ -290,6 +302,8 @@ export class GameRenderer {
                 this.renderEnemy(ctx, player, sprite.data as Enemy, sprite.dist, zBuffer);
             } else if (sprite.type === 'projectile') {
                 this.renderProjectile(ctx, player, sprite.data as Projectile, sprite.dist, zBuffer);
+            } else if (sprite.type === 'ragdoll') {
+                this.renderRagdollPart(ctx, player, sprite.data as RagdollPart, sprite.dist, zBuffer);
             } else {
                 this.renderPickup(ctx, player, sprite.data as Pickup, sprite.dist, zBuffer);
             }
@@ -494,6 +508,102 @@ export class GameRenderer {
             ctx.fillStyle = "#fff";
             ctx.fillRect(screenX - size * 0.3, screenY - size * 0.3, size * 0.6, size * 0.6);
         }
+        ctx.restore();
+    }
+
+    private renderRagdollPart(
+        ctx: CanvasRenderingContext2D,
+        player: Player,
+        part: RagdollPart,
+        dist: number,
+        zBuffer: number[]
+    ) {
+        const SCREEN_WIDTH = this.screenWidth;
+        const SCREEN_HEIGHT = this.screenHeight;
+        const NUM_RAYS = this.numRays;
+
+        const dx = part.x - player.x;
+        const dy = part.y - player.y;
+
+        const angleToPart = Math.atan2(dy, dx);
+        const relAngle = normalizeAngle(angleToPart - player.angle);
+
+        if (Math.abs(relAngle) > FOV / 2 + 0.2) return;
+
+        const screenX = SCREEN_WIDTH / 2 + (relAngle / FOV) * SCREEN_WIDTH;
+
+        // Calculate vertical position based on z height
+        const heightOffset = (part.z - 0.5) * (SCREEN_HEIGHT / dist) * 0.8;
+        const screenY = SCREEN_HEIGHT / 2 - heightOffset;
+
+        // Size based on distance and part size
+        const size = Math.max(3, (SCREEN_HEIGHT / dist) * part.size * 0.5);
+
+        // Check visibility
+        const startRay = Math.floor(((screenX - size) / SCREEN_WIDTH) * NUM_RAYS);
+        const endRay = Math.ceil(((screenX + size) / SCREEN_WIDTH) * NUM_RAYS);
+
+        let visible = false;
+        for (let r = Math.max(0, startRay); r <= Math.min(NUM_RAYS - 1, endRay); r++) {
+            if (zBuffer[r] > dist - 0.3) {
+                visible = true;
+                break;
+            }
+        }
+        if (!visible) return;
+
+        // Calculate fade based on lifetime
+        const fadeProgress = part.lifetime / part.maxLifetime;
+        const alpha = fadeProgress > 0.7 ? 1 - (fadeProgress - 0.7) / 0.3 : 1;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(screenX, screenY);
+        ctx.rotate(part.rotation);
+
+        // Shade color based on distance
+        const shade = Math.max(0.3, 1 - dist / 12);
+
+        // Darken color
+        const darkenedColor = shadeColor(part.color, shade);
+        ctx.fillStyle = darkenedColor;
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 1;
+
+        // Draw different shapes based on part type
+        switch (part.type) {
+            case 'head':
+                // Circle
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'torso':
+                // Rectangle
+                ctx.fillRect(-size * 0.8, -size, size * 1.6, size * 2);
+                ctx.strokeRect(-size * 0.8, -size, size * 1.6, size * 2);
+                break;
+            case 'arm_l':
+            case 'arm_r':
+                // Thin rectangle
+                ctx.fillRect(-size * 0.3, -size, size * 0.6, size * 2);
+                ctx.strokeRect(-size * 0.3, -size, size * 0.6, size * 2);
+                break;
+            case 'leg_l':
+            case 'leg_r':
+                // Tapered rectangle
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.4, -size);
+                ctx.lineTo(size * 0.4, -size);
+                ctx.lineTo(size * 0.3, size);
+                ctx.lineTo(-size * 0.3, size);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                break;
+        }
+
         ctx.restore();
     }
 

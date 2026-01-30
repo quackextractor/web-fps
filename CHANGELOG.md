@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.33] - 2026-01-30
+
+### Added
+-   **Ragdoll Death System**: Enemies now spawn body parts (head, torso, arms, legs) when killed.
+    -   Physics simulation with gravity, floor bouncing, and friction.
+    -   Parts rotate and tumble as they fall.
+    -   Parts fade out after ~3 seconds.
+    -   Colored based on enemy type.
+
 ## [0.2.32] - 2026-01-30
 
 ### Changed

@@ -24,6 +24,7 @@ import {
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";
+import { RagdollManager } from "@/lib/Ragdoll";
 import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
@@ -86,6 +87,7 @@ export default function FPSGame() {
   const fpsRef = useRef(0);
   const frameCountRef = useRef(0);
   const lastFPSTimeRef = useRef(0);
+  const ragdollManagerRef = useRef(new RagdollManager());
 
   const [, forceUpdate] = useState(0);
   const keysRef = useRef<Set<string>>(new Set());
@@ -317,6 +319,7 @@ export default function FPSGame() {
               enemy.animFrame = 0;
               killsRef.current += 1;
               soundManager.playEnemyDeath(enemy.type);
+              ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y);
             }
           }
         }
@@ -358,6 +361,7 @@ export default function FPSGame() {
             enemy.animFrame = 0;
             killsRef.current += 1;
             soundManager.playEnemyDeath(enemy.type);
+            ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y);
           } else {
             enemy.state = "hurt";
           }
@@ -591,6 +595,9 @@ export default function FPSGame() {
         setGameState("dead");
         return;
       }
+
+      // Update ragdoll physics
+      ragdollManagerRef.current.update(dt);
     };
 
     const gameLoop = (time: number) => {
@@ -631,6 +638,7 @@ export default function FPSGame() {
           enemies: enemiesRef.current,
           projectiles: projectilesRef.current,
           pickups: pickupsRef.current,
+          ragdollParts: ragdollManagerRef.current.getParts(),
           level,
           shootFlash: shootFlashRef.current,
           hurtFlash: hurtFlashRef.current,
