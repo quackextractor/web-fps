@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.30] - 2026-01-30
+
+### Fixed
+-   **Settings Live Updates**: Converted settings to use React Context (`SettingsProvider`). All menus and gameplay now share the same settings state, so changes apply instantly after clicking Apply without requiring a page refresh.
+
+### Changed
+-   **Pause Menu Styling**: Updated pause menu to use retro pixel font (`retro-text`) instead of Impact font. Added scanlines overlay and centered layout for consistency with other menus.
+
 ## [0.2.29] - 2026-01-30
 
 ### Added
