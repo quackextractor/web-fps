@@ -1,14 +1,5 @@
-import React from "react";
-import { GameSettings } from "@/hooks/use-settings";
-
-interface SettingsMenuProps {
-    onBack: () => void;
-    settings: GameSettings;
-    setSettings: (settings: GameSettings) => void;
-    unlockAllLevels: () => void;
-    unlockAllWeapons: () => void;
-}
-
+import React, { useState, useEffect } from "react";
+import { GameSettings, DEFAULT_SETTINGS } from "@/hooks/use-settings";
 import { MenuButton } from "./game-ui/MenuButton";
 
 interface SettingsMenuProps {
@@ -30,8 +21,35 @@ export function SettingsMenu({
     resetSettings,
     clearProgress,
 }: SettingsMenuProps) {
-    const updateSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
-        setSettings({ ...settings, [key]: value });
+    // Local state for pending changes
+    const [localSettings, setLocalSettings] = useState<GameSettings>(settings);
+    const [hasChanges, setHasChanges] = useState(false);
+
+    // Sync local settings when props change (e.g., after reset)
+    useEffect(() => {
+        setLocalSettings(settings);
+        setHasChanges(false);
+    }, [settings]);
+
+    const updateLocalSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
+        setLocalSettings(prev => ({ ...prev, [key]: value }));
+        setHasChanges(true);
+    };
+
+    const applySettings = () => {
+        setSettings(localSettings);
+        setHasChanges(false);
+    };
+
+    const discardChanges = () => {
+        setLocalSettings(settings);
+        setHasChanges(false);
+        onBack();
+    };
+
+    const handleResetDefaults = () => {
+        setLocalSettings(DEFAULT_SETTINGS);
+        setHasChanges(true);
     };
 
     const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (val: boolean) => void }) => (
@@ -72,6 +90,7 @@ export function SettingsMenu({
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-6 shadow-2xl h-full md:h-auto overflow-y-auto">
                 <h2 className="retro-text text-2xl md:text-4xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     OPTIONS
+                    {hasChanges && <span className="text-yellow-500 text-sm ml-4">*</span>}
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs">
@@ -80,22 +99,22 @@ export function SettingsMenu({
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4">AUDIO</h3>
                         <Slider
                             label="MASTER VOLUME"
-                            value={settings.volume}
+                            value={localSettings.volume}
                             min={0}
                             max={1}
                             step={0.05}
-                            onChange={(v) => updateSetting("volume", v)}
+                            onChange={(v) => updateLocalSetting("volume", v)}
                             format={(v) => `${Math.round(v * 100)}%`}
                         />
                         <Toggle
                             label="SOUND EFFECTS"
-                            value={settings.soundEnabled}
-                            onChange={(v) => updateSetting("soundEnabled", v)}
+                            value={localSettings.soundEnabled}
+                            onChange={(v) => updateLocalSetting("soundEnabled", v)}
                         />
                         <Toggle
                             label="MUSIC (SOON)"
-                            value={settings.musicEnabled}
-                            onChange={(v) => updateSetting("musicEnabled", v)}
+                            value={localSettings.musicEnabled}
+                            onChange={(v) => updateLocalSetting("musicEnabled", v)}
                         />
                     </div>
 
@@ -104,29 +123,29 @@ export function SettingsMenu({
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4">GAMEPLAY</h3>
                         <Slider
                             label="SENSITIVITY"
-                            value={settings.mouseSensitivity}
+                            value={localSettings.mouseSensitivity}
                             min={0.2}
                             max={3.0}
                             step={0.1}
-                            onChange={(v) => updateSetting("mouseSensitivity", v)}
+                            onChange={(v) => updateLocalSetting("mouseSensitivity", v)}
                             format={(v) => `${v.toFixed(1)}x`}
                         />
                         <Slider
                             label="GAME SPEED"
-                            value={settings.timeScale}
+                            value={localSettings.timeScale}
                             min={0.1}
                             max={3}
                             step={0.1}
-                            onChange={(v) => updateSetting("timeScale", v)}
+                            onChange={(v) => updateLocalSetting("timeScale", v)}
                             format={(v) => `${v.toFixed(1)}x`}
                         />
                         <Slider
                             label="TURN SPEED"
-                            value={settings.turnSpeed}
+                            value={localSettings.turnSpeed}
                             min={0.1}
                             max={3.0}
                             step={0.1}
-                            onChange={(v) => updateSetting("turnSpeed", v)}
+                            onChange={(v) => updateLocalSetting("turnSpeed", v)}
                             format={(v) => `${v.toFixed(1)}x`}
                         />
                         <div className="flex flex-col gap-2 bg-gray-900 p-2 retro-border">
@@ -136,8 +155,8 @@ export function SettingsMenu({
                                     <button
                                         key={diff}
                                         type="button"
-                                        onClick={() => updateSetting("difficulty", diff)}
-                                        className={`flex-1 py-2 retro-text text-[10px] retro-border transition-colors uppercase ${settings.difficulty === diff
+                                        onClick={() => updateLocalSetting("difficulty", diff)}
+                                        className={`flex-1 py-2 retro-text text-[10px] retro-border transition-colors uppercase ${localSettings.difficulty === diff
                                             ? "bg-red-600 text-white border-white"
                                             : "bg-black text-gray-500 border-gray-700 hover:border-gray-500"
                                             }`}
@@ -149,14 +168,14 @@ export function SettingsMenu({
                         </div>
                     </div>
 
-                    {/* Display The Section */}
+                    {/* Display Section */}
                     <div className="space-y-4">
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4">DISPLAY</h3>
                         <div className="flex flex-col gap-2 bg-gray-900 p-2 retro-border">
                             <label className="text-white retro-text text-xs">RESOLUTION</label>
                             <select
-                                value={settings.resolution}
-                                onChange={(e) => updateSetting("resolution", e.target.value as any)}
+                                value={localSettings.resolution}
+                                onChange={(e) => updateLocalSetting("resolution", e.target.value as any)}
                                 className="bg-black text-white p-2 retro-border retro-text text-[10px] outline-none"
                             >
                                 <option value="320x240">320x240 (ULTRA)</option>
@@ -171,19 +190,35 @@ export function SettingsMenu({
                             </select>
                         </div>
                         <Toggle
+                            label="SCANLINES"
+                            value={localSettings.scanlinesEnabled}
+                            onChange={(v) => updateLocalSetting("scanlinesEnabled", v)}
+                        />
+                        {localSettings.scanlinesEnabled && (
+                            <Slider
+                                label="SCANLINE SIZE"
+                                value={localSettings.scanlineSize}
+                                min={2}
+                                max={8}
+                                step={1}
+                                onChange={(v) => updateLocalSetting("scanlineSize", v)}
+                                format={(v) => `${v}px`}
+                            />
+                        )}
+                        <Toggle
                             label="SMOOTHING"
-                            value={settings.imageSmoothingEnabled}
-                            onChange={(v) => updateSetting("imageSmoothingEnabled", v)}
+                            value={localSettings.imageSmoothingEnabled}
+                            onChange={(v) => updateLocalSetting("imageSmoothingEnabled", v)}
                         />
                         <Toggle
                             label="FULLSCREEN"
-                            value={settings.fullscreen}
-                            onChange={(v) => updateSetting("fullscreen", v)}
+                            value={localSettings.fullscreen}
+                            onChange={(v) => updateLocalSetting("fullscreen", v)}
                         />
                         <Toggle
                             label="SHOW FPS"
-                            value={settings.showFPS}
-                            onChange={(v) => updateSetting("showFPS", v)}
+                            value={localSettings.showFPS}
+                            onChange={(v) => updateLocalSetting("showFPS", v)}
                         />
                         <div className="flex flex-col gap-2 bg-gray-900 p-2 retro-border">
                             <label className="text-white retro-text text-xs">CROSSHAIR</label>
@@ -192,8 +227,8 @@ export function SettingsMenu({
                                     <button
                                         key={style}
                                         type="button"
-                                        onClick={() => updateSetting("crosshairStyle", style)}
-                                        className={`flex-1 py-2 retro-text text-[10px] retro-border transition-colors uppercase ${settings.crosshairStyle === style
+                                        onClick={() => updateLocalSetting("crosshairStyle", style)}
+                                        className={`flex-1 py-2 retro-text text-[10px] retro-border transition-colors uppercase ${localSettings.crosshairStyle === style
                                             ? "bg-red-600 text-white border-white"
                                             : "bg-black text-gray-500 border-gray-700 hover:border-gray-500"
                                             }`}
@@ -224,8 +259,8 @@ export function SettingsMenu({
                         </button>
                         <Toggle
                             label="DEBUG MODE (P)"
-                            value={settings.debugMode}
-                            onChange={(v) => updateSetting("debugMode", v)}
+                            value={localSettings.debugMode}
+                            onChange={(v) => updateLocalSetting("debugMode", v)}
                         />
 
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8">DATA</h3>
@@ -244,14 +279,19 @@ export function SettingsMenu({
                 </div>
 
                 <div className="mt-8 flex flex-col md:flex-row items-center gap-4 border-t-4 border-gray-800 pt-6">
-                    <div className="w-full md:w-1/2">
-                        <MenuButton onClick={resetSettings} variant="danger">
+                    <div className="w-full md:w-1/3">
+                        <MenuButton onClick={handleResetDefaults} variant="danger">
                             RESET DEFAULTS
                         </MenuButton>
                     </div>
-                    <div className="w-full md:w-1/2">
-                        <MenuButton onClick={onBack} variant="secondary">
-                            BACK
+                    <div className="w-full md:w-1/3">
+                        <MenuButton onClick={applySettings} variant="primary">
+                            APPLY
+                        </MenuButton>
+                    </div>
+                    <div className="w-full md:w-1/3">
+                        <MenuButton onClick={discardChanges} variant="secondary">
+                            {hasChanges ? "CANCEL" : "BACK"}
                         </MenuButton>
                     </div>
                 </div>

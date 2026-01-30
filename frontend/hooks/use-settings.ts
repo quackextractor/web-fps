@@ -14,6 +14,8 @@ export interface GameSettings {
     fullscreen: boolean;
     turnSpeed: number;
     imageSmoothingEnabled: boolean;
+    scanlinesEnabled: boolean;
+    scanlineSize: number;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -30,6 +32,8 @@ export const DEFAULT_SETTINGS: GameSettings = {
     fullscreen: false,
     turnSpeed: 1.0,
     imageSmoothingEnabled: false,
+    scanlinesEnabled: true,
+    scanlineSize: 2,
 };
 
 const STORAGE_KEY = "doom-settings";
