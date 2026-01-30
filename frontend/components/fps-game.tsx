@@ -23,8 +23,6 @@ import {
   hasLineOfSight,
   getDistance,
   normalizeAngle,
-  findPath,
-  hasClearWalkingPath,
 } from "@/lib/fps-engine";
 import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";

@@ -1,5 +1,5 @@
 import React from "react";
-import { GameSettings, useSettings } from "@/hooks/use-settings";
+import { GameSettings } from "@/hooks/use-settings";
 
 interface SettingsMenuProps {
     onBack: () => void;
