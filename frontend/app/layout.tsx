@@ -2,6 +2,7 @@ import React from "react"
 import type { Metadata } from 'next'
 import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SettingsProvider } from '@/hooks/use-settings'
 import './globals.css'
 
 const pressStart2P = Press_Start_2P({
@@ -43,9 +44,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pressStart2P.variable} antialiased`}>
-        {children}
+        <SettingsProvider>
+          {children}
+        </SettingsProvider>
         <Analytics />
       </body>
     </html>
   )
 }
+

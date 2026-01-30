@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
 export interface GameSettings {
     mouseSensitivity: number;
@@ -38,7 +40,21 @@ export const DEFAULT_SETTINGS: GameSettings = {
 
 const STORAGE_KEY = "doom-settings";
 
-export function useSettings() {
+interface SettingsContextType {
+    settings: GameSettings;
+    setSettings: (settings: GameSettings) => void;
+    updateSetting: <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => void;
+    resetSettings: () => void;
+    isLoaded: boolean;
+}
+
+const SettingsContext = createContext<SettingsContextType | null>(null);
+
+interface SettingsProviderProps {
+    children: ReactNode;
+}
+
+export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settings, setSettingsState] = useState<GameSettings>(DEFAULT_SETTINGS);
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -90,11 +106,17 @@ export function useSettings() {
         setSettings(DEFAULT_SETTINGS);
     }, [setSettings]);
 
-    return {
-        settings,
-        setSettings,
-        updateSetting,
-        resetSettings,
-        isLoaded,
-    };
+    return (
+        <SettingsContext.Provider value={{ settings, setSettings, updateSetting, resetSettings, isLoaded }}>
+            {children}
+        </SettingsContext.Provider>
+    );
+}
+
+export function useSettings() {
+    const context = useContext(SettingsContext);
+    if (!context) {
+        throw new Error("useSettings must be used within a SettingsProvider");
+    }
+    return context;
 }
