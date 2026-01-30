@@ -183,6 +183,20 @@ export function SettingsMenu({
                                 format={(v) => `${v}x`}
                             />
                         )}
+                        <Toggle
+                            label="AUTO-CLEAR"
+                            value={localSettings.ragdollAutoClear}
+                            onChange={(v) => updateLocalSetting("ragdollAutoClear", v)}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                (window as any).clearRagdolls?.();
+                            }}
+                            className="w-full py-2 bg-gray-800 hover:bg-gray-700 text-white retro-text text-[10px] retro-border transition-colors uppercase mt-2"
+                        >
+                            CLEAR ALL PARTS
+                        </button>
                     </div>
 
                     {/* Display Section */}

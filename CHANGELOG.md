@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.37] - 2026-01-30
+
+### Changed
+-   **UI Refinement**: Removed the confirmation dialog from the "CLEAR ALL PARTS" button for a smoother experience.
+
+## [0.2.36] - 2026-01-30
+
+### Added
+-   **Ragdoll Clear Settings**:
+    -   Added "AUTO-CLEAR" toggle to ragdoll settings. Disabling it allows ragdoll parts to stay on the ground indefinitely.
+    -   Added "CLEAR ALL PARTS" button to manually purge all ragdolls from the scene.
+-   Increased Gore Multiplier maximum to 20x.
+
 ## [0.2.35] - 2026-01-30
 
 ### Fixed

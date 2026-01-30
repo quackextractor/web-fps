@@ -110,6 +110,16 @@ export default function FPSGame() {
 
     // Initialize renderer
     rendererRef.current = new GameRenderer(800, 600, 200);
+
+    // Expose clear function for settings menu
+    (window as any).clearRagdolls = () => {
+      ragdollManagerRef.current.clear();
+      forceUpdate(n => n + 1);
+    };
+
+    return () => {
+      delete (window as any).clearRagdolls;
+    };
   }, []);
 
   const screenWidthRef = useRef(800);
@@ -601,7 +611,7 @@ export default function FPSGame() {
       }
 
       // Update ragdoll physics
-      ragdollManagerRef.current.update(dt);
+      ragdollManagerRef.current.update(dt, settings.ragdollAutoClear);
     };
 
     const gameLoop = (time: number) => {

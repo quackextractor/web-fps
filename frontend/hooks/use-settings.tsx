@@ -20,6 +20,7 @@ export interface GameSettings {
     scanlineSize: number;
     ragdollEnabled: boolean;
     ragdollMultiplier: number;
+    ragdollAutoClear: boolean;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -40,6 +41,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
     scanlineSize: 2,
     ragdollEnabled: true,
     ragdollMultiplier: 1,
+    ragdollAutoClear: true,
 };
 
 const STORAGE_KEY = "doom-settings";

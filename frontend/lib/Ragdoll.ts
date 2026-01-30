@@ -116,14 +116,15 @@ export class RagdollManager {
         }
     }
 
-    update(dt: number): void {
+    update(dt: number, autoClear: boolean = true): void {
         const dtFactor = dt / 16.67; // Normalize to 60fps
 
         this.parts = this.parts.filter(part => {
-            part.lifetime += dtFactor;
-
-            if (part.lifetime >= part.maxLifetime) {
-                return false; // Remove expired parts
+            if (autoClear) {
+                part.lifetime += dtFactor;
+                if (part.lifetime >= part.maxLifetime) {
+                    return false; // Remove expired parts
+                }
             }
 
             if (!part.onGround) {
