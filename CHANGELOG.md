@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.38] - 2026-01-30
+
+### Added
+-   **Custom Confirmation Modal**: Replaced browser-native `window.confirm` with a custom retro-styled modal for the "CLEAR PROGRESS" action.
+
 ## [0.2.37] - 2026-01-30
 
 ### Changed

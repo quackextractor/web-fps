@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GameSettings, DEFAULT_SETTINGS } from "@/hooks/use-settings";
 import { MenuButton } from "./game-ui/MenuButton";
 import { ScanlinesOverlay } from "./game-ui/ScanlinesOverlay";
+import { ConfirmationModal } from "./game-ui/ConfirmationModal";
 
 interface SettingsMenuProps {
     onBack: () => void;
@@ -25,6 +26,7 @@ export function SettingsMenu({
     // Local state for pending changes
     const [localSettings, setLocalSettings] = useState<GameSettings>(settings);
     const [hasChanges, setHasChanges] = useState(false);
+    const [showResetProgressModal, setShowResetProgressModal] = useState(false);
 
     // Sync local settings when props change (e.g., after reset)
     useEffect(() => {
@@ -297,17 +299,26 @@ export function SettingsMenu({
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8">DATA</h3>
                         <button
                             type="button"
-                            onClick={() => {
-                                if (window.confirm("Are you sure you want to clear your game progress? This cannot be undone.")) {
-                                    clearProgress();
-                                }
-                            }}
+                            onClick={() => setShowResetProgressModal(true)}
                             className="w-full py-3 bg-red-900/50 hover:bg-red-600 hover:text-white text-red-200 retro-text text-[10px] retro-border transition-colors uppercase"
                         >
                             CLEAR PROGRESS
                         </button>
                     </div>
                 </div>
+
+                <ConfirmationModal
+                    isOpen={showResetProgressModal}
+                    title="CLEAR PROGRESS?"
+                    message="Are you sure you want to clear your game progress? This cannot be undone."
+                    onConfirm={() => {
+                        clearProgress();
+                        setShowResetProgressModal(false);
+                    }}
+                    onCancel={() => setShowResetProgressModal(false)}
+                    confirmText="CLEAR ALL"
+                    cancelText="CANCEL"
+                />
 
                 <div className="mt-8 flex flex-col md:flex-row items-center gap-4 border-t-4 border-gray-800 pt-6">
                     <div className="w-full md:w-1/3">
