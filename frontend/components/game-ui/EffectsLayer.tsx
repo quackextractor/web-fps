@@ -1,28 +1,14 @@
 import React from "react";
-import { useSettings } from "@/hooks/use-settings";
+import { ScanlinesOverlay } from "./ScanlinesOverlay";
 
 interface EffectsLayerProps {
     hurtFlash: number; // 0 to >0 value
 }
 
 export const EffectsLayer: React.FC<EffectsLayerProps> = ({ hurtFlash }) => {
-    const { settings } = useSettings();
-
-    const scanlineStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 50,
-        background: `linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)`,
-        backgroundSize: `100% ${settings.scanlineSize}px`,
-    };
-
     return (
         <>
-            {settings.scanlinesEnabled && <div style={scanlineStyle} />}
+            <ScanlinesOverlay />
 
             {/* Damage flash overlay */}
             <div

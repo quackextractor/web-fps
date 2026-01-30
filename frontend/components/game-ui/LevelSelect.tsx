@@ -1,5 +1,6 @@
 import React from "react";
 import { MenuButton } from "./MenuButton";
+import { ScanlinesOverlay } from "./ScanlinesOverlay";
 import { type Level } from "@/lib/fps-engine";
 
 export interface SavedProgress {
@@ -23,7 +24,7 @@ export const LevelSelect: React.FC<LevelSelectProps> = ({
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none">
-            <div className="scanlines" />
+            <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 shadow-2xl overflow-y-auto max-h-full">
                 <h2 className="retro-text text-3xl md:text-5xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>

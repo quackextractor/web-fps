@@ -1,5 +1,6 @@
 import React from "react";
 import { MenuButton } from "./MenuButton";
+import { ScanlinesOverlay } from "./ScanlinesOverlay";
 
 interface VictoryScreenProps {
     totalKills: number;
@@ -16,7 +17,7 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none">
-            <div className="scanlines" />
+            <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-lg p-6 bg-black retro-border text-center">
                 <h2 className="retro-text text-3xl md:text-5xl text-yellow-500 mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>

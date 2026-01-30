@@ -1,5 +1,6 @@
 import React from "react";
 import { MenuButton } from "./MenuButton";
+import { ScanlinesOverlay } from "./ScanlinesOverlay";
 
 interface DeathScreenProps {
     levelName: string;
@@ -16,7 +17,7 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950 p-4 select-none">
-            <div className="scanlines" />
+            <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-md text-center">
                 <h2 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 animate-pulse tracking-tighter" style={{ textShadow: "4px 4px 0px #000" }}>

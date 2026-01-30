@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GameSettings, DEFAULT_SETTINGS } from "@/hooks/use-settings";
 import { MenuButton } from "./game-ui/MenuButton";
+import { ScanlinesOverlay } from "./game-ui/ScanlinesOverlay";
 
 interface SettingsMenuProps {
     onBack: () => void;
@@ -85,7 +86,7 @@ export function SettingsMenu({
 
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 z-50 overflow-y-auto select-none">
-            <div className="scanlines" />
+            <ScanlinesOverlay enabled={localSettings.scanlinesEnabled} size={localSettings.scanlineSize} />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-6 shadow-2xl h-full md:h-auto overflow-y-auto">
                 <h2 className="retro-text text-2xl md:text-4xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>

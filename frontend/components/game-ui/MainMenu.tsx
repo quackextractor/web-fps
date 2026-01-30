@@ -1,5 +1,6 @@
 import React from "react";
 import { MenuButton } from "./MenuButton";
+import { ScanlinesOverlay } from "./ScanlinesOverlay";
 
 interface MainMenuProps {
     onStartGame: (levelIndex: number) => void;
@@ -14,7 +15,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black overflow-hidden select-none">
-            <div className="scanlines" />
+            <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">
                 <h1 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 text-center animate-pulse leading-snug tracking-tighter"

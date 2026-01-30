@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.29] - 2026-01-30
+
+### Added
+-   **Scanline Options**: Added customizable scanline settings in Options -> Display:
+    -   Toggle scanlines on/off.
+    -   Adjust scanline size (2-8px).
+-   **Apply Button**: Settings now require clicking "Apply" to save. Unsaved changes are discarded on Cancel/Back.
+-   **Live Preview**: Scanline settings show a live preview in the settings menu before applying.
+
+### Changed
+-   **ScanlinesOverlay Component**: Created a reusable `ScanlinesOverlay` component used across all menus and gameplay.
+
+### Removed
+-   **Vignette Effect**: Removed the CRT vignette dark corners effect.
+-   **Random Glitch Effect**: Removed the random screen glitch effect.
+
 ## [0.2.28] - 2026-01-30
 
 ### Added
