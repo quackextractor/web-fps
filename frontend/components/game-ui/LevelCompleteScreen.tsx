@@ -27,7 +27,7 @@ export const LevelCompleteScreen: React.FC<LevelCompleteScreenProps> = ({
             <p className="text-green-400 text-lg mb-6">Kills: {kills} | Health: {Math.ceil(health)}%</p>
             <div className="flex flex-col gap-4 w-64">
                 <MenuButton onClick={onNextLevel}>
-                    {!isLastLevel ? "NEXT LEVEL (E)" : "FINAL VICTORY"}
+                    {!isLastLevel ? "NEXT LEVEL (SPACE)" : "FINAL VICTORY"}
                 </MenuButton>
                 <MenuButton onClick={onMainMenu} variant="secondary">
                     MAIN MENU

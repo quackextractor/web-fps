@@ -418,6 +418,7 @@ export default function FPSGame() {
       if (keysRef.current.has("arrowleft")) newAngle -= 0.05 * settings.turnSpeed;
       if (keysRef.current.has("arrowright")) newAngle += 0.05 * settings.turnSpeed;
       if (keysRef.current.has("q")) newAngle -= 0.05 * settings.turnSpeed;
+      if (keysRef.current.has("e")) newAngle += 0.05 * settings.turnSpeed;
 
       if (keysRef.current.has(" ") || keysRef.current.has("f") || mouseDownRef.current) {
         attack();
@@ -649,8 +650,8 @@ export default function FPSGame() {
         }
       }
 
-      // E to proceed to next level (when level complete)
-      if (key === "e" && gameStateRef.current === "levelComplete") {
+      // Space to proceed to next level (when level complete)
+      if (key === " " && gameStateRef.current === "levelComplete") {
         nextLevel();
       }
 
