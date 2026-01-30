@@ -84,17 +84,72 @@ export class GameRenderer {
         }
     }
 
-    private textures: Map<string, HTMLImageElement> = new Map();
+    private textures: Map<string, HTMLImageElement | HTMLCanvasElement> = new Map();
 
     loadLevelTextures(level: Level) {
         if (!level.wallTextures) return;
-        Object.values(level.wallTextures).forEach(path => {
+        Object.entries(level.wallTextures).forEach(([_, path]) => {
             if (!this.textures.has(path)) {
-                const img = new Image();
-                img.src = path;
-                this.textures.set(path, img);
+                if (path.startsWith("generated:")) {
+                    if (path === "generated:exit") {
+                        const tex = this.generateExitTexture();
+                        this.textures.set(path, tex as unknown as HTMLImageElement);
+                    }
+                } else {
+                    const img = new Image();
+                    img.src = path;
+                    this.textures.set(path, img);
+                }
             }
         });
+    }
+
+    private generateExitTexture(): HTMLCanvasElement {
+        const canvas = document.createElement("canvas");
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return canvas;
+
+        // Background - Hazard stripes
+        ctx.fillStyle = "#333";
+        ctx.fillRect(0, 0, 64, 64);
+
+        ctx.fillStyle = "#e00";
+        ctx.beginPath();
+        for (let i = -64; i < 128; i += 16) {
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i + 8, 0);
+            ctx.lineTo(i - 24, 64);
+            ctx.lineTo(i - 32, 64);
+            ctx.fill();
+        }
+
+        // Metal border
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(0, 0, 64, 64);
+
+        // Inner plaque
+        ctx.fillStyle = "#111";
+        ctx.fillRect(8, 20, 48, 24);
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(8, 20, 48, 24);
+
+        // Text
+        ctx.fillStyle = "#0f0";
+        ctx.font = "bold 16px monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("EXIT", 32, 32);
+
+        // LED glow
+        ctx.shadowColor = "#0f0";
+        ctx.shadowBlur = 5;
+        ctx.fillText("EXIT", 32, 32);
+
+        return canvas;
     }
 
     private renderWorld(ctx: CanvasRenderingContext2D, state: RenderState) {
@@ -142,7 +197,7 @@ export class GameRenderer {
 
             // Texture Mapping
             let texturePath = level.wallTextures?.[wallType];
-            let texture = texturePath ? this.textures.get(texturePath) : null;
+            let texture: any = texturePath ? this.textures.get(texturePath) : null;
 
             if (texture && texture.complete) {
                 let wallX;

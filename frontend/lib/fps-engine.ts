@@ -450,7 +450,7 @@ export const LEVELS: Level[] = [
       2: '/textures/wall_metal.bmp', // Tech floor
       3: '/textures/wall_tech.bmp',
       4: '/textures/wall_tech.bmp',
-      9: '/textures/wall_tech.bmp', // Exit
+      9: 'generated:exit', // Exit
     },
     enemies: [
       createEnemy(EnemyType.ZOMBIE, 5, 5),
@@ -480,7 +480,7 @@ export const LEVELS: Level[] = [
       2: '/textures/wall_brick.bmp',
       3: '/textures/wall_metal.bmp',
       4: '/textures/wall_brick.bmp',
-      9: '/textures/wall_metal.bmp', // Exit
+      9: 'generated:exit', // Exit
     },
     enemies: [
       createEnemy(EnemyType.SOLDIER, 5, 5),
@@ -513,7 +513,7 @@ export const LEVELS: Level[] = [
     wallTextures: {
       1: '/textures/wall_stone.bmp',
       5: '/textures/wall_stone.bmp',
-      9: '/textures/wall_metal.bmp', // Exit
+      9: 'generated:exit', // Exit
     },
     enemies: [
       createEnemy(EnemyType.IMP, 6, 5),
@@ -549,7 +549,7 @@ export const LEVELS: Level[] = [
     exitY: 12,
     wallTextures: {
       1: '/textures/wall_tech.bmp',
-      9: '/textures/wall_meta.bmp',
+      9: 'generated:exit',
     },
     enemies: [
       createEnemy(EnemyType.ZOMBIE, 5, 3),
