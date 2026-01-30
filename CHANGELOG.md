@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.22] - 2026-01-30
+
+### Changed
+-   **Codebase Architecture**: Major refactor of `fps-game.tsx` to strictly follow the Single Responsibility Principle. The monolithic component has been split into:
+    -   **GameRenderer**: A dedicated class handling all Canvas rendering logic (World, Entities, HUD) in `frontend/engine/graphics`.
+    -   **UI Components**: Discrete React components for `MainMenu`, `LevelSelect`, `PauseMenu`, `DeathScreen`, etc., in `frontend/components/game-ui`.
+    -   **FPSGame**: Now purely focuses on Game Loop management and State orchestration.
+-   **Maintenance**: Fixed a runtime error in `GameRenderer` where `pickups` were not being passed to the HUD.
+
 ## [0.2.21] - 2026-01-29
 
 ### Fixed
