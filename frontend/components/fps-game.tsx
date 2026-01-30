@@ -34,6 +34,9 @@ import { PauseMenu } from "./game-ui/PauseMenu";
 import { DeathScreen } from "./game-ui/DeathScreen";
 import { LevelCompleteScreen } from "./game-ui/LevelCompleteScreen";
 import { VictoryScreen } from "./game-ui/VictoryScreen";
+import { HUD } from "./game-ui/HUD";
+import { EffectsLayer } from "./game-ui/EffectsLayer";
+import { Crosshair } from "./game-ui/Crosshair";
 
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
@@ -856,6 +859,26 @@ export default function FPSGame() {
           className="border-4 border-red-900 rounded-lg cursor-none w-full h-full object-contain"
           style={{ imageRendering: "pixelated" }}
         />
+
+        {/* Retro Effects Layer */}
+        <EffectsLayer hurtFlash={hurtFlashRef.current} />
+
+        {/* HUD Overlay */}
+        {gameState === "playing" && (
+          <>
+            <Crosshair />
+            <HUD
+              health={player.health}
+              armor={player.armor}
+              ammo={player.ammo}
+              weapon={player.weapon}
+              kills={killsRef.current}
+              totalKills={totalKillsRef.current}
+              levelName={LEVELS[currentLevel]?.name || "Unknown"}
+              weaponsUnlocked={weaponsUnlockedRef.current}
+            />
+          </>
+        )}
 
         {/* Main Menu */}
         {gameState === "mainMenu" && (

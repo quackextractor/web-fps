@@ -55,9 +55,12 @@ export class GameRenderer {
     render(ctx: CanvasRenderingContext2D, state: RenderState) {
         this.renderWorld(ctx, state);
 
-        // Draw HUD and Weapon (on top of world)
+        // Draw Weapon (on top of world)
         this.drawWeapon(ctx, state.player, state.shootFlash);
-        this.drawHUD(ctx, state.player, state.enemies, state.level, state.pickups, state.weaponsUnlocked, state.settings.crosshairStyle);
+
+        // HUD is now rendered via React in fps-game.tsx
+        // Only drawing Minimap if strictly needed here, but plan is to move/keep visuals separate
+        // this.drawHUD... REMOVED
 
         // Flashes
         const hurtAlpha = state.hurtFlash / 10;
@@ -522,172 +525,7 @@ export class GameRenderer {
         }
     }
 
-    private drawHUD(ctx: CanvasRenderingContext2D, player: Player, enemies: Enemy[], level: Level, pickups: Pickup[], weaponsUnlocked: Set<WeaponType>, crosshairStyle: string) {
-        const SCREEN_WIDTH = this.screenWidth;
-        const SCREEN_HEIGHT = this.screenHeight;
-
-        const deadEnemies = enemies.filter((e) => e.state === "dead").length;
-        const totalEnemies = enemies.length;
-
-        ctx.fillStyle = "rgba(40, 40, 40, 0.9)";
-        ctx.fillRect(0, SCREEN_HEIGHT - 70, SCREEN_WIDTH, 70);
-
-        ctx.fillStyle = "#333";
-        ctx.fillRect(15, SCREEN_HEIGHT - 55, 180, 22);
-        const healthColor = player.health > 50 ? "#00aa00" : player.health > 25 ? "#ffaa00" : "#ff0000";
-        ctx.fillStyle = healthColor;
-        ctx.fillRect(15, SCREEN_HEIGHT - 55, (player.health / player.maxHealth) * 180, 22);
-        ctx.strokeStyle = "#666";
-        ctx.strokeRect(15, SCREEN_HEIGHT - 55, 180, 22);
-
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px monospace";
-        ctx.fillText(`HP: ${Math.ceil(player.health)}`, 20, SCREEN_HEIGHT - 40);
-
-        if (player.armor > 0) {
-            ctx.fillStyle = "#333";
-            ctx.fillRect(15, SCREEN_HEIGHT - 28, 180, 12);
-            ctx.fillStyle = "#0088ff";
-            ctx.fillRect(15, SCREEN_HEIGHT - 28, (player.armor / 100) * 180, 12);
-            ctx.strokeStyle = "#666";
-            ctx.strokeRect(15, SCREEN_HEIGHT - 28, 180, 12);
-            ctx.fillStyle = "#88ccff";
-            ctx.font = "bold 10px monospace";
-            ctx.fillText(`ARMOR: ${Math.ceil(player.armor)}`, 20, SCREEN_HEIGHT - 19);
-        }
-
-        const weapon = WEAPON_CONFIG[player.weapon];
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px monospace";
-        ctx.fillText(weapon.name.toUpperCase(), 220, SCREEN_HEIGHT - 45);
-
-        if (weapon.ammoType) {
-            ctx.fillStyle = "#ffcc00";
-            ctx.font = "bold 24px monospace";
-            ctx.fillText(`${player.ammo[weapon.ammoType]}`, 220, SCREEN_HEIGHT - 18);
-            ctx.fillStyle = "#888";
-            ctx.font = "12px monospace";
-            ctx.fillText(weapon.ammoType.toUpperCase(), 280, SCREEN_HEIGHT - 20);
-        } else {
-            ctx.fillStyle = "#888";
-            ctx.font = "14px monospace";
-            ctx.fillText("MELEE", 220, SCREEN_HEIGHT - 20);
-        }
-
-        ctx.fillStyle = "#ff4444";
-        ctx.font = "bold 16px monospace";
-        ctx.fillText(`KILLS: ${deadEnemies}/${totalEnemies}`, 380, SCREEN_HEIGHT - 35);
-
-        ctx.fillStyle = "#aaa";
-        ctx.font = "12px monospace";
-        ctx.fillText(level.name, 380, SCREEN_HEIGHT - 18);
-
-        ctx.fillStyle = "#222";
-        ctx.fillRect(520, SCREEN_HEIGHT - 60, 130, 45);
-        ctx.strokeStyle = "#444";
-        ctx.strokeRect(520, SCREEN_HEIGHT - 60, 130, 45);
-
-        const weapons = [WeaponType.FIST, WeaponType.CHAINSAW, WeaponType.PISTOL, WeaponType.SHOTGUN, WeaponType.CHAINGUN];
-        weapons.forEach((w, i) => {
-            const hasWeapon = weaponsUnlocked.has(w);
-            const isActive = player.weapon === w;
-            const slotX = 525 + i * 25;
-            const slotY = SCREEN_HEIGHT - 55;
-
-            ctx.fillStyle = isActive ? "#ff6600" : hasWeapon ? "#444" : "#222";
-            ctx.fillRect(slotX, slotY, 22, 35);
-
-            if (hasWeapon) {
-                ctx.fillStyle = isActive ? "#fff" : "#888";
-                ctx.font = "bold 10px monospace";
-                ctx.fillText(`${i + 1}`, slotX + 7, slotY + 22);
-            }
-        });
-
-        // Crosshair
-        ctx.strokeStyle = "#0f0";
-        ctx.fillStyle = "#0f0";
-        ctx.lineWidth = 2;
-
-        if (crosshairStyle === "cross") {
-            ctx.beginPath();
-            ctx.moveTo(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT / 2);
-            ctx.lineTo(SCREEN_WIDTH / 2 - 5, SCREEN_HEIGHT / 2);
-            ctx.moveTo(SCREEN_WIDTH / 2 + 5, SCREEN_HEIGHT / 2);
-            ctx.lineTo(SCREEN_WIDTH / 2 + 15, SCREEN_HEIGHT / 2);
-            ctx.moveTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 15);
-            ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 5);
-            ctx.moveTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 5);
-            ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 15);
-            ctx.stroke();
-        } else if (crosshairStyle === "dot") {
-            ctx.beginPath();
-            ctx.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3, 0, Math.PI * 2);
-            ctx.fill();
-        } else {
-            ctx.beginPath();
-            ctx.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-        ctx.lineWidth = 1;
-
-        // Minimap
-        const mapSize = 90;
-        const mapX = SCREEN_WIDTH - mapSize - 15;
-        const mapY = SCREEN_HEIGHT - mapSize - 80;
-        const cellWidth = mapSize / level.map[0].length;
-        const cellHeight = mapSize / level.map.length;
-
-        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-        ctx.fillRect(mapX - 2, mapY - 2, mapSize + 4, mapSize + 4);
-
-        for (let row = 0; row < level.map.length; row++) {
-            for (let col = 0; col < level.map[row].length; col++) {
-                const cell = level.map[row][col];
-                if (cell > 0) {
-                    ctx.fillStyle = cell === 9 ? "#ffaa00" : "#555";
-                    ctx.fillRect(
-                        Math.floor(mapX + col * cellWidth),
-                        Math.floor(mapY + row * cellHeight),
-                        Math.ceil(cellWidth) + 1,
-                        Math.ceil(cellHeight) + 1
-                    );
-                }
-            }
-        }
-
-        ctx.fillStyle = "#0f0";
-        ctx.beginPath();
-        ctx.arc(mapX + player.x * cellWidth, mapY + player.y * cellHeight, 3, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = "#0f0";
-        ctx.beginPath();
-        ctx.moveTo(mapX + player.x * cellWidth, mapY + player.y * cellHeight);
-        ctx.lineTo(
-            mapX + player.x * cellWidth + Math.cos(player.angle) * 8,
-            mapY + player.y * cellHeight + Math.sin(player.angle) * 8
-        );
-        ctx.stroke();
-
-        enemies.forEach((enemy) => {
-            if (enemy.state !== "dead") {
-                ctx.fillStyle = "#f00";
-                ctx.beginPath();
-                ctx.arc(mapX + enemy.x * cellWidth, mapY + enemy.y * cellHeight, 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        });
-
-        pickups.forEach((pickup) => {
-            if (!pickup.collected) {
-                ctx.fillStyle = PICKUP_CONFIG[pickup.type].color;
-                ctx.beginPath();
-                ctx.rect(mapX + pickup.x * cellWidth - 1, mapY + pickup.y * cellHeight - 1, 3, 3);
-                ctx.fill();
-            }
-        });
-    }
+    // drawHUD removed in favor of React HUD
 
     private renderDebugView(
         ctx: CanvasRenderingContext2D,

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.28] - 2026-01-30
+
+### Added
+-   **Retro HUD**: Replaced the legacy canvas-based HUD with a fully detailed React-based overlay.
+    -   Scanning CRT lines, vignette, and screen flicker effects.
+    -   Damage pulse effect when taking damage.
+    -   Stylized Health and Armor bars with numeric readouts.
+    -   Weapon selection indicator.
+    -   Classic green crosshair.
+
 ## [0.2.27] - 2026-01-30
 
 ### Added
