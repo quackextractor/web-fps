@@ -386,30 +386,34 @@ export default function FPSGame() {
       const strafeX = Math.cos(newAngle - Math.PI / 2);
       const strafeY = Math.sin(newAngle - Math.PI / 2);
 
-      if (keysRef.current.has("w") || keysRef.current.has("arrowup")) {
-        const testX = newX + moveX * MOVE_SPEED;
-        const testY = newY + moveY * MOVE_SPEED;
-        if (!checkCollision(level.map, testX, newY)) newX = testX;
-        if (!checkCollision(level.map, newX, testY)) newY = testY;
-        isMoving = true;
-      }
-      if (keysRef.current.has("s") || keysRef.current.has("arrowdown")) {
-        const testX = newX - moveX * MOVE_SPEED;
-        const testY = newY - moveY * MOVE_SPEED;
-        if (!checkCollision(level.map, testX, newY)) newX = testX;
-        if (!checkCollision(level.map, newX, testY)) newY = testY;
-        isMoving = true;
-      }
-      if (keysRef.current.has("a")) {
-        const testX = newX + strafeX * MOVE_SPEED;
-        const testY = newY + strafeY * MOVE_SPEED;
-        if (!checkCollision(level.map, testX, newY)) newX = testX;
-        if (!checkCollision(level.map, newX, testY)) newY = testY;
-        isMoving = true;
-      }
-      if (keysRef.current.has("d")) {
-        const testX = newX - strafeX * MOVE_SPEED;
-        const testY = newY - strafeY * MOVE_SPEED;
+      let moveForward = 0;
+      let moveStrafe = 0;
+
+      if (keysRef.current.has("w") || keysRef.current.has("arrowup")) moveForward += 1;
+      if (keysRef.current.has("s") || keysRef.current.has("arrowdown")) moveForward -= 1;
+      if (keysRef.current.has("a")) moveStrafe += 1;
+      if (keysRef.current.has("d")) moveStrafe -= 1;
+
+      if (moveForward !== 0 || moveStrafe !== 0) {
+        // Normalize vector
+        const length = Math.sqrt(moveForward * moveForward + moveStrafe * moveStrafe);
+        moveForward /= length;
+        moveStrafe /= length;
+
+        // Calculate deltas
+        // moveX/moveY is direction vector for forward
+        // strafeX/strafeY is direction vector for strafe (left)
+        // newX += (forward * moveX + strafe * strafeX) * speed
+        // newY += (forward * moveY + strafe * strafeY) * speed
+
+        const deltaX = (moveForward * moveX + moveStrafe * strafeX) * MOVE_SPEED;
+        const deltaY = (moveForward * moveY + moveStrafe * strafeY) * MOVE_SPEED;
+
+        // Apply collision
+        const testX = newX + deltaX;
+        const testY = newY + deltaY;
+
+        // Try move X then Y (sliding)
         if (!checkCollision(level.map, testX, newY)) newX = testX;
         if (!checkCollision(level.map, newX, testY)) newY = testY;
         isMoving = true;
