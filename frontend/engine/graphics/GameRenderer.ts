@@ -34,6 +34,7 @@ export interface RenderState {
         debugMode: boolean;
         showFPS: boolean;
         crosshairStyle: string;
+        imageSmoothingEnabled: boolean;
     };
     fps: number;
 }
@@ -122,6 +123,13 @@ export class GameRenderer {
         const zBuffer: number[] = [];
         const rayWidth = SCREEN_WIDTH / NUM_RAYS;
 
+        if (state.settings.imageSmoothingEnabled) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+        } else {
+            ctx.imageSmoothingEnabled = false;
+        }
+
         for (let i = 0; i < NUM_RAYS; i++) {
             const rayAngle = player.angle - FOV / 2 + (i / NUM_RAYS) * FOV;
             const { distance, wallType, side, hitX, hitY } = castRay(level.map, player.x, player.y, rayAngle);
@@ -146,6 +154,9 @@ export class GameRenderer {
                 // Flip texture if facing specific directions
                 if (side === 0 && Math.cos(rayAngle) > 0) wallX = 1 - wallX;
                 if (side === 1 && Math.sin(rayAngle) < 0) wallX = 1 - wallX;
+
+                // Fix jitter: Clamp and ensure precision
+                wallX = Math.max(0, Math.min(1, wallX));
 
                 const texX = Math.floor(wallX * texture.width);
 

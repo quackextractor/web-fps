@@ -170,6 +170,11 @@ export function SettingsMenu({
                             </select>
                         </div>
                         <Toggle
+                            label="Image Smoothing"
+                            value={settings.imageSmoothingEnabled}
+                            onChange={(v) => updateSetting("imageSmoothingEnabled", v)}
+                        />
+                        <Toggle
                             label="Fullscreen"
                             value={settings.fullscreen}
                             onChange={(v) => updateSetting("fullscreen", v)}

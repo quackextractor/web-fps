@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.26] - 2026-01-30
+
+### Fixed
+-   **Texture Jitter**: Fixed a visual jitter issue where wall textures would shimmer or fluctuate during movement, caused by sub-pixel precision errors in the raycaster. Implemented coordinate clamping to ensure stable texture sampling.
+
+### Added
+-   **Image Smoothing Option**: Added a toggle in Settings -> Display to enable/disable linear interpolation for textures. Default is OFF (Retro style).
+
 ## [0.2.25] - 2026-01-30
 
 ### Added

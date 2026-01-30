@@ -621,7 +621,8 @@ export default function FPSGame() {
           settings: {
             debugMode: settings.debugMode,
             showFPS: settings.showFPS,
-            crosshairStyle: settings.crosshairStyle
+            crosshairStyle: settings.crosshairStyle,
+            imageSmoothingEnabled: settings.imageSmoothingEnabled,
           },
           fps: fpsRef.current
         };
