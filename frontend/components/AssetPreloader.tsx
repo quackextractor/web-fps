@@ -1,0 +1,95 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+
+interface AssetPreloaderProps {
+    onComplete: () => void;
+    assets: {
+        images: string[];
+        sounds: string[];
+    };
+}
+
+export function AssetPreloader({ onComplete, assets }: AssetPreloaderProps) {
+    const [progress, setProgress] = useState(0);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let loaded = 0;
+        const total = assets.images.length + assets.sounds.length;
+
+        if (total === 0) {
+            onComplete();
+            return;
+        }
+
+        const updateProgress = () => {
+            loaded++;
+            setProgress(Math.floor((loaded / total) * 100));
+            if (loaded === total) {
+                // Small delay for visual polish
+                setTimeout(onComplete, 500);
+            }
+        };
+
+        const handleError = (src: string) => {
+            console.error(`Failed to load asset: ${src}`);
+            // We still continue even if one asset fails to load
+            updateProgress();
+        };
+
+        // Preload images
+        assets.images.forEach((src) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = updateProgress;
+            img.onerror = () => handleError(src);
+        });
+
+        // Preload sounds
+        assets.sounds.forEach((src) => {
+            const audio = new Audio();
+            audio.src = src;
+            audio.oncanplaythrough = updateProgress;
+            audio.onerror = () => handleError(src);
+            // Some browsers require explicit load for Audio
+            audio.load();
+        });
+    }, [assets, onComplete]);
+
+    return (
+        <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8">
+            <div className="w-full max-w-md retro-border p-8 bg-gray-900 shadow-2xl">
+                <h2 className="retro-text text-2xl text-red-600 mb-8 text-center animate-pulse">
+                    LOADING ASSETS
+                </h2>
+
+                <div className="w-full h-8 bg-black retro-border p-1 mb-4">
+                    <div
+                        className="h-full bg-red-600 transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                    />
+                </div>
+
+                <div className="flex justify-between items-center">
+                    <span className="retro-text text-[10px] text-gray-500 uppercase">
+                        {progress < 100 ? "Initializing..." : "Complete"}
+                    </span>
+                    <span className="retro-text text-[10px] text-yellow-500">
+                        {progress}%
+                    </span>
+                </div>
+
+                {error && (
+                    <div className="mt-4 p-2 bg-red-900/50 border border-red-500 text-red-200 retro-text text-[8px] text-center uppercase">
+                        Warning: Some assets failed to load
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-8 retro-text text-[8px] text-gray-700 uppercase tracking-widest animate-pulse">
+                Descent into Darkness...
+            </div>
+        </div>
+    );
+}

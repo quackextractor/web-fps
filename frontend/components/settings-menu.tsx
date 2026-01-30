@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { GameSettings, DEFAULT_SETTINGS } from "@/hooks/use-settings";
+import { useGameActions } from "@/context/GameActionContext";
 import { MenuButton } from "./game-ui/MenuButton";
 import { ScanlinesOverlay } from "./game-ui/ScanlinesOverlay";
 import { ConfirmationModal } from "./game-ui/ConfirmationModal";
@@ -23,6 +24,8 @@ export function SettingsMenu({
     resetSettings,
     clearProgress,
 }: SettingsMenuProps) {
+    const { clearRagdolls } = useGameActions();
+
     // Local state for pending changes
     const [localSettings, setLocalSettings] = useState<GameSettings>(settings);
     const [hasChanges, setHasChanges] = useState(false);
@@ -34,26 +37,26 @@ export function SettingsMenu({
         setHasChanges(false);
     }, [settings]);
 
-    const updateLocalSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
+    const updateLocalSetting = useCallback(<K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
         setLocalSettings(prev => ({ ...prev, [key]: value }));
         setHasChanges(true);
-    };
+    }, []);
 
-    const applySettings = () => {
+    const applySettings = useCallback(() => {
         setSettings(localSettings);
         setHasChanges(false);
-    };
+    }, [localSettings, setSettings]);
 
-    const discardChanges = () => {
+    const discardChanges = useCallback(() => {
         setLocalSettings(settings);
         setHasChanges(false);
         onBack();
-    };
+    }, [settings, onBack]);
 
-    const handleResetDefaults = () => {
+    const handleResetDefaults = useCallback(() => {
         setLocalSettings(DEFAULT_SETTINGS);
         setHasChanges(true);
-    };
+    }, []);
 
     const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (val: boolean) => void }) => (
         <div className="flex items-center justify-between bg-gray-900 p-2 retro-border">
@@ -85,6 +88,47 @@ export function SettingsMenu({
             />
         </div>
     );
+
+    const KeyBinder = ({ label, keys, onBindingChange }: { label: string; keys: string[]; onBindingChange: (newKeys: string[]) => void }) => {
+        const [isBinding, setIsBinding] = useState(false);
+
+        useEffect(() => {
+            if (!isBinding) return;
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                e.preventDefault();
+                const key = e.key.toLowerCase();
+                if (key === "escape") {
+                    setIsBinding(false);
+                    return;
+                }
+
+                // Toggle key in the array
+                const newKeys = keys.includes(key)
+                    ? keys.filter(k => k !== key)
+                    : [...keys, key];
+
+                onBindingChange(newKeys);
+                setIsBinding(false);
+            };
+
+            window.addEventListener("keydown", handleKeyDown);
+            return () => window.removeEventListener("keydown", handleKeyDown);
+        }, [isBinding, keys, onBindingChange]);
+
+        return (
+            <div className="flex items-center justify-between bg-gray-900 p-2 retro-border">
+                <label className="text-white retro-text text-[10px] md:text-xs uppercase">{label}</label>
+                <button
+                    type="button"
+                    onClick={() => setIsBinding(true)}
+                    className={`min-w-[80px] px-2 py-1 retro-border text-[10px] retro-text transition-colors ${isBinding ? "bg-yellow-600 text-black border-white" : "bg-black text-gray-400 border-gray-700 hover:border-gray-500"}`}
+                >
+                    {isBinding ? "PRESS ANY KEY" : (keys?.join(" / ").toUpperCase() || "NONE")}
+                </button>
+            </div>
+        );
+    };
 
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 z-50 overflow-y-auto select-none">
@@ -192,9 +236,7 @@ export function SettingsMenu({
                         />
                         <button
                             type="button"
-                            onClick={() => {
-                                (window as any).clearRagdolls?.();
-                            }}
+                            onClick={clearRagdolls}
                             className="w-full py-2 bg-gray-800 hover:bg-gray-700 text-white retro-text text-[10px] retro-border transition-colors uppercase mt-2"
                         >
                             CLEAR ALL PARTS
@@ -304,6 +346,58 @@ export function SettingsMenu({
                         >
                             CLEAR PROGRESS
                         </button>
+                    </div>
+
+                    {/* Controls Section */}
+                    <div className="md:col-span-2 mt-8">
+                        <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 uppercase">CONTROLS</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <KeyBinder
+                                label="FORWARD"
+                                keys={localSettings.controls?.forward}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, forward: k })}
+                            />
+                            <KeyBinder
+                                label="BACKWARD"
+                                keys={localSettings.controls?.backward}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, backward: k })}
+                            />
+                            <KeyBinder
+                                label="STRAFE LEFT"
+                                keys={localSettings.controls?.strafeLeft}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, strafeLeft: k })}
+                            />
+                            <KeyBinder
+                                label="STRAFE RIGHT"
+                                keys={localSettings.controls?.strafeRight}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, strafeRight: k })}
+                            />
+                            <KeyBinder
+                                label="TURN LEFT"
+                                keys={localSettings.controls?.left}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, left: k })}
+                            />
+                            <KeyBinder
+                                label="TURN RIGHT"
+                                keys={localSettings.controls?.right}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, right: k })}
+                            />
+                            <KeyBinder
+                                label="ATTACK"
+                                keys={localSettings.controls?.attack}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, attack: k })}
+                            />
+                            <KeyBinder
+                                label="RESTART"
+                                keys={localSettings.controls?.restart}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, restart: k })}
+                            />
+                            <KeyBinder
+                                label="PAUSE / CANCEL"
+                                keys={localSettings.controls?.pause}
+                                onBindingChange={(k) => updateLocalSetting("controls", { ...localSettings.controls, pause: k })}
+                            />
+                        </div>
                     </div>
                 </div>
 

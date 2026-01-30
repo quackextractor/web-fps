@@ -28,7 +28,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
                 <div className="flex flex-col gap-6 w-full max-w-sm">
                     <MenuButton onClick={() => onStartGame(0)}>
-                        NEW GAME
+                        PLAY
                     </MenuButton>
                     <MenuButton onClick={onSelectLevel} variant="secondary">
                         SELECT LEVEL

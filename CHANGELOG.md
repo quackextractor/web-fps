@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.3.0] - 2026-01-30
+
+### Added
+-   **Keyboard Remapping**: Fully customizable control scheme via the Options menu. Supports multiple key bindings per action.
+-   **Asset Preloader**: New loading screen system ensuring all heavy assets (textures, sounds) are cached before gameplay starts.
+-   **Robust Settings Architecture**: Implemented deep-merge logic for persistent settings to prevent app crashes when loading legacy configurations.
+-   **GameActionContext**: Introduced a decoupled communication layer for internal game events, removing reliance on global `window` objects.
+
+### Changed
+-   **Performance Optimization**: Optimized the game loop by implementing in-place "swap-and-pop" removal for projectiles, significantly reducing Garbage Collection pressure.
+-   **Architecture Refactor**: Improved separation of concerns between game logic and UI state.
+-   **Updated Documentation**: Overhauled README and created technical documentation in `docs/documentation.md`.
+
+### Fixed
+-   **Control Logic Safety**: Added optional chaining and safe accessors for all critical control paths to handle undefined or corrupted configuration states.
+
 ## [0.2.38] - 2026-01-30
 
 ### Added

@@ -21,6 +21,26 @@ export interface GameSettings {
     ragdollEnabled: boolean;
     ragdollMultiplier: number;
     ragdollAutoClear: boolean;
+    controls: ControlScheme;
+}
+
+export interface ControlScheme {
+    forward: string[];
+    backward: string[];
+    left: string[];
+    right: string[];
+    strafeLeft: string[];
+    strafeRight: string[];
+    attack: string[];
+    weapon1: string[];
+    weapon2: string[];
+    weapon3: string[];
+    weapon4: string[];
+    weapon5: string[];
+    pause: string[];
+    nextWeapon: string[];
+    prevWeapon: string[];
+    restart: string[];
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -42,6 +62,24 @@ export const DEFAULT_SETTINGS: GameSettings = {
     ragdollEnabled: true,
     ragdollMultiplier: 1,
     ragdollAutoClear: true,
+    controls: {
+        forward: ["w", "arrowup"],
+        backward: ["s", "arrowdown"],
+        left: ["q", "arrowleft"],
+        right: ["e", "arrowright"],
+        strafeLeft: ["a"],
+        strafeRight: ["d"],
+        attack: [" ", "f"],
+        weapon1: ["1"],
+        weapon2: ["2"],
+        weapon3: ["3"],
+        weapon4: ["4"],
+        weapon5: ["5"],
+        pause: ["escape", "control"],
+        nextWeapon: ["]", "="],
+        prevWeapon: ["[", "-"],
+        restart: ["r"],
+    },
 };
 
 const STORAGE_KEY = "doom-settings";
@@ -73,7 +111,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (stored) {
                 const parsed = JSON.parse(stored);
                 // Merge with default to ensure new fields are present
-                setSettingsState({ ...DEFAULT_SETTINGS, ...parsed });
+                // We do a manual deep merge for controls to be safe
+                const merged = {
+                    ...DEFAULT_SETTINGS,
+                    ...parsed,
+                    controls: {
+                        ...DEFAULT_SETTINGS.controls,
+                        ...(parsed.controls || {})
+                    }
+                };
+                setSettingsState(merged);
             }
         } catch (e) {
             console.warn("Failed to load settings from localStorage", e);

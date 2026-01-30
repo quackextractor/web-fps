@@ -38,6 +38,8 @@ import { VictoryScreen } from "./game-ui/VictoryScreen";
 import { HUD } from "./game-ui/HUD";
 import { EffectsLayer } from "./game-ui/EffectsLayer";
 import { Crosshair } from "./game-ui/Crosshair";
+import { useGameActions } from "@/context/GameActionContext";
+import { AssetPreloader } from "./AssetPreloader";
 
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
@@ -49,11 +51,13 @@ export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
 
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
+  const { registerClearRagdolls } = useGameActions();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -111,16 +115,16 @@ export default function FPSGame() {
     // Initialize renderer
     rendererRef.current = new GameRenderer(800, 600, 200);
 
-    // Expose clear function for settings menu
-    (window as any).clearRagdolls = () => {
+    // Register clear function to context
+    registerClearRagdolls(() => {
       ragdollManagerRef.current.clear();
       forceUpdate(n => n + 1);
-    };
+    });
 
     return () => {
-      delete (window as any).clearRagdolls;
+      // Cleanup if needed
     };
-  }, []);
+  }, [registerClearRagdolls]);
 
   const screenWidthRef = useRef(800);
   const screenHeightRef = useRef(600);
@@ -428,10 +432,13 @@ export default function FPSGame() {
       let moveForward = 0;
       let moveStrafe = 0;
 
-      if (keysRef.current.has("w") || keysRef.current.has("arrowup")) moveForward += 1;
-      if (keysRef.current.has("s") || keysRef.current.has("arrowdown")) moveForward -= 1;
-      if (keysRef.current.has("a")) moveStrafe += 1;
-      if (keysRef.current.has("d")) moveStrafe -= 1;
+      const { controls } = settings;
+      const hasControl = (keys: string[] | undefined) => keys?.some(k => keysRef.current.has(k)) || false;
+
+      if (hasControl(controls?.forward)) moveForward += 1;
+      if (hasControl(controls?.backward)) moveForward -= 1;
+      if (hasControl(controls?.strafeLeft)) moveStrafe += 1;
+      if (hasControl(controls?.strafeRight)) moveStrafe -= 1;
 
       if (moveForward !== 0 || moveStrafe !== 0) {
         // Normalize vector
@@ -458,12 +465,10 @@ export default function FPSGame() {
         isMoving = true;
       }
 
-      if (keysRef.current.has("arrowleft")) newAngle -= 0.05 * settings.turnSpeed;
-      if (keysRef.current.has("arrowright")) newAngle += 0.05 * settings.turnSpeed;
-      if (keysRef.current.has("q")) newAngle -= 0.05 * settings.turnSpeed;
-      if (keysRef.current.has("e")) newAngle += 0.05 * settings.turnSpeed;
+      if (hasControl(controls?.left)) newAngle -= 0.05 * settings.turnSpeed;
+      if (hasControl(controls?.right)) newAngle += 0.05 * settings.turnSpeed;
 
-      if (keysRef.current.has(" ") || keysRef.current.has("f") || mouseDownRef.current) {
+      if (hasControl(controls?.attack) || mouseDownRef.current) {
         attack();
       }
 
@@ -580,13 +585,17 @@ export default function FPSGame() {
       }
 
       // Update projectiles
-      projectilesRef.current = projectilesRef.current.filter((proj) => {
+      const projs = projectilesRef.current;
+      for (let i = projs.length - 1; i >= 0; i--) {
+        const proj = projs[i];
         proj.x += proj.dx;
         proj.y += proj.dy;
 
-        if (checkCollision(level.map, proj.x, proj.y, 0.1)) return false;
+        let shouldRemove = false;
 
-        if (proj.fromEnemy) {
+        if (checkCollision(level.map, proj.x, proj.y, 0.1)) {
+          shouldRemove = true;
+        } else if (proj.fromEnemy) {
           const distToPlayer = getDistance(proj.x, proj.y, currentPlayer.x, currentPlayer.y);
           if (distToPlayer < 0.5) {
             let damage = proj.damage;
@@ -598,12 +607,20 @@ export default function FPSGame() {
             playerRef.current.health = Math.max(0, playerRef.current.health - damage);
             hurtFlashRef.current = 10;
             soundManager.playHurt();
-            return false;
+            shouldRemove = true;
           }
         }
 
-        return getDistance(proj.x, proj.y, currentPlayer.x, currentPlayer.y) < 40;
-      });
+        if (!shouldRemove && getDistance(proj.x, proj.y, currentPlayer.x, currentPlayer.y) >= 40) {
+          shouldRemove = true;
+        }
+
+        if (shouldRemove) {
+          // Efficient removal: swap with last element and pop
+          projs[i] = projs[projs.length - 1];
+          projs.pop();
+        }
+      }
 
       if (playerRef.current.health <= 0) {
         setGameState("dead");
@@ -686,13 +703,14 @@ export default function FPSGame() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
       keysRef.current.add(key);
+      const { controls } = settings;
+      const isControl = (keys: string[] | undefined, k: string) => keys?.includes(k) || false;
 
       if ((key === " " || key === "f" || key.startsWith("arrow")) && gameStateRef.current === "playing") {
         e.preventDefault();
       }
 
-      // R to restart current level
-      if (key === "r") {
+      if (isControl(controls?.restart, key)) {
         if (gameStateRef.current === "dead") {
           restartCurrentLevel();
         } else if (gameStateRef.current === "playing") {
@@ -701,12 +719,12 @@ export default function FPSGame() {
       }
 
       // Space to proceed to next level (when level complete)
-      if (key === " " && gameStateRef.current === "levelComplete") {
+      if (isControl(controls?.attack, key) && gameStateRef.current === "levelComplete") {
         nextLevel();
       }
 
       // ESC to pause/return to menu
-      if (key === "escape" || key === "control") {
+      if (isControl(controls?.pause, key)) {
         if (gameStateRef.current === "playing") {
           setGameState("paused");
         } else if (gameStateRef.current === "paused") {
@@ -727,16 +745,24 @@ export default function FPSGame() {
         }
       }
 
-      if (key >= "1" && key <= "5" && gameStateRef.current === "playing") {
-        const weaponIndex = Number.parseInt(key) - 1;
-        const weapons = [WeaponType.FIST, WeaponType.CHAINSAW, WeaponType.PISTOL, WeaponType.SHOTGUN, WeaponType.CHAINGUN];
-        if (weaponsUnlockedRef.current.has(weapons[weaponIndex])) {
-          playerRef.current.weapon = weapons[weaponIndex];
+      const weaponKeys = [
+        controls?.weapon1,
+        controls?.weapon2,
+        controls?.weapon3,
+        controls?.weapon4,
+        controls?.weapon5
+      ];
+      for (let i = 0; i < weaponKeys.length; i++) {
+        if (isControl(weaponKeys[i], key) && gameStateRef.current === "playing") {
+          const weapons = [WeaponType.FIST, WeaponType.CHAINSAW, WeaponType.PISTOL, WeaponType.SHOTGUN, WeaponType.CHAINGUN];
+          if (weaponsUnlockedRef.current.has(weapons[i])) {
+            playerRef.current.weapon = weapons[i];
+          }
         }
       }
 
-      if (key === "[" || key === "-") switchWeapon(-1);
-      if (key === "]" || key === "=") switchWeapon(1);
+      if (controls.prevWeapon.some(k => k === key)) switchWeapon(-1);
+      if (controls.nextWeapon.some(k => k === key)) switchWeapon(1);
 
       if (key === "t") {
         const testLevelIndex = LEVELS.length - 1;
@@ -877,6 +903,21 @@ export default function FPSGame() {
 
   return (
     <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden">
+      {!assetsLoaded && (
+        <AssetPreloader
+          onComplete={() => setAssetsLoaded(true)}
+          assets={{
+            images: [
+              '/textures/wall_tech.bmp',
+              '/textures/wall_metal.bmp',
+              '/textures/wall_brick.bmp',
+              '/textures/wall_stone.bmp',
+            ],
+            sounds: [] // Sounds are currently synthesized
+          }}
+        />
+      )}
+
       <div className="relative w-full h-full flex items-center justify-center aspect-video">
         <canvas
           ref={canvasRef}
