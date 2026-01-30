@@ -177,7 +177,7 @@ export function SettingsMenu({
                                 label="GORE MULTIPLIER"
                                 value={localSettings.ragdollMultiplier}
                                 min={1}
-                                max={5}
+                                max={20}
                                 step={1}
                                 onChange={(v) => updateLocalSetting("ragdollMultiplier", v)}
                                 format={(v) => `${v}x`}
