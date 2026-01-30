@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.25] - 2026-01-30
+
+### Added
+-   **Wall Textures**: Replaced solid color walls with retro-style texture mapping. Textures are procedurally generated (tech, brick, stone, metal) and assigned per-level.
+
 ## [0.2.24] - 2026-01-30
 
 ### Fixed

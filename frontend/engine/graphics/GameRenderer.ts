@@ -83,6 +83,19 @@ export class GameRenderer {
         }
     }
 
+    private textures: Map<string, HTMLImageElement> = new Map();
+
+    loadLevelTextures(level: Level) {
+        if (!level.wallTextures) return;
+        Object.values(level.wallTextures).forEach(path => {
+            if (!this.textures.has(path)) {
+                const img = new Image();
+                img.src = path;
+                this.textures.set(path, img);
+            }
+        });
+    }
+
     private renderWorld(ctx: CanvasRenderingContext2D, state: RenderState) {
         const { player, level, enemies, projectiles, pickups } = state;
         const SCREEN_WIDTH = this.screenWidth;
@@ -111,7 +124,7 @@ export class GameRenderer {
 
         for (let i = 0; i < NUM_RAYS; i++) {
             const rayAngle = player.angle - FOV / 2 + (i / NUM_RAYS) * FOV;
-            const { distance, wallType, side } = castRay(level.map, player.x, player.y, rayAngle);
+            const { distance, wallType, side, hitX, hitY } = castRay(level.map, player.x, player.y, rayAngle);
 
             const correctedDist = distance * Math.cos(rayAngle - player.angle);
             zBuffer[i] = correctedDist;
@@ -119,12 +132,55 @@ export class GameRenderer {
             const wallHeight = Math.min((SCREEN_HEIGHT / correctedDist) * 1.2, SCREEN_HEIGHT);
             const wallTop = (SCREEN_HEIGHT - wallHeight) / 2;
 
-            const colors = WALL_COLORS[wallType] || WALL_COLORS[1];
-            const baseColor = side === 0 ? colors.light : colors.dark;
+            // Texture Mapping
+            let texturePath = level.wallTextures?.[wallType];
+            let texture = texturePath ? this.textures.get(texturePath) : null;
 
-            const shade = Math.max(0.2, 1 - correctedDist / 15);
-            ctx.fillStyle = shadeColor(baseColor, shade);
-            ctx.fillRect(Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight));
+            if (texture && texture.complete) {
+                let wallX;
+                if (side === 0) wallX = hitY; // If hit vertical wall, use Y
+                else wallX = hitX;            // If hit horizontal wall, use X
+
+                wallX -= Math.floor(wallX);
+
+                // Flip texture if facing specific directions
+                if (side === 0 && Math.cos(rayAngle) > 0) wallX = 1 - wallX;
+                if (side === 1 && Math.sin(rayAngle) < 0) wallX = 1 - wallX;
+
+                const texX = Math.floor(wallX * texture.width);
+
+                // Darken sides for depth perception
+                if (side === 1) {
+                    ctx.filter = 'brightness(0.7)';
+                } else {
+                    ctx.filter = 'none';
+                }
+
+                // Draw texture strip
+                // We draw using drawImage to scale the 1px wide strip to rayWidth
+                ctx.drawImage(
+                    texture,
+                    texX, 0, 1, texture.height,
+                    Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight)
+                );
+
+                ctx.filter = 'none';
+
+                // Distance shading (fog)
+                const shade = Math.max(0, Math.min(0.8, correctedDist / 15));
+                if (shade > 0) {
+                    ctx.fillStyle = `rgba(0, 0, 0, ${shade})`;
+                    ctx.fillRect(Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight));
+                }
+
+            } else {
+                // Fallback to solid colors
+                const colors = WALL_COLORS[wallType] || WALL_COLORS[1];
+                const baseColor = side === 0 ? colors.light : colors.dark;
+                const shade = Math.max(0.2, 1 - correctedDist / 15);
+                ctx.fillStyle = shadeColor(baseColor, shade);
+                ctx.fillRect(Math.floor(i * rayWidth), Math.floor(wallTop), Math.ceil(rayWidth) + 1, Math.ceil(wallHeight));
+            }
         }
 
         // Sprites

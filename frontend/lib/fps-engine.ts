@@ -325,6 +325,9 @@ export interface Level {
   name: string;
   exitX: number;
   exitY: number;
+  wallTextures: Record<number, string>;
+  floorTexture?: string;
+  ceilingTexture?: string;
 }
 
 export const WALL_COLORS: Record<number, { dark: string; light: string }> = {
@@ -442,6 +445,13 @@ export const LEVELS: Level[] = [
     startAngle: 0,
     exitX: 18,
     exitY: 12,
+    wallTextures: {
+      1: '/textures/wall_tech.bmp',
+      2: '/textures/wall_metal.bmp', // Tech floor
+      3: '/textures/wall_tech.bmp',
+      4: '/textures/wall_tech.bmp',
+      9: '/textures/wall_tech.bmp', // Exit
+    },
     enemies: [
       createEnemy(EnemyType.ZOMBIE, 5, 5),
       createEnemy(EnemyType.ZOMBIE, 15, 5),
@@ -465,6 +475,13 @@ export const LEVELS: Level[] = [
     startAngle: 0,
     exitX: 20,
     exitY: 12,
+    wallTextures: {
+      1: '/textures/wall_brick.bmp',
+      2: '/textures/wall_brick.bmp',
+      3: '/textures/wall_metal.bmp',
+      4: '/textures/wall_brick.bmp',
+      9: '/textures/wall_metal.bmp', // Exit
+    },
     enemies: [
       createEnemy(EnemyType.SOLDIER, 5, 5),
       createEnemy(EnemyType.SOLDIER, 15, 5),
@@ -493,6 +510,11 @@ export const LEVELS: Level[] = [
     startAngle: 0,
     exitX: 22,
     exitY: 10,
+    wallTextures: {
+      1: '/textures/wall_stone.bmp',
+      5: '/textures/wall_stone.bmp',
+      9: '/textures/wall_metal.bmp', // Exit
+    },
     enemies: [
       createEnemy(EnemyType.IMP, 6, 5),
       createEnemy(EnemyType.IMP, 18, 5),
@@ -525,6 +547,10 @@ export const LEVELS: Level[] = [
     startAngle: 0,
     exitX: 13,
     exitY: 12,
+    wallTextures: {
+      1: '/textures/wall_tech.bmp',
+      9: '/textures/wall_meta.bmp',
+    },
     enemies: [
       createEnemy(EnemyType.ZOMBIE, 5, 3),
       createEnemy(EnemyType.SOLDIER, 7, 3),

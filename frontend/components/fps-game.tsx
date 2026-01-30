@@ -180,6 +180,10 @@ export default function FPSGame() {
     projectilesRef.current = [];
     killsRef.current = 0;
     shootFlashRef.current = 0;
+
+    if (rendererRef.current) {
+      rendererRef.current.loadLevelTextures(level);
+    }
   }, [savedProgress.unlockedWeapons, getDifficultyMultiplier]);
 
   const restartCurrentLevel = useCallback(() => {
