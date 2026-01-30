@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.32] - 2026-01-30
+
+### Changed
+-   **Weapon Model Overhaul**: Completely redesigned all 5 weapon sprites with enhanced retro details:
+    -   **Fist**: Detailed hand anatomy with knuckles, two-tone skin shading, punching animation.
+    -   **Chainsaw**: Wood grain handle, gradient housing, animated chain teeth, exhaust smoke, vibration effect, blood splatter.
+    -   **Pistol**: Slide/frame separation, sights (front/rear), hammer, trigger, recoil animation, ejecting shell casings, multi-layer muzzle flash.
+    -   **Shotgun**: Wood grain stock, pump action animation, receiver details, red bead sight, shell ejection, spread pattern muzzle flash.
+    -   **Chaingun**: Ammo box with belt feed, brass bullets on belt, heat glow effect, brass casing stream, flickering muzzle flash.
+
+### Added
+-   **Weapon Animations**: Enhanced animations for all weapons including recoil, reload/pump sequences, and improved muzzle flash effects.
+
+## [0.2.31] - 2026-01-30
+
+### Changed
+-   **Retro Enemy Sprites**: Completely redesigned all 8 enemy types with a polished retro aesthetic:
+    -   Added black outlines around all enemy silhouettes for better definition.
+    -   Glowing eyes for all enemies (yellow for Imp, green for Demon/HellKnight, red for Baron/Cyberdemon, orange for Zombie).
+    -   Blocky angular shapes reminiscent of classic 90s shooters.
+    -   Visible triangular teeth and curved horns.
+    -   Enhanced attack effects with glowing projectiles.
+    -   Improved muscle/body shading with darker color gradients.
+-   **Weapon Sprites**: Added black outlines to all weapon sprites for visual consistency.
+
+### Added
+-   **Sprite Helpers**: New pixel-art style rendering functions (`drawBlockyRect`, `drawRetroEllipse`, `drawGlowingEyes`, `drawTeeth`, `drawHorns`) for consistent retro look.
+
 ## [0.2.30] - 2026-01-30
 
 ### Fixed
