@@ -48,7 +48,7 @@ interface SavedProgress {
   highestLevel: number;
 }
 
-export default function DoomGame() {
+export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
@@ -1396,7 +1396,7 @@ export default function DoomGame() {
 
   // Handle Savegame Persistence
   useEffect(() => {
-    const saved = localStorage.getItem("doom-savegame");
+    const saved = localStorage.getItem("fps-savegame");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -1418,7 +1418,7 @@ export default function DoomGame() {
       unlockedWeapons: Array.from(savedProgress.unlockedWeapons),
       highestLevel: savedProgress.highestLevel
     };
-    localStorage.setItem("doom-savegame", JSON.stringify(toSave));
+    localStorage.setItem("fps-savegame", JSON.stringify(toSave));
   }, [savedProgress]);
 
 
