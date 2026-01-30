@@ -1,11 +1,16 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const pressStart2P = Press_Start_2P({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-press-start-2p',
+});
+
+// Remove unused Geist fonts
 
 export const metadata: Metadata = {
   title: 'INFERNO - Descent Into Darkness',
@@ -27,7 +32,7 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
-    generator: 'v0.app'
+  generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -37,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body className={`${pressStart2P.variable} antialiased`}>
         {children}
         <Analytics />
       </body>

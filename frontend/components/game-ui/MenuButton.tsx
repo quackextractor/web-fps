@@ -11,11 +11,11 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
     children,
     variant = "primary"
 }) => {
-    const baseClasses = "w-full px-6 py-3 text-lg font-bold rounded transition-all duration-200 transform hover:scale-105 active:scale-95";
+    const baseClasses = "w-full px-6 py-4 text-sm md:text-base font-bold transition-all duration-75 transform active:translate-y-1 retro-text retro-border uppercase tracking-widest";
     const variantClasses = {
-        primary: "bg-red-700 hover:bg-red-600 text-white border-2 border-red-500",
-        secondary: "bg-gray-700 hover:bg-gray-600 text-white border-2 border-gray-500",
-        danger: "bg-yellow-600 hover:bg-yellow-500 text-black border-2 border-yellow-400",
+        primary: "bg-red-700 hover:bg-white hover:text-red-700 text-white border-black",
+        secondary: "bg-gray-800 hover:bg-white hover:text-black text-white border-black",
+        danger: "bg-yellow-600 hover:bg-red-600 hover:text-white text-black border-black",
     };
     return (
         <button type="button" onClick={onClick} className={`${baseClasses} ${variantClasses[variant]}`}>
