@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.27] - 2026-01-30
+
+### Added
+-   **Clear Progress**: Added a button in Settings -> Data to wipe all game progress (unlocked levels and weapons).
+-   **Version Display**: Main Menu now displays the current game version synced from `version.md`.
+
 ## [0.2.26] - 2026-01-30
 
 ### Fixed

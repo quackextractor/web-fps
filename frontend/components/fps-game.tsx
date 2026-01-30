@@ -254,6 +254,20 @@ export default function FPSGame() {
     weaponsUnlockedRef.current = allWeapons;
   }, []);
 
+  const clearProgress = useCallback(() => {
+    const initialWeapons = new Set([WeaponType.FIST, WeaponType.PISTOL]);
+    setSavedProgress({
+      unlockedLevels: new Set([0]),
+      unlockedWeapons: initialWeapons,
+      highestLevel: 0,
+    });
+    weaponsUnlockedRef.current = initialWeapons;
+    // Reset internal refs for consistency if currently playing/in-between
+    previousLevelWeaponsRef.current = new Set(initialWeapons);
+    previousLevelAmmoRef.current = { [AmmoType.BULLETS]: 50, [AmmoType.SHELLS]: 0 };
+    totalKillsRef.current = 0;
+  }, []);
+
   const attack = useCallback(() => {
     const player = playerRef.current;
     const weapon = WEAPON_CONFIG[player.weapon];
@@ -874,6 +888,7 @@ export default function FPSGame() {
             unlockAllLevels={unlockAllLevels}
             unlockAllWeapons={unlockAllWeapons}
             resetSettings={resetSettings}
+            clearProgress={clearProgress}
           />
         )}
 

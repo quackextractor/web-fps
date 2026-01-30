@@ -46,7 +46,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 </div>
 
                 <div className="absolute bottom-4 right-4 text-[10px] text-gray-800 font-mono">
-                    v0.2.26
+                    v{process.env.NEXT_PUBLIC_GAME_VERSION || "0.0.0"}
                 </div>
             </div>
         </div>

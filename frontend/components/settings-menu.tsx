@@ -17,6 +17,8 @@ interface SettingsMenuProps {
     setSettings: (settings: GameSettings) => void;
     unlockAllLevels: () => void;
     unlockAllWeapons: () => void;
+    resetSettings: () => void;
+    clearProgress: () => void;
 }
 
 export function SettingsMenu({
@@ -26,7 +28,8 @@ export function SettingsMenu({
     unlockAllLevels,
     unlockAllWeapons,
     resetSettings,
-}: SettingsMenuProps & { resetSettings: () => void }) {
+    clearProgress,
+}: SettingsMenuProps) {
     const updateSetting = <K extends keyof GameSettings>(key: K, value: GameSettings[K]) => {
         setSettings({ ...settings, [key]: value });
     };
@@ -202,7 +205,7 @@ export function SettingsMenu({
                         </div>
                     </div>
 
-                    {/* Cheats Section */}
+                    {/* Cheats & Data Section */}
                     <div className="space-y-4">
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4">CHEATS</h3>
                         <button
@@ -224,6 +227,19 @@ export function SettingsMenu({
                             value={settings.debugMode}
                             onChange={(v) => updateSetting("debugMode", v)}
                         />
+
+                        <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8">DATA</h3>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (window.confirm("Are you sure you want to clear your game progress? This cannot be undone.")) {
+                                    clearProgress();
+                                }
+                            }}
+                            className="w-full py-3 bg-red-900/50 hover:bg-red-600 hover:text-white text-red-200 retro-text text-[10px] retro-border transition-colors uppercase"
+                        >
+                            CLEAR PROGRESS
+                        </button>
                     </div>
                 </div>
 
