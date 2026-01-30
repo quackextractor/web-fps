@@ -221,6 +221,7 @@ export default function FPSGame() {
       totalKillsRef.current += killsRef.current;
       loadLevel(next, true);
       setGameState("playing");
+      lock(true);
     } else {
       setGameState("victory");
     }
@@ -654,11 +655,12 @@ export default function FPSGame() {
       }
 
       // ESC to pause/return to menu
-      if (key === "escape") {
+      if (key === "escape" || key === "control") {
         if (gameStateRef.current === "playing") {
           setGameState("paused");
         } else if (gameStateRef.current === "paused") {
           setGameState("playing");
+          lock(true);
         } else if (gameStateRef.current === "settings") {
           setGameState(previousGameStateRef.current);
         } else if (gameStateRef.current === "levelSelect") {
