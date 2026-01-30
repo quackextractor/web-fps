@@ -780,7 +780,10 @@ export function findPath(
     { x: 0, y: 1 },  // Down
     { x: -1, y: 0 }, // Left
     { x: 1, y: 0 },  // Right
-    { x: 1, y: 0 },  // Right
+    { x: -1, y: -1 }, // Up-Left
+    { x: 1, y: -1 },  // Up-Right
+    { x: -1, y: 1 },  // Down-Left
+    { x: 1, y: 1 },   // Down-Right
   ];
 
   let iterations = 0;

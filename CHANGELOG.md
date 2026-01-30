@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.24] - 2026-01-30
+
+### Fixed
+-   **Pathfinding Bug**: Fixed a bug where the A* algorithm was using a duplicate neighbor, potentially causing inefficient pathing.
+
+### Added
+-   **Safe Diagonal Movement**: Enemies can now move diagonally in open spaces (8-way A*), but predictive path smoothing remains disabled to ensure safe corner navigation.
+-   **Stuck Detection**: Implemented a "stuck detector" that forces enemies to recalculate their path if they haven't moved significantly for 0.5 seconds.
+
 ## [0.2.23] - 2026-01-30
 
 ### Fixed

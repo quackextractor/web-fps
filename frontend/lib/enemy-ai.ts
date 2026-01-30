@@ -100,14 +100,30 @@ export function updateEnemyAI(
 
     if (enemy.state !== 'chasing') return result;
 
-    // 5. Pathfinding Update
+    // 5. Stuck Detection
+    const distMoved = Math.sqrt(Math.pow(enemy.x - enemy.lastX, 2) + Math.pow(enemy.y - enemy.lastY, 2));
+    if (enemy.state === 'chasing' && distMoved < 0.01) {
+        enemy.stuckFrameCount++;
+    } else {
+        enemy.stuckFrameCount = 0;
+    }
+
+    // Update last pos
+    enemy.lastX = enemy.x;
+    enemy.lastY = enemy.y;
+
+    // Force recalc if stuck for > 0.5s (approx 30 frames at 60fps)
+    const isStuck = enemy.stuckFrameCount > 30;
+
+    // 6. Pathfinding Update
     // Only recalc path if: 
     // a) Enough time passed
     // b) Target moved significantly (optimization, optional)
     // c) No current path
     // d) We can't see the player (if we can see, we might DIRECT seek, but careful of walls)
+    // e) WE ARE STUCK
 
-    const shouldRecalc = (time - enemy.lastPathTime > PATH_RECALC_INTERVAL) || (enemy.path.length === 0);
+    const shouldRecalc = (time - enemy.lastPathTime > PATH_RECALC_INTERVAL) || (enemy.path.length === 0) || isStuck;
 
     if (shouldRecalc) {
         const startNode = { x: Math.floor(enemy.x), y: Math.floor(enemy.y) };
