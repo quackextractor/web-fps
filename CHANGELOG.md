@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.23] - 2026-01-30
+
+### Fixed
+-   **Cursor Lock**: Fixed an issue where the cursor would not re-lock immediately when unpausing or transitioning to the next level. Now uses strict pointer locking.
+-   **Movement Calculation**: Fixed diagonal movement speed being faster than cardinal directions. Movement vectors are now normalized.
+
+### Changed
+-   **Input Bindings**:
+    -   Added `Ctrl` as an alternative key for Pausing/Unpausing.
+    -   Rebound `E` to Turn Right (was Next Level).
+    -   Rebound `Space` to Next Level (in Level Complete screen).
+
 ## [0.2.22] - 2026-01-30
 
 ### Changed
