@@ -43,7 +43,7 @@ let partIdCounter = 0;
 export class RagdollManager {
     private parts: RagdollPart[] = [];
 
-    spawnRagdoll(enemy: Enemy, playerX: number, playerY: number): void {
+    spawnRagdoll(enemy: Enemy, playerX: number, playerY: number, multiplier: number = 1): void {
         const config = ENEMY_CONFIG[enemy.type];
         const baseColor = ENEMY_COLORS[enemy.type];
         const baseSize = config.size * 0.3;
@@ -60,56 +60,59 @@ export class RagdollManager {
 
         const partTypes: RagdollPartType[] = ['head', 'torso', 'arm_l', 'arm_r', 'leg_l', 'leg_r'];
 
-        for (const partType of partTypes) {
-            const spread = 0.3;
-            const offsetX = (Math.random() - 0.5) * spread;
-            const offsetY = (Math.random() - 0.5) * spread;
+        // Spawn multiple copies based on multiplier
+        for (let m = 0; m < multiplier; m++) {
+            for (const partType of partTypes) {
+                const spread = 0.3 + m * 0.1; // Increase spread with multiplier
+                const offsetX = (Math.random() - 0.5) * spread;
+                const offsetY = (Math.random() - 0.5) * spread;
 
-            // Parts start at different heights
-            let startZ = 0.5;
-            let size = baseSize;
+                // Parts start at different heights
+                let startZ = 0.5;
+                let size = baseSize;
 
-            switch (partType) {
-                case 'head':
-                    startZ = 0.9;
-                    size = baseSize * 0.7;
-                    break;
-                case 'torso':
-                    startZ = 0.6;
-                    size = baseSize * 1.2;
-                    break;
-                case 'arm_l':
-                case 'arm_r':
-                    startZ = 0.5;
-                    size = baseSize * 0.5;
-                    break;
-                case 'leg_l':
-                case 'leg_r':
-                    startZ = 0.3;
-                    size = baseSize * 0.6;
-                    break;
+                switch (partType) {
+                    case 'head':
+                        startZ = 0.9;
+                        size = baseSize * 0.7;
+                        break;
+                    case 'torso':
+                        startZ = 0.6;
+                        size = baseSize * 1.2;
+                        break;
+                    case 'arm_l':
+                    case 'arm_r':
+                        startZ = 0.5;
+                        size = baseSize * 0.5;
+                        break;
+                    case 'leg_l':
+                    case 'leg_r':
+                        startZ = 0.3;
+                        size = baseSize * 0.6;
+                        break;
+                }
+
+                const part: RagdollPart = {
+                    id: partIdCounter++,
+                    x: enemy.x + offsetX,
+                    y: enemy.y + offsetY,
+                    z: startZ + Math.random() * 0.2,
+                    vx: dirX * impactSpeed + (Math.random() - 0.5) * 0.08,
+                    vy: dirY * impactSpeed + (Math.random() - 0.5) * 0.08,
+                    vz: 0.08 + Math.random() * 0.08, // Initial upward velocity
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.4,
+                    type: partType,
+                    color: baseColor,
+                    size: size * (0.8 + Math.random() * 0.4), // Vary sizes
+                    lifetime: 0,
+                    maxLifetime: MAX_LIFETIME + Math.random() * 60,
+                    enemyType: enemy.type,
+                    onGround: false,
+                };
+
+                this.parts.push(part);
             }
-
-            const part: RagdollPart = {
-                id: partIdCounter++,
-                x: enemy.x + offsetX,
-                y: enemy.y + offsetY,
-                z: startZ,
-                vx: dirX * impactSpeed + (Math.random() - 0.5) * 0.05,
-                vy: dirY * impactSpeed + (Math.random() - 0.5) * 0.05,
-                vz: 0.08 + Math.random() * 0.06, // Initial upward velocity
-                rotation: Math.random() * Math.PI * 2,
-                rotationSpeed: (Math.random() - 0.5) * 0.3,
-                type: partType,
-                color: baseColor,
-                size,
-                lifetime: 0,
-                maxLifetime: MAX_LIFETIME + Math.random() * 60,
-                enemyType: enemy.type,
-                onGround: false,
-            };
-
-            this.parts.push(part);
         }
     }
 

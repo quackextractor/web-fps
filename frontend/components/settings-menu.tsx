@@ -167,6 +167,22 @@ export function SettingsMenu({
                                 ))}
                             </div>
                         </div>
+                        <Toggle
+                            label="RAGDOLLS"
+                            value={localSettings.ragdollEnabled}
+                            onChange={(v) => updateLocalSetting("ragdollEnabled", v)}
+                        />
+                        {localSettings.ragdollEnabled && (
+                            <Slider
+                                label="GORE MULTIPLIER"
+                                value={localSettings.ragdollMultiplier}
+                                min={1}
+                                max={5}
+                                step={1}
+                                onChange={(v) => updateLocalSetting("ragdollMultiplier", v)}
+                                format={(v) => `${v}x`}
+                            />
+                        )}
                     </div>
 
                     {/* Display Section */}

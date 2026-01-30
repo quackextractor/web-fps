@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.2.35] - 2026-01-30
+
+### Fixed
+-   **Settings Reactivity**: Fixed an issue where the new Ragdoll settings (toggle and multiplier) were not applying in-game due to stale closures.
+
+## [0.2.34] - 2026-01-30
+
+### Added
+-   **Ragdoll Settings**: Added options menu controls for ragdoll effects.
+    -   Toggle to enable/disable ragdolls.
+    -   Gore multiplier slider (1x-5x) to increase number of body parts.
+-   Dead enemies no longer show corpse sprite (only ragdoll parts appear).
+
 ## [0.2.33] - 2026-01-30
 
 ### Added

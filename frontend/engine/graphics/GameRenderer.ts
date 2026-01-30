@@ -37,6 +37,8 @@ export interface RenderState {
         showFPS: boolean;
         crosshairStyle: string;
         imageSmoothingEnabled: boolean;
+        ragdollEnabled: boolean;
+        ragdollMultiplier: number;
     };
     fps: number;
 }

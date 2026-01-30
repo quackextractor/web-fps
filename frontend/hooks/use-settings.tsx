@@ -18,6 +18,8 @@ export interface GameSettings {
     imageSmoothingEnabled: boolean;
     scanlinesEnabled: boolean;
     scanlineSize: number;
+    ragdollEnabled: boolean;
+    ragdollMultiplier: number;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
@@ -36,6 +38,8 @@ export const DEFAULT_SETTINGS: GameSettings = {
     imageSmoothingEnabled: false,
     scanlinesEnabled: true,
     scanlineSize: 2,
+    ragdollEnabled: true,
+    ragdollMultiplier: 1,
 };
 
 const STORAGE_KEY = "doom-settings";

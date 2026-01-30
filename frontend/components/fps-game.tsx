@@ -319,7 +319,9 @@ export default function FPSGame() {
               enemy.animFrame = 0;
               killsRef.current += 1;
               soundManager.playEnemyDeath(enemy.type);
-              ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y);
+              if (settings.ragdollEnabled) {
+                ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y, settings.ragdollMultiplier);
+              }
             }
           }
         }
@@ -361,14 +363,16 @@ export default function FPSGame() {
             enemy.animFrame = 0;
             killsRef.current += 1;
             soundManager.playEnemyDeath(enemy.type);
-            ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y);
+            if (settings.ragdollEnabled) {
+              ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y, settings.ragdollMultiplier);
+            }
           } else {
             enemy.state = "hurt";
           }
         }
       }
     }
-  }, []);
+  }, [settings.ragdollEnabled, settings.ragdollMultiplier]);
 
   const switchWeapon = useCallback((delta: number) => {
     const weapons = Array.from(weaponsUnlockedRef.current).sort((a, b) => a - b);
@@ -648,6 +652,8 @@ export default function FPSGame() {
             showFPS: settings.showFPS,
             crosshairStyle: settings.crosshairStyle,
             imageSmoothingEnabled: settings.imageSmoothingEnabled,
+            ragdollEnabled: settings.ragdollEnabled,
+            ragdollMultiplier: settings.ragdollMultiplier,
           },
           fps: fpsRef.current
         };
@@ -662,7 +668,7 @@ export default function FPSGame() {
 
     animationId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationId);
-  }, [gameState, settings.mouseSensitivity, settings.timeScale, settings.debugMode]);
+  }, [gameState, settings.mouseSensitivity, settings.timeScale, settings.debugMode, settings.ragdollEnabled, settings.ragdollMultiplier]);
 
 
   // Keyboard controls
