@@ -624,19 +624,6 @@ export default function FPSGame() {
     animationId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationId);
   }, [gameState, settings.mouseSensitivity, settings.timeScale, settings.debugMode]);
-
-  function getProjectileColor(type: EnemyType): string {
-    switch (type) {
-      case EnemyType.IMP: return "#ff6600";
-      case EnemyType.SOLDIER: return "#ffff00";
-      case EnemyType.CACODEMON: return "#0066ff";
-      case EnemyType.BARON: return "#00ff00";
-      case EnemyType.HELLKNIGHT: return "#00ff66";
-      case EnemyType.CYBERDEMON: return "#ff0000";
-      default: return "#ffffff";
-    }
-  }
-
   const renderDebugView = (
     ctx: CanvasRenderingContext2D,
     level: Level,
