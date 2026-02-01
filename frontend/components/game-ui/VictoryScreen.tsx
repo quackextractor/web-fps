@@ -16,26 +16,26 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
     onMainMenu
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 p-4 select-none overflow-hidden">
             <ScanlinesOverlay />
 
-            <div className="relative z-10 w-full max-w-lg p-6 bg-black retro-border text-center">
-                <h2 className="retro-text text-3xl md:text-5xl text-yellow-500 mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>
+            <div className="relative z-10 w-full max-w-sm p-4 md:p-8 bg-black retro-border text-center flex flex-col h-full max-h-[90vh] justify-center">
+                <h2 className="retro-text text-[clamp(2rem,8vw,3.5rem)] text-yellow-500 mb-6 animate-pulse tracking-tight shrink-0" style={{ textShadow: "4px 4px 0px #303000" }}>
                     VICTORY!
                 </h2>
 
-                <p className="retro-text text-white text-xs md:text-sm mb-8 leading-relaxed">
+                <p className="retro-text text-white text-[clamp(10px,2vw,12px)] mb-8 leading-relaxed opacity-80">
                     CONGRATULATIONS!
                     <br /><br />
                     YOU HAVE CONQUERED THE DUNGEON.
                 </p>
 
-                <div className="mb-8 space-y-2 retro-text text-xs text-green-400">
-                    <p>TOTAL KILLS: {totalKills}</p>
-                    <p>FINAL HEALTH: {Math.ceil(health)}%</p>
+                <div className="mb-10 space-y-3 retro-text text-[clamp(10px,2vw,12px)] text-green-400">
+                    <p className="flex justify-between border-b border-green-900/30 pb-1">TOTAL KILLS: <span>{totalKills}</span></p>
+                    <p className="flex justify-between border-b border-green-900/30 pb-1">FINAL HEALTH: <span>{Math.ceil(health)}%</span></p>
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 w-full shrink-0">
                     <MenuButton onClick={onPlayAgain}>
                         PLAY AGAIN
                     </MenuButton>

@@ -59,23 +59,23 @@ export function SettingsMenu({
     }, []);
 
     const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (val: boolean) => void }) => (
-        <div className="flex items-center justify-between bg-gray-900 p-2 retro-border">
-            <label className="text-white retro-text text-xs md:text-sm">{label}</label>
+        <div className="flex items-center justify-between bg-gray-900 p-3 retro-border">
+            <label className="text-white retro-text text-[clamp(10px,1.5vw,12px)]">{label}</label>
             <button
                 type="button"
                 onClick={() => onChange(!value)}
-                className={`w-8 h-8 flex items-center justify-center retro-border transition-colors ${value ? "bg-red-600" : "bg-black"}`}
+                className={`w-[clamp(1.5rem,4vw,2rem)] h-[clamp(1.5rem,4vw,2rem)] flex items-center justify-center retro-border transition-colors ${value ? "bg-red-600" : "bg-black"}`}
             >
-                {value && <div className="w-4 h-4 bg-white" />}
+                {value && <div className="w-[clamp(0.75rem,2vw,1rem)] h-[clamp(0.75rem,2vw,1rem)] bg-white" />}
             </button>
         </div>
     );
 
     const Slider = ({ label, value, min, max, step, onChange, format = (v) => v.toString() }: { label: string; value: number; min: number; max: number; step: number; onChange: (val: number) => void; format?: (v: number) => string }) => (
-        <div className="flex flex-col gap-2 bg-gray-900 p-2 retro-border">
+        <div className="flex flex-col gap-2 bg-gray-900 p-3 retro-border">
             <div className="flex justify-between items-end">
-                <label className="text-white retro-text text-xs md:text-sm">{label}</label>
-                <span className="text-yellow-500 retro-text text-xs">{format(value)}</span>
+                <label className="text-white retro-text text-[clamp(10px,1.5vw,12px)]">{label}</label>
+                <span className="text-yellow-500 retro-text text-[clamp(10px,1.5vw,12px)]">{format(value)}</span>
             </div>
             <input
                 type="range"
@@ -131,13 +131,13 @@ export function SettingsMenu({
     };
 
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 z-50 overflow-y-auto select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-2 md:p-4 z-50 overflow-y-auto select-none">
             <ScanlinesOverlay enabled={localSettings.scanlinesEnabled} size={localSettings.scanlineSize} />
 
-            <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-6 shadow-2xl h-full md:h-auto overflow-y-auto">
-                <h2 className="retro-text text-2xl md:text-4xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+            <div className="relative z-10 w-full max-w-5xl bg-black retro-border p-3 md:p-8 shadow-2xl h-full md:h-auto max-h-[98vh] overflow-y-auto flex flex-col">
+                <h2 className="retro-text text-[clamp(1.25rem,5vw,2.5rem)] text-red-600 mb-4 md:mb-8 text-center tracking-tighter shrink-0" style={{ textShadow: "4px 4px 0px #300000" }}>
                     OPTIONS
-                    {hasChanges && <span className="text-yellow-500 text-sm ml-4">*</span>}
+                    {hasChanges && <span className="text-yellow-500 text-xs md:text-sm ml-4 animate-pulse">PENDING CHANGES</span>}
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs">

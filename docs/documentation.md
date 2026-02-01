@@ -38,6 +38,7 @@ INFERNO is a 2.5D retro FPS engine built with React and Next.js, utilizing a cus
 
 ### UI & Layout
 - **HUD Adaptability**: The HUD dynamically switches between a desktop layout (bottom status bar) and a mobile layout (top corner widgets) to avoid obstruction by touch controls. Recent updates use `clamp()` and relative scaling for perfect legibility across all resolutions.
+- **Responsive Menus**: All in-game menus (Main, Settings, Paused, etc.) use fluid typography and flexible containers to maintain a consistent retro aesthetic on devices ranging from low-resolution handhelds to high-end desktop monitors.
 - **Orientation Lock**: Automatically prompts users to switch to landscape mode on mobile devices for optimal FOV.
 - **Responsive Container**: The game uses a dynamic aspect-ratio container that aligns perfectly with the internal rendering resolution, ensuring overlay alignment remains consistent.
 - **Viewmodel Scaling**: Weapon sprites are automatically scaled based on vertical resolution to maintain a consistent visual weight across different screen heights.
