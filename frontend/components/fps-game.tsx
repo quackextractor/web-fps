@@ -105,11 +105,19 @@ export default function FPSGame() {
 
   const touchJoystickRef = useRef({ x: 0, y: 0 });
   const touchLookRef = useRef(0);
+  const touchTurnButtonsRef = useRef(0); // -1 for left, 1 for right
   const isTouchDeviceRef = useRef(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    isTouchDeviceRef.current = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const ua = navigator.userAgent;
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    const isIPad = (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    // Mobile controls should only appear on actual touch devices (mobile/tablet)
+    // We filter out desktop touchscreens by requiring a mobile UA or a small screen width
+    isTouchDeviceRef.current = isTouch && (isMobileUA || isIPad || window.innerWidth < 1024);
   }, []);
 
   useEffect(() => {
@@ -450,6 +458,11 @@ export default function FPSGame() {
         const direction = settings.invertLook ? -1 : 1;
         newAngle += touchLookRef.current * ROTATION_SPEED * settings.touchSensitivity * direction;
         touchLookRef.current = 0;
+      }
+
+      // Turn Buttons
+      if (touchTurnButtonsRef.current !== 0) {
+        newAngle += touchTurnButtonsRef.current * 0.05 * settings.touchSensitivity;
       }
 
       const { controls } = settings;
@@ -920,9 +933,11 @@ export default function FPSGame() {
 
 
   const player = playerRef.current;
+  const [resW, resH] = settings.resolution.split("x").map(Number);
+  const aspectRatio = resW / resH;
 
   return (
-    <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden">
+    <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden p-0 m-0">
       {!assetsLoaded && (
         <AssetPreloader
           onComplete={() => setAssetsLoaded(true)}
@@ -938,125 +953,150 @@ export default function FPSGame() {
         />
       )}
 
-      <div className="relative w-full h-full flex items-center justify-center aspect-video">
-        <canvas
-          ref={canvasRef}
-          className="border-4 border-red-900 rounded-lg cursor-none w-full h-full object-contain"
-          style={{ imageRendering: "pixelated" }}
-        />
+      {/* Main Game Container - Responsively scales to fit screen while maintaining aspect ratio */}
+      <div
+        className="relative flex items-center justify-center bg-black shadow-[0_0_50px_rgba(0,0,0,1)]"
+        style={{
+          width: '100%',
+          height: '100%',
+          maxHeight: '100vh',
+          maxWidth: '100vw',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <div
+          className="relative overflow-hidden"
+          style={{
+            aspectRatio: `${resW}/${resH}`,
+            maxWidth: '100%',
+            maxHeight: '100%',
+            height: 'auto',
+            width: `min(100%, calc(100vh * ${aspectRatio}))`,
+          }}
+        >
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full cursor-none block"
+            style={{ imageRendering: "pixelated" }}
+          />
 
-        {/* Retro Effects Layer */}
-        <EffectsLayer hurtFlash={hurtFlashRef.current} />
+          {/* Retro Effects Layer */}
+          <EffectsLayer hurtFlash={hurtFlashRef.current} />
 
-        {/* HUD Overlay */}
-        {gameState === "playing" && (
-          <>
-            <HUD
-              health={playerRef.current.health}
-              armor={playerRef.current.armor}
-              ammo={playerRef.current.ammo}
-              weapon={playerRef.current.weapon}
-              kills={killsRef.current}
-              isMobile={isMobile || isTouchDeviceRef.current}
-              levelName={LEVELS[currentLevel]?.name || "Unknown"}
-              weaponsUnlocked={weaponsUnlockedRef.current}
-            />
-            <Crosshair style={settings.crosshairStyle} />
-            {(isMobile || isTouchDeviceRef.current) && (
-              <MobileControls
-                onMove={(v) => { touchJoystickRef.current = v; }}
-                onLook={(d) => { touchLookRef.current = d; }}
-                onFire={(f) => { mouseDownRef.current = f; }}
-                onInteract={() => {
-                  // Look for interactable objects or just trigger attack if no usage logic yet
-                  // For now, interaction is not deeply implemented, but we can call attack or other logic
-                }}
-                onNextWeapon={() => switchWeapon(1)}
-                onPrevWeapon={() => switchWeapon(-1)}
+          {/* HUD Overlay - Now strictly inside the game area */}
+          {gameState === "playing" && (
+            <>
+              <HUD
+                health={playerRef.current.health}
+                armor={playerRef.current.armor}
+                ammo={playerRef.current.ammo}
+                weapon={playerRef.current.weapon}
+                kills={killsRef.current}
+                isMobile={isMobile || isTouchDeviceRef.current}
+                levelName={LEVELS[currentLevel]?.name || "Unknown"}
+                weaponsUnlocked={weaponsUnlockedRef.current}
               />
-            )}
-          </>
-        )}
+              <Crosshair style={settings.crosshairStyle} />
+              {isTouchDeviceRef.current && (
+                <MobileControls
+                  onMove={(v) => { touchJoystickRef.current = v; }}
+                  onLook={(d) => { touchLookRef.current = d; }}
+                  onFire={(f) => { mouseDownRef.current = f; }}
+                  onTurn={(t) => { touchTurnButtonsRef.current = t; }}
+                  onNextWeapon={() => switchWeapon(1)}
+                  onPrevWeapon={() => switchWeapon(-1)}
+                />
+              )}
+            </>
+          )}
 
-        {/* Main Menu */}
-        {gameState === "mainMenu" && (
-          <MainMenu
-            onStartGame={startGame}
-            onSelectLevel={() => setGameState("levelSelect")}
-            onOptions={() => {
-              setPreviousGameState("mainMenu");
-              setGameState("settings");
-            }}
-          />
-        )}
+          {/* UI Overlays inside game area */}
+          <div className="absolute inset-0 z-[60] pointer-events-none flex items-center justify-center">
+            <div className="pointer-events-auto w-full h-full flex items-center justify-center">
+              {/* Main Menu */}
+              {gameState === "mainMenu" && (
+                <MainMenu
+                  onStartGame={startGame}
+                  onSelectLevel={() => setGameState("levelSelect")}
+                  onOptions={() => {
+                    setPreviousGameState("mainMenu");
+                    setGameState("settings");
+                  }}
+                />
+              )}
 
-        {/* Level Select */}
-        {gameState === "levelSelect" && (
-          <LevelSelect
-            levels={LEVELS}
-            savedProgress={savedProgress}
-            onStartGame={startGame}
-            onBack={() => setGameState("mainMenu")}
-          />
-        )}
+              {/* Level Select */}
+              {gameState === "levelSelect" && (
+                <LevelSelect
+                  levels={LEVELS}
+                  savedProgress={savedProgress}
+                  onStartGame={startGame}
+                  onBack={() => setGameState("mainMenu")}
+                />
+              )}
 
-        {/* Settings */}
-        {gameState === "settings" && (
-          <SettingsMenu
-            onBack={() => setGameState(previousGameState)}
-            settings={settings}
-            setSettings={setSettings}
-            unlockAllLevels={unlockAllLevels}
-            unlockAllWeapons={unlockAllWeapons}
-            resetSettings={resetSettings}
-            clearProgress={clearProgress}
-          />
-        )}
+              {/* Settings */}
+              {gameState === "settings" && (
+                <SettingsMenu
+                  onBack={() => setGameState(previousGameState)}
+                  settings={settings}
+                  setSettings={setSettings}
+                  unlockAllLevels={unlockAllLevels}
+                  unlockAllWeapons={unlockAllWeapons}
+                  resetSettings={resetSettings}
+                  clearProgress={clearProgress}
+                />
+              )}
 
-        {/* Paused */}
-        {gameState === "paused" && (
-          <PauseMenu
-            onResume={() => setGameState("playing")}
-            onOptions={() => {
-              setPreviousGameState("paused");
-              setGameState("settings");
-            }}
-            onRestart={restartCurrentLevel}
-            onExit={() => setGameState("mainMenu")}
-          />
-        )}
+              {/* Paused */}
+              {gameState === "paused" && (
+                <PauseMenu
+                  onResume={() => setGameState("playing")}
+                  onOptions={() => {
+                    setPreviousGameState("paused");
+                    setGameState("settings");
+                  }}
+                  onRestart={restartCurrentLevel}
+                  onExit={() => setGameState("mainMenu")}
+                />
+              )}
 
-        {/* Dead */}
-        {gameState === "dead" && (
-          <DeathScreen
-            levelName={LEVELS[currentLevel]?.name}
-            kills={killsRef.current}
-            onRestart={restartCurrentLevel}
-            onMainMenu={() => setGameState("mainMenu")}
-          />
-        )}
+              {/* Dead */}
+              {gameState === "dead" && (
+                <DeathScreen
+                  levelName={LEVELS[currentLevel]?.name}
+                  kills={killsRef.current}
+                  onRestart={restartCurrentLevel}
+                  onMainMenu={() => setGameState("mainMenu")}
+                />
+              )}
 
-        {/* Level Complete */}
-        {gameState === "levelComplete" && (
-          <LevelCompleteScreen
-            levelName={LEVELS[currentLevel].name}
-            kills={killsRef.current}
-            health={player.health}
-            isLastLevel={currentLevel >= LEVELS.length - 1}
-            onNextLevel={nextLevel}
-            onMainMenu={() => setGameState("mainMenu")}
-          />
-        )}
+              {/* Level Complete */}
+              {gameState === "levelComplete" && (
+                <LevelCompleteScreen
+                  levelName={LEVELS[currentLevel].name}
+                  kills={killsRef.current}
+                  health={player.health}
+                  isLastLevel={currentLevel >= LEVELS.length - 1}
+                  onNextLevel={nextLevel}
+                  onMainMenu={() => setGameState("mainMenu")}
+                />
+              )}
 
-        {/* Victory */}
-        {gameState === "victory" && (
-          <VictoryScreen
-            totalKills={totalKillsRef.current + killsRef.current}
-            health={player.health}
-            onPlayAgain={() => startGame(0)}
-            onMainMenu={() => setGameState("mainMenu")}
-          />
-        )}
+              {/* Victory */}
+              {gameState === "victory" && (
+                <VictoryScreen
+                  totalKills={totalKillsRef.current + killsRef.current}
+                  health={player.health}
+                  onPlayAgain={() => startGame(0)}
+                  onMainMenu={() => setGameState("mainMenu")}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

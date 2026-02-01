@@ -613,28 +613,36 @@ export class GameRenderer {
         const SCREEN_WIDTH = this.screenWidth;
         const SCREEN_HEIGHT = this.screenHeight;
 
+        // Base height for scaling is 600px
+        const uiScale = SCREEN_HEIGHT / 600;
         const bob = player.isMoving ? Math.sin(player.bobPhase) * 10 : 0;
         const weaponX = SCREEN_WIDTH / 2;
-        const weaponY = SCREEN_HEIGHT - 150 + bob;
+        const weaponY = SCREEN_HEIGHT - (130 * uiScale) + (bob * uiScale);
         const meleeSwing = player.isMeleeing ? Math.sin(player.meleeFrame * Math.PI) * 50 : 0;
+
+        ctx.save();
+        ctx.translate(weaponX + (meleeSwing * uiScale), weaponY);
+        ctx.scale(uiScale, uiScale);
 
         switch (player.weapon) {
             case WeaponType.FIST:
-                Sprites.drawFist(ctx, weaponX + meleeSwing, weaponY, flash);
+                Sprites.drawFist(ctx, 0, 0, flash);
                 break;
             case WeaponType.CHAINSAW:
-                Sprites.drawChainsaw(ctx, weaponX + meleeSwing * 0.5, weaponY, flash);
+                Sprites.drawChainsaw(ctx, 0, 0, flash);
                 break;
             case WeaponType.PISTOL:
-                Sprites.drawPistol(ctx, weaponX, weaponY, flash);
+                Sprites.drawPistol(ctx, 0, 0, flash);
                 break;
             case WeaponType.SHOTGUN:
-                Sprites.drawShotgun(ctx, weaponX, weaponY, flash);
+                Sprites.drawShotgun(ctx, 0, 0, flash);
                 break;
             case WeaponType.CHAINGUN:
-                Sprites.drawChaingun(ctx, weaponX, weaponY, flash);
+                Sprites.drawChaingun(ctx, 0, 0, flash);
                 break;
         }
+
+        ctx.restore();
     }
 
     // drawHUD removed in favor of React HUD

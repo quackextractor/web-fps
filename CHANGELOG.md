@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.4.2] - 2026-02-01
+
+### Fixed
+-   **Desktop Mobile Controls**: Improved device detection logic to prevent mobile touch controls from appearing on desktop computers with touchscreens.
+-   **Device Detection**: Integrated User Agent and iPad-specific checks to accurately differentiate between true mobile/tablet devices and touch-capable desktop laptops.
+
+## [0.4.1] - 2026-02-01
+
+### Changed
+-   **Refined Mobile Controls**:
+    -   Removed the redundant "USE" button from the mobile overlay.
+    -   Added dedicated **Turn Left** and **Turn Right** arrow buttons on the right side for classic control preference.
+    -   Optimized Look Zone area to avoid overlapping with new turn buttons.
+-   **Improved Responsiveness**:
+    -   **Dynamic Aspect Ratio**: The game container now strictly follows the internal resolution's aspect ratio (4:3 or 16:9), ensuring the HUD and Controls are perfectly aligned with the game image regardless of device aspect ratio.
+    -   **Resolution-Independent Viewmodel**: The weapon sprites (viewmodel) now scale proportionally to the vertical resolution, preventing them from appearing too large or small on different screen sizes.
+    -   **Responsive HUD**: Updated the HUD components to use `clamp()` and relative sizes, making them legible and well-proportioned across all mobile and desktop resolutions.
+
 ## [0.4.0] - 2026-02-01
 
 ### Added

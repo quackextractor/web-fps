@@ -12,7 +12,7 @@ interface MobileControlsProps {
     onMove: (vector: { x: number; y: number }) => void;
     onLook: (delta: number) => void;
     onFire: (firing: boolean) => void;
-    onInteract: () => void;
+    onTurn: (direction: number) => void; // -1 for left, 1 for right, 0 for stop
     onNextWeapon: () => void;
     onPrevWeapon: () => void;
 }
@@ -21,7 +21,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     onMove,
     onLook,
     onFire,
-    onInteract,
+    onTurn,
     onNextWeapon,
     onPrevWeapon
 }) => {
@@ -75,9 +75,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     };
 
     const handleLookMove = (e: React.TouchEvent) => {
-        // Find the touch that is NOT the joystick touch (if any)
         const touches = Array.from(e.touches);
-        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 2);
+        // Track look zone (middle-right of screen, excluding button areas if possible)
+        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 3 && t.clientX < window.innerWidth * 0.85);
 
         if (lookTouch) {
             if (lastLookX.current !== null) {
@@ -92,7 +92,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
 
     const handleLookEnd = (e: React.TouchEvent) => {
         const touches = Array.from(e.touches);
-        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 2);
+        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 3 && t.clientX < window.innerWidth * 0.85);
         if (!lookTouch) {
             lastLookX.current = null;
         }
@@ -106,7 +106,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
         >
             {/* Movement Joystick (Left Side) */}
             <div
-                className="absolute bottom-12 left-12 w-32 h-32 bg-white/10 rounded-full border-2 border-white/20 pointer-events-auto flex items-center justify-center"
+                className="absolute bottom-8 left-8 w-32 h-32 bg-white/10 rounded-full border-2 border-white/20 pointer-events-auto flex items-center justify-center"
                 ref={joystickRef}
                 onTouchStart={handleJoystickStart}
                 onTouchMove={handleJoystickMove}
@@ -122,32 +122,44 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
 
             {/* Fire Button (Right Side) */}
             <div
-                className="absolute bottom-12 right-12 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all"
+                className="absolute bottom-8 right-24 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all"
                 onTouchStart={() => onFire(true)}
                 onTouchEnd={() => onFire(false)}
             >
                 <span className="text-white font-bold text-xl uppercase tracking-tighter">FIRE</span>
             </div>
 
-            {/* Weapon Switch & Interact (Top Right Side) */}
-            <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-4 pointer-events-auto">
+            {/* Turn Buttons (Rightmost Side) */}
+            <div className="absolute right-4 bottom-8 flex flex-col gap-4 pointer-events-auto">
                 <button
-                    className="p-4 bg-white/10 rounded-lg border border-white/20 active:bg-white/30"
-                    onClick={onNextWeapon}
+                    className="w-16 h-16 bg-white/10 rounded-full border-2 border-white/20 flex items-center justify-center active:bg-white/30 active:scale-95 transition-all"
+                    onTouchStart={() => onTurn(-1)}
+                    onTouchEnd={() => onTurn(0)}
                 >
-                    <span className="text-white text-sm font-bold">NEXT</span>
+                    <span className="text-white text-2xl">←</span>
                 </button>
                 <button
-                    className="p-4 bg-white/10 rounded-lg border border-white/20 active:bg-white/30"
+                    className="w-16 h-16 bg-white/10 rounded-full border-2 border-white/20 flex items-center justify-center active:bg-white/30 active:scale-95 transition-all"
+                    onTouchStart={() => onTurn(1)}
+                    onTouchEnd={() => onTurn(0)}
+                >
+                    <span className="text-white text-2xl">→</span>
+                </button>
+            </div>
+
+            {/* Weapon Switch (Top Right Side) */}
+            <div className="absolute top-4 right-4 flex gap-4 pointer-events-auto">
+                <button
+                    className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
                     onClick={onPrevWeapon}
                 >
-                    <span className="text-white text-sm font-bold">PREV</span>
+                    <span className="text-white text-xs font-bold font-mono">PREV</span>
                 </button>
                 <button
-                    className="p-4 bg-yellow-600/30 rounded-lg border border-yellow-600/50 active:bg-yellow-600/60"
-                    onClick={onInteract}
+                    className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
+                    onClick={onNextWeapon}
                 >
-                    <span className="text-white text-sm font-bold">USE</span>
+                    <span className="text-white text-xs font-bold font-mono">NEXT</span>
                 </button>
             </div>
         </div>
