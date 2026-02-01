@@ -40,6 +40,8 @@ import { EffectsLayer } from "./game-ui/EffectsLayer";
 import { Crosshair } from "./game-ui/Crosshair";
 import { useGameActions } from "@/context/GameActionContext";
 import { AssetPreloader } from "./AssetPreloader";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileControls } from "./game-ui/MobileControls";
 
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
@@ -101,6 +103,15 @@ export default function FPSGame() {
   const accumulatorRef = useRef(0);
   const gameStateRef = useRef(gameState);
 
+  const touchJoystickRef = useRef({ x: 0, y: 0 });
+  const touchLookRef = useRef(0);
+  const isTouchDeviceRef = useRef(false);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    isTouchDeviceRef.current = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  }, []);
+
   useEffect(() => {
     if (isLoaded) {
       soundManager.setEnabled(settings.soundEnabled);
@@ -131,7 +142,10 @@ export default function FPSGame() {
   const numRaysRef = useRef(200);
 
   // Mouse controls hook - moved up so it can be used in callbacks
-  const { lock, unlock, isLocked } = usePointerLock(canvasRef as React.RefObject<HTMLElement>, gameState === "playing");
+  const { lock, unlock, isLocked } = usePointerLock(
+    canvasRef as React.RefObject<HTMLElement>,
+    gameState === "playing" && !isTouchDeviceRef.current
+  );
 
   useEffect(() => {
     gameStateRef.current = gameState;
@@ -429,8 +443,14 @@ export default function FPSGame() {
       const strafeX = Math.cos(newAngle - Math.PI / 2);
       const strafeY = Math.sin(newAngle - Math.PI / 2);
 
-      let moveForward = 0;
-      let moveStrafe = 0;
+      let moveForward = touchJoystickRef.current.y;
+      let moveStrafe = -touchJoystickRef.current.x;
+
+      if (touchLookRef.current !== 0) {
+        const direction = settings.invertLook ? -1 : 1;
+        newAngle += touchLookRef.current * ROTATION_SPEED * settings.touchSensitivity * direction;
+        touchLookRef.current = 0;
+      }
 
       const { controls } = settings;
       const hasControl = (keys: string[] | undefined) => keys?.some(k => keysRef.current.has(k)) || false;
@@ -931,17 +951,30 @@ export default function FPSGame() {
         {/* HUD Overlay */}
         {gameState === "playing" && (
           <>
-            <Crosshair />
             <HUD
-              health={player.health}
-              armor={player.armor}
-              ammo={player.ammo}
-              weapon={player.weapon}
+              health={playerRef.current.health}
+              armor={playerRef.current.armor}
+              ammo={playerRef.current.ammo}
+              weapon={playerRef.current.weapon}
               kills={killsRef.current}
-              totalKills={totalKillsRef.current}
+              isMobile={isMobile || isTouchDeviceRef.current}
               levelName={LEVELS[currentLevel]?.name || "Unknown"}
               weaponsUnlocked={weaponsUnlockedRef.current}
             />
+            <Crosshair style={settings.crosshairStyle} />
+            {(isMobile || isTouchDeviceRef.current) && (
+              <MobileControls
+                onMove={(v) => { touchJoystickRef.current = v; }}
+                onLook={(d) => { touchLookRef.current = d; }}
+                onFire={(f) => { mouseDownRef.current = f; }}
+                onInteract={() => {
+                  // Look for interactable objects or just trigger attack if no usage logic yet
+                  // For now, interaction is not deeply implemented, but we can call attack or other logic
+                }}
+                onNextWeapon={() => switchWeapon(1)}
+                onPrevWeapon={() => switchWeapon(-1)}
+              />
+            )}
           </>
         )}
 

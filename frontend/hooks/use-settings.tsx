@@ -22,6 +22,9 @@ export interface GameSettings {
     ragdollMultiplier: number;
     ragdollAutoClear: boolean;
     controls: ControlScheme;
+    touchSensitivity: number;
+    autoFire: boolean;
+    invertLook: boolean;
 }
 
 export interface ControlScheme {
@@ -80,6 +83,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
         prevWeapon: ["[", "-"],
         restart: ["r"],
     },
+    touchSensitivity: 2.0,
+    autoFire: false,
+    invertLook: false,
 };
 
 const STORAGE_KEY = "doom-settings";

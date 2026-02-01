@@ -34,6 +34,12 @@ INFERNO is a 2.5D retro FPS engine built with React and Next.js, utilizing a cus
 ### Input System
 - **Remappable Controls**: All keyboard inputs are mapped via the `ControlScheme` interface and can be reassigned in the options menu.
 - **Pointer Lock**: Custom hook `usePointerLock` ensures high-precision mouse look.
+- **Mobile Support**: Full touch-based overlay with a virtual joystick for movement, a trackpad zone for looking, and dedicated action buttons. Analog touch input is merged with keyboard inputs in the game loop.
+
+### UI & Layout
+- **HUD Adaptability**: The HUD dynamically switches between a desktop layout (bottom status bar) and a mobile layout (top corner widgets) to avoid obstruction by touch controls.
+- **Orientation Lock**: Automatically prompts users to switch to landscape mode on mobile devices for optimal FOV.
+- **Standalone Mode**: Includes a web manifest for an app-like fullscreen experience when added to the home screen.
 
 ## Assets
 - **Preloading**: `AssetPreloader` ensures all required textures and sounds are cached before gameplay begins.

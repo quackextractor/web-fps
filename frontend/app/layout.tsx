@@ -4,6 +4,7 @@ import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/hooks/use-settings'
 import { GameActionProvider } from '@/context/GameActionContext'
+import { OrientationLock } from '@/components/game-ui/OrientationLock'
 import './globals.css'
 
 const pressStart2P = Press_Start_2P({
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
+  manifest: '/manifest.json',
   generator: 'v0.app'
 }
 
@@ -47,6 +49,7 @@ export default function RootLayout({
       <body className={`${pressStart2P.variable} antialiased`}>
         <SettingsProvider>
           <GameActionProvider>
+            <OrientationLock />
             {children}
           </GameActionProvider>
         </SettingsProvider>

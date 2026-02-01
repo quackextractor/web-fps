@@ -7,9 +7,10 @@ interface HUDProps {
     ammo: { [key in AmmoType]: number };
     weapon: WeaponType;
     kills: number;
-    totalKills: number | undefined; // Optional depending on how we pass it
+    totalKills?: number;
     levelName: string;
     weaponsUnlocked: Set<WeaponType>;
+    isMobile?: boolean;
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -21,6 +22,7 @@ export const HUD: React.FC<HUDProps> = ({
     totalKills = 0,
     levelName,
     weaponsUnlocked,
+    isMobile = false,
 }) => {
     const currentWeapon = WEAPON_CONFIG[weapon];
     const currentAmmo = currentWeapon.ammoType !== null ? ammo[currentWeapon.ammoType] : null;
@@ -31,9 +33,64 @@ export const HUD: React.FC<HUDProps> = ({
         return "text-red-500 animate-pulse";
     };
 
+    if (isMobile) {
+        return (
+            <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-2 z-40 font-mono text-white retro-text select-none">
+                {/* Mobile Top Bar: Health(Left) and Ammo(Right) */}
+                <div className="flex justify-between items-start">
+                    {/* Health & Armor */}
+                    <div className="flex flex-col gap-1 w-32 bg-black/60 p-1 border-2 border-gray-700 retro-border">
+                        <div className="flex justify-between items-center px-1">
+                            <span className="text-[10px] text-gray-400">HP</span>
+                            <span className={`text-sm font-bold ${getHealthColor(health)}`}>{Math.ceil(health)}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-900 border border-gray-600">
+                            <div
+                                className={`h-full ${health > 50 ? 'bg-green-600' : health > 25 ? 'bg-yellow-600' : 'bg-red-600'}`}
+                                style={{ width: `${Math.min(100, health)}%` }}
+                            />
+                        </div>
+                        {armor > 0 && (
+                            <div className="w-full h-1 bg-gray-900 border border-blue-900/50 mt-1">
+                                <div
+                                    className="h-full bg-blue-500"
+                                    style={{ width: `${Math.min(100, armor)}%` }}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Level & Kills (Center) */}
+                    <div className="flex flex-col items-center opacity-70">
+                        <span className="text-[10px] bg-black/40 px-1 rounded">{levelName}</span>
+                        <span className="text-[10px] text-red-400 font-bold">KILLS: {kills}</span>
+                    </div>
+
+                    {/* Weapon & Ammo */}
+                    <div className="flex flex-col items-end gap-1 w-32 bg-black/60 p-1 border-2 border-gray-700 retro-border text-right">
+                        <span className="text-[10px] text-yellow-500 font-bold truncate w-full">{currentWeapon.name.toUpperCase()}</span>
+                        <div className="flex items-baseline gap-1">
+                            {currentAmmo !== null ? (
+                                <>
+                                    <span className="text-xl font-bold">{currentAmmo}</span>
+                                    <span className="text-[8px] text-gray-400">{currentWeapon.ammoType?.toUpperCase()}</span>
+                                </>
+                            ) : (
+                                <span className="text-gray-500 text-xs">---</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom area kept clear for mobile controls */}
+                <div className="flex-1" />
+            </div>
+        );
+    }
+
     return (
         <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 z-40 font-mono text-white retro-text select-none">
-            {/* Top Bar - Score? Or maybe just Level Name and Kills */}
+            {/* Top Bar */}
             <div className="flex justify-between items-start opacity-80">
                 <div className="flex flex-col gap-1">
                     <span className="text-xl bg-black/50 px-2 py-1 rounded border-2 border-white/20">
@@ -47,12 +104,8 @@ export const HUD: React.FC<HUDProps> = ({
                 </div>
             </div>
 
-            {/* Center - Crosshair is drawn separately or can be here? Let's leave currently as CSS/Canvas or add here if needed. 
-          The GameRenderer draws it currently. We can move it here later if we want React crosshair. */}
-
             {/* Bottom Bar - Status */}
             <div className="flex items-end justify-between gap-4">
-
                 {/* Left: Health & Armor */}
                 <div className="flex flex-col gap-2 w-[260px]">
                     <div className="bg-black/70 border-4 border-gray-700 p-2 relative retro-border">
@@ -121,7 +174,6 @@ export const HUD: React.FC<HUDProps> = ({
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

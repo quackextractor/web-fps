@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.4.0] - 2026-02-01
+
+### Added
+-   **Full Mobile Support**: Implemented a comprehensive touch-based control system for playing on mobile devices.
+    -   **Virtual Joystick**: Integrated a left-side joystick for movement (WASD equivalent).
+    -   **Look Zone**: Enabled high-precision camera rotation via a right-side trackpad zone.
+    -   **Action Buttons**: Floating buttons for Fire, Interact/Use, and Weapon Switching.
+-   **Adaptive HUD**: The HUD now dynamically adjusts its layout for mobile screens, moving status indicators to the top corners to avoid finger obstruction.
+-   **Orientation Lock**: Added a specialized overlay that prompts mobile users to switch to Landscape mode for the best visual experience.
+-   **Standalone Mode (PWA)**: Added a web manifest (`manifest.json`) enabling the game to be "Added to Home Screen" and run in fullscreen standalone mode.
+-   **Mobile Settings**: New options added to the Settings menu:
+    -   **Touch Sensitivity** slider.
+    -   **Auto-Fire** and **Invert Look** toggles.
+
+### Changed
+-   **Engine Input Refactor**: The core `FPSGame` loop now handles analog touch vectors alongside digital keyboard states for seamless movement integration.
+-   **Pointer Lock Adaptation**: The game now skips pointer lock handshakes on touch-capable devices, allowing immediate gameplay without browser warnings.
+-   **Viewport Optimization**: Applied `touch-action: none` to the game canvas to prevent accidental browser gestures (zoom, swipe-to-refresh) during gameplay.
+
+
 ## [0.3.0] - 2026-01-30
 
 ### Added

@@ -346,6 +346,27 @@ export function SettingsMenu({
                         >
                             CLEAR PROGRESS
                         </button>
+
+                        <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8 uppercase">MOBILE</h3>
+                        <Slider
+                            label="TOUCH SENSITIVITY"
+                            value={localSettings.touchSensitivity}
+                            min={0.5}
+                            max={5.0}
+                            step={0.1}
+                            onChange={(v) => updateLocalSetting("touchSensitivity", v)}
+                            format={(v) => `${v.toFixed(1)}x`}
+                        />
+                        <Toggle
+                            label="AUTO-FIRE"
+                            value={localSettings.autoFire}
+                            onChange={(v) => updateLocalSetting("autoFire", v)}
+                        />
+                        <Toggle
+                            label="INVERT LOOK"
+                            value={localSettings.invertLook}
+                            onChange={(v) => updateLocalSetting("invertLook", v)}
+                        />
                     </div>
 
                     {/* Controls Section */}

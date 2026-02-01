@@ -125,6 +125,10 @@
     @apply bg-black text-foreground overflow-hidden w-screen h-screen m-0 p-0 overscroll-none;
     font-family: var(--font-press-start-2p), system-ui, sans-serif;
   }
+
+  canvas {
+    touch-action: none;
+  }
 }
 
 .retro-text {
