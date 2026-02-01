@@ -11,7 +11,7 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
     children,
     variant = "primary"
 }) => {
-    const baseClasses = "w-full px-[clamp(1rem,4vw,2rem)] py-[clamp(0.75rem,2vh,1.25rem)] text-[clamp(0.7rem,2.5vw,1rem)] font-bold transition-all duration-75 transform active:translate-y-1 retro-text retro-border uppercase tracking-widest";
+    const baseClasses = "w-full px-6 py-4 text-sm md:text-base font-bold transition-all duration-75 transform active:translate-y-1 retro-text retro-border uppercase tracking-widest";
     const variantClasses = {
         primary: "bg-red-700 hover:bg-white hover:text-red-700 text-white border-black",
         secondary: "bg-gray-800 hover:bg-white hover:text-black text-white border-black",

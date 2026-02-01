@@ -3,15 +3,6 @@
 All notable changes to this project will be documented in this file.
 
 
-## [0.4.3] - 2026-02-01
-
-### Changed
--   **Menu Responsiveness Overhaul**: Updated all UI menus (Main Menu, Settings, Level Select, Pause, Death, Level Complete, Victory) to be fully responsive.
-    -   Implemented `clamp()` for fluid typography that scales across all resolutions.
-    -   Used relative units and flexible grid layouts to prevent UI overflow on small mobile screens.
-    -   Improved vertical space management in menus to handle ultra-wide and ultra-tall aspect ratios correctly.
-    -   Refined `MenuButton` components with adaptive padding and font sizes.
-
 ## [0.4.2] - 2026-02-01
 
 ### Fixed

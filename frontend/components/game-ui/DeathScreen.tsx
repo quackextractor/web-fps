@@ -16,18 +16,18 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
     onMainMenu
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/95 p-4 select-none overflow-hidden">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950 p-4 select-none">
             <ScanlinesOverlay />
 
-            <div className="relative z-10 w-full max-w-sm text-center flex flex-col items-center h-full justify-center">
-                <h2 className="retro-text text-[clamp(2rem,10vw,4rem)] text-red-600 mb-2 animate-pulse tracking-tighter" style={{ textShadow: "4px 4px 0px #000" }}>
+            <div className="relative z-10 w-full max-w-md text-center">
+                <h2 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 animate-pulse tracking-tighter" style={{ textShadow: "4px 4px 0px #000" }}>
                     YOU DIED
                 </h2>
-                <p className="retro-text text-red-400 text-[clamp(0.5rem,2vw,0.875rem)] mb-12 tracking-widest opacity-80">
+                <p className="retro-text text-red-400 text-xs md:text-sm mb-12 tracking-widest opacity-80">
                     PRESS 'R' TO RESTART
                 </p>
 
-                <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-4">
                     <MenuButton onClick={onRestart}>
                         TRY AGAIN
                     </MenuButton>
@@ -36,7 +36,7 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
                     </MenuButton>
                 </div>
 
-                <p className="mt-8 text-red-500/50 text-[clamp(8px,1.5vw,10px)] retro-text">
+                <p className="mt-8 text-red-500/50 text-[10px] retro-text">
                     WEAPONS PRESERVED
                 </p>
             </div>
