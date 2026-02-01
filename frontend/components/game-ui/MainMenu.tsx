@@ -39,10 +39,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 </div>
 
                 <div className="mt-16 text-gray-500 text-center text-[10px] md:text-xs font-mono retro-text opacity-50">
-                    <p className="text-yellow-600 mb-2">CONTROLS</p>
+                    <p className="text-yellow-600 mb-2">DEFAULT CONTROLS</p>
                     <div className="flex flex-col gap-1">
                         <p>WASD: MOVE  •  MOUSE: LOOK</p>
                         <p>CLICK: FIRE •  1-5: WEAPON</p>
+                        <p>SPACE: CONFIRM •  CTRL: CANCEL</p>
                     </div>
                 </div>
 
