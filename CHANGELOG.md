@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.8] - 2026-02-03
+### Added
+- **Desktop Touchscreen Controls**: Enabled full support for using mobile-style touchscreen controls on desktop via mouse clicks when forced.
+- **Pointer Events Integration**: Migrated mobile controls from Touch events to Pointer events for universal compatibility (Mouse, Pen, Touch).
+- **Pointer Capture**: Implemented pointer capture on joystick and look zone to ensure continuous tracking even if the cursor leaves the element during dragging.
+### Changed
+- **Adaptive Cursor**: The mouse cursor is now automatically shown as a standard pointer when forced mobile controls are active on desktop, and hidden only when true mouse-look (pointer lock) is engaged.
+- **Testing**: Updated unit tests to verify mobile control functionality using Pointer event simulations.
+
 ## [0.4.7] - 2026-02-03
 ### Fixed
 - **Mobile Controls**: Fixed an issue where the hidden menu overlay was blocking touch-to-turn swiping during gameplay.
