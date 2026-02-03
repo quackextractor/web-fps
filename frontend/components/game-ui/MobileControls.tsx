@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useSettings } from "@/hooks/use-settings";
-import { Target, Pause, ChevronLeft, ChevronRight } from "lucide-react";
+import { Crosshair, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface TouchPosition {
     x: number;
@@ -152,7 +152,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                     onFire(false);
                 }}
             >
-                <Target className="w-12 h-12 text-white" />
+                <Crosshair className="w-12 h-12 text-white" />
             </button>
 
             {/* Top Bar (Pause & Weapons) */}

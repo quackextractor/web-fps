@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.9] - 2026-02-03
+### Changed
+- **Default Resolution**: Set the default game resolution to "Ultra Retro" (320x240) for a more authentic retro experience.
+- **Mobile UI**: Replaced the generic "Target" icon on the shoot button with a custom retro-styled "Crosshair" icon.
+
 ## [0.4.8] - 2026-02-03
 ### Added
 - **Desktop Touchscreen Controls**: Enabled full support for using mobile-style touchscreen controls on desktop via mouse clicks when forced.

@@ -57,7 +57,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
     difficulty: "normal",
     timeScale: 1.0,
     debugMode: false,
-    resolution: "800x600",
+    resolution: "320x240",
     fullscreen: false,
     turnSpeed: 1.0,
     imageSmoothingEnabled: false,
