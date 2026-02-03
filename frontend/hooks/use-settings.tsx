@@ -25,6 +25,7 @@ export interface GameSettings {
     touchSensitivity: number;
     autoFire: boolean;
     invertLook: boolean;
+    forceMobileControls: boolean;
 }
 
 export interface ControlScheme {
@@ -86,6 +87,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
     touchSensitivity: 2.0,
     autoFire: false,
     invertLook: false,
+    forceMobileControls: false,
 };
 
 const STORAGE_KEY = "doom-settings";

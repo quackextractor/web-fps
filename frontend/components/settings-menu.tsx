@@ -337,6 +337,11 @@ export function SettingsMenu({
                             value={localSettings.debugMode}
                             onChange={(v) => updateLocalSetting("debugMode", v)}
                         />
+                        <Toggle
+                            label="FORCE MOBILE CONTROLS"
+                            value={localSettings.forceMobileControls}
+                            onChange={(v) => updateLocalSetting("forceMobileControls", v)}
+                        />
 
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8">DATA</h3>
                         <button

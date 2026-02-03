@@ -109,6 +109,7 @@ export default function FPSGame() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
+    if (!isLoaded) return;
     const ua = navigator.userAgent;
     const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     const isIPad = (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
@@ -116,8 +117,9 @@ export default function FPSGame() {
 
     // Mobile controls should only appear on actual touch devices (mobile/tablet)
     // We filter out desktop touchscreens by requiring a mobile UA or a small screen width
-    isTouchDeviceRef.current = isTouch && (isMobileUA || isIPad || window.innerWidth < 1024);
-  }, []);
+    // forceMobileControls bypasses these checks for testing
+    isTouchDeviceRef.current = settings.forceMobileControls || (isTouch && (isMobileUA || isIPad || window.innerWidth < 1024));
+  }, [isLoaded, settings.forceMobileControls]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -151,7 +153,7 @@ export default function FPSGame() {
   // Mouse controls hook - moved up so it can be used in callbacks
   const { lock, unlock, isLocked } = usePointerLock(
     canvasRef as React.RefObject<HTMLElement>,
-    gameState === "playing" && !isTouchDeviceRef.current
+    gameState === "playing" && !isTouchDeviceRef.current && !settings.forceMobileControls
   );
 
   useEffect(() => {

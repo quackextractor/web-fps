@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2026-02-03
+### Added
+- "Mobile Testing Mode" in debug options (Settings -> Cheats).
+- Ability to force mobile touch controls on desktop for testing and development.
+- Automatic pointer lock disabling when mobile mode is forced on desktop.
 
+## [0.4.4] - 2026-02-03
+### Added
+- High-quality Lucide icons to mobile touch controls.
+- Accessibility labels (`aria-label`) to mobile control buttons.
+- Detailed unit tests for mobile control buttons (Fire, Pause, Weapons).
 
 ## [0.4.3] - 2026-02-03
 
@@ -338,11 +348,6 @@ All notable changes to this project will be documented in this file.
 -   **Enemy Pathfinding**: Enemies now use A* algorithms to navigate around walls and obstacles when chasing the player, improving AI intelligence.
 -   **Auto-fire**: Holding down the fire button (Mouse/Space/F) now continuously fires weapons, improving combat fluidity especially for the Chaingun.
 
-## [0.1.7] - 2026-02-03
-### Added
-- High-quality Lucide icons to mobile touch controls.
-- Accessibility labels (`aria-label`) to mobile control buttons.
-- Detailed unit tests for mobile control buttons (Fire, Pause, Weapons).
 
 ## [0.1.6] - 2026-02-03
 
