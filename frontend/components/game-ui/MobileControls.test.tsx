@@ -42,7 +42,7 @@ describe('MobileControls', () => {
 
     it('calls onFire when pressing the FIRE button', () => {
         const onFire = vi.fn();
-        const { getByText } = render(
+        const { getByLabelText } = render(
             <MobileControls
                 onMove={() => { }}
                 onLook={() => { }}
@@ -53,7 +53,7 @@ describe('MobileControls', () => {
             />
         );
 
-        const fireButton = getByText('FIRE');
+        const fireButton = getByLabelText('Fire');
         fireEvent.touchStart(fireButton);
         expect(onFire).toHaveBeenCalledWith(true);
 
@@ -63,7 +63,7 @@ describe('MobileControls', () => {
 
     it('calls onPause when pressing the PAUSE button', () => {
         const onPause = vi.fn();
-        const { getByText } = render(
+        const { getByLabelText } = render(
             <MobileControls
                 onMove={() => { }}
                 onLook={() => { }}
@@ -74,8 +74,32 @@ describe('MobileControls', () => {
             />
         );
 
-        const pauseButton = getByText('⏸');
+        const pauseButton = getByLabelText('Pause Game');
         fireEvent.click(pauseButton);
         expect(onPause).toHaveBeenCalled();
+    });
+
+    it('calls onNextWeapon and onPrevWeapon when pressing weapon buttons', () => {
+        const onNextWeapon = vi.fn();
+        const onPrevWeapon = vi.fn();
+        const { getByLabelText } = render(
+            <MobileControls
+                onMove={() => { }}
+                onLook={() => { }}
+                onFire={() => { }}
+                onPause={() => { }}
+                onNextWeapon={onNextWeapon}
+                onPrevWeapon={onPrevWeapon}
+            />
+        );
+
+        const nextButton = getByLabelText('Next Weapon');
+        const prevButton = getByLabelText('Previous Weapon');
+
+        fireEvent.click(nextButton);
+        expect(onNextWeapon).toHaveBeenCalled();
+
+        fireEvent.click(prevButton);
+        expect(onPrevWeapon).toHaveBeenCalled();
     });
 });

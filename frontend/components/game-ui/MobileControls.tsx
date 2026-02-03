@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useSettings } from "@/hooks/use-settings";
+import { Target, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface TouchPosition {
     x: number;
@@ -137,35 +138,39 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             </div>
 
             {/* Fire Button (Right Side) */}
-            <div
+            <button
+                aria-label="Fire"
                 className="absolute bottom-8 right-24 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all z-10"
                 onTouchStart={() => onFire(true)}
                 onTouchEnd={() => onFire(false)}
             >
-                <span className="text-white font-bold text-xl uppercase tracking-tighter">FIRE</span>
-            </div>
+                <Target className="w-12 h-12 text-white" />
+            </button>
 
             {/* Top Bar (Pause & Weapons) */}
             <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
                 <button
+                    aria-label="Pause Game"
                     className="w-12 h-12 bg-white/10 rounded-full border border-white/20 flex items-center justify-center pointer-events-auto active:bg-white/30"
                     onClick={onPause}
                 >
-                    <span className="text-white text-xl">⏸</span>
+                    <Pause className="w-6 h-6 text-white fill-current" />
                 </button>
 
                 <div className="flex gap-4 pointer-events-auto">
                     <button
-                        className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
+                        aria-label="Previous Weapon"
+                        className="w-12 h-12 bg-white/10 rounded border border-white/20 flex items-center justify-center active:bg-white/30"
                         onClick={onPrevWeapon}
                     >
-                        <span className="text-white text-xs font-bold font-mono">PREV</span>
+                        <ChevronLeft className="w-6 h-6 text-white" />
                     </button>
                     <button
-                        className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
+                        aria-label="Next Weapon"
+                        className="w-12 h-12 bg-white/10 rounded border border-white/20 flex items-center justify-center active:bg-white/30"
                         onClick={onNextWeapon}
                     >
-                        <span className="text-white text-xs font-bold font-mono">NEXT</span>
+                        <ChevronRight className="w-6 h-6 text-white" />
                     </button>
                 </div>
             </div>

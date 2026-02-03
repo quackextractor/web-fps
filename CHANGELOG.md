@@ -338,7 +338,13 @@ All notable changes to this project will be documented in this file.
 -   **Enemy Pathfinding**: Enemies now use A* algorithms to navigate around walls and obstacles when chasing the player, improving AI intelligence.
 -   **Auto-fire**: Holding down the fire button (Mouse/Space/F) now continuously fires weapons, improving combat fluidity especially for the Chaingun.
 
-## [0.1.0] - 2026-01-28
+## [0.1.7] - 2026-02-03
+### Added
+- High-quality Lucide icons to mobile touch controls.
+- Accessibility labels (`aria-label`) to mobile control buttons.
+- Detailed unit tests for mobile control buttons (Fire, Pause, Weapons).
+
+## [0.1.6] - 2026-02-03
 
 ### Added
 -   **Tickspeed Control**: Added a "Game Speed" slider in the Options menu, allowing players to adjust game speed from 0.1x to 3.0x.
