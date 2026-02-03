@@ -12,6 +12,7 @@ interface MobileControlsProps {
     onMove: (vector: { x: number; y: number }) => void;
     onLook: (delta: number) => void;
     onFire: (firing: boolean) => void;
+    onPause: () => void;
     onNextWeapon: () => void;
     onPrevWeapon: () => void;
 }
@@ -20,6 +21,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     onMove,
     onLook,
     onFire,
+    onPause,
     onNextWeapon,
     onPrevWeapon
 }) => {
@@ -143,20 +145,29 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 <span className="text-white font-bold text-xl uppercase tracking-tighter">FIRE</span>
             </div>
 
-            {/* Weapon Switch (Top Right Side) */}
-            <div className="absolute top-4 right-4 flex gap-4 pointer-events-auto">
+            {/* Top Bar (Pause & Weapons) */}
+            <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
                 <button
-                    className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
-                    onClick={onPrevWeapon}
+                    className="w-12 h-12 bg-white/10 rounded-full border border-white/20 flex items-center justify-center pointer-events-auto active:bg-white/30"
+                    onClick={onPause}
                 >
-                    <span className="text-white text-xs font-bold font-mono">PREV</span>
+                    <span className="text-white text-xl">⏸</span>
                 </button>
-                <button
-                    className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
-                    onClick={onNextWeapon}
-                >
-                    <span className="text-white text-xs font-bold font-mono">NEXT</span>
-                </button>
+
+                <div className="flex gap-4 pointer-events-auto">
+                    <button
+                        className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
+                        onClick={onPrevWeapon}
+                    >
+                        <span className="text-white text-xs font-bold font-mono">PREV</span>
+                    </button>
+                    <button
+                        className="px-4 py-2 bg-white/10 rounded border border-white/20 active:bg-white/30"
+                        onClick={onNextWeapon}
+                    >
+                        <span className="text-white text-xs font-bold font-mono">NEXT</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

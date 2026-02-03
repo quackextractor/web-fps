@@ -999,6 +999,7 @@ export default function FPSGame() {
                   onMove={(v) => { touchJoystickRef.current = v; }}
                   onLook={(d) => { touchLookRef.current = d; }}
                   onFire={(f) => { mouseDownRef.current = f; }}
+                  onPause={() => setGameState("paused")}
                   onNextWeapon={() => switchWeapon(1)}
                   onPrevWeapon={() => switchWeapon(-1)}
                 />

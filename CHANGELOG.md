@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 -   **Mobile Controls Restructuring**: 
     -   Removed legacy discrete Turn Left/Right buttons.
     -   Implemented a full right-half swipe zone for camera rotation.
+    -   Added a dedicated Mobile Pause button (⏸) in the top-left corner.
     -   Added ID-based touch tracking to support multi-touch "claw" grips.
     -   Improved z-index layering to allow simultaneous looking and firing.
 
