@@ -975,7 +975,7 @@ export default function FPSGame() {
         >
           <canvas
             ref={canvasRef}
-            className="w-full h-full cursor-none block"
+            className={`w-full h-full block ${isTouchDeviceRef.current ? "cursor-default" : "cursor-none"}`}
             style={{ imageRendering: "pixelated" }}
           />
 

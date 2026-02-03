@@ -34,31 +34,34 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     const lastLookX = useRef<number>(0);
     const { settings } = useSettings();
 
-    const handleJoystickStart = (e: React.TouchEvent) => {
+    const handleJoystickStart = (e: React.PointerEvent) => {
         setIsMoving(true);
+        e.currentTarget.setPointerCapture(e.pointerId);
         updateJoystick(e);
     };
 
-    const handleJoystickMove = (e: React.TouchEvent) => {
+    const handleJoystickMove = (e: React.PointerEvent) => {
         if (!isMoving) return;
         updateJoystick(e);
     };
 
-    const handleJoystickEnd = () => {
+    const handleJoystickEnd = (e: React.PointerEvent) => {
         setIsMoving(false);
+        e.currentTarget.releasePointerCapture(e.pointerId);
         setJoystickPos({ x: 0, y: 0 });
         onMove({ x: 0, y: 0 });
     };
 
-    const updateJoystick = (e: React.TouchEvent) => {
+    const updateJoystick = (e: React.PointerEvent) => {
         if (!joystickRef.current) return;
         const rect = joystickRef.current.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        const touch = e.touches[0];
+        const pointerX = e.clientX;
+        const pointerY = e.clientY;
 
-        const dx = touch.clientX - centerX;
-        const dy = touch.clientY - centerY;
+        const dx = pointerX - centerX;
+        const dy = pointerY - centerY;
         const distance = Math.sqrt(dx * dx + dy * dy);
         const maxDist = rect.width / 2;
 
@@ -76,35 +79,28 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
         onMove({ x, y: -y }); // Invert Y for forward movement
     };
 
-    const handleLookStart = (e: React.TouchEvent) => {
-        // Only grab the first finger that touches this zone if we aren't already tracking one
+    const handleLookStart = (e: React.PointerEvent) => {
+        // Only grab the first pointer that touches this zone if we aren't already tracking one
         if (lookFingerId.current === null) {
-            const touch = e.changedTouches[0];
-            lookFingerId.current = touch.identifier;
-            lastLookX.current = touch.clientX;
+            lookFingerId.current = e.pointerId;
+            lastLookX.current = e.clientX;
+            e.currentTarget.setPointerCapture(e.pointerId);
         }
     };
 
-    const handleLookMove = (e: React.TouchEvent) => {
-        if (lookFingerId.current === null) return;
+    const handleLookMove = (e: React.PointerEvent) => {
+        if (lookFingerId.current === null || e.pointerId !== lookFingerId.current) return;
 
-        // Find the specific finger we are tracking
-        const touch = Array.from(e.changedTouches).find(t => t.identifier === lookFingerId.current);
-
-        if (touch) {
-            const deltaX = touch.clientX - lastLookX.current;
-            onLook(deltaX); // Send delta to Game Loop
-            lastLookX.current = touch.clientX;
-        }
+        const deltaX = e.clientX - lastLookX.current;
+        onLook(deltaX); // Send delta to Game Loop
+        lastLookX.current = e.clientX;
     };
 
-    const handleLookEnd = (e: React.TouchEvent) => {
-        if (lookFingerId.current === null) return;
+    const handleLookEnd = (e: React.PointerEvent) => {
+        if (lookFingerId.current === null || e.pointerId !== lookFingerId.current) return;
 
-        const touch = Array.from(e.changedTouches).find(t => t.identifier === lookFingerId.current);
-        if (touch) {
-            lookFingerId.current = null;
-        }
+        lookFingerId.current = null;
+        e.currentTarget.releasePointerCapture(e.pointerId);
     };
 
     return (
@@ -116,18 +112,20 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             <div
                 data-testid="look-zone"
                 className="absolute inset-0 pointer-events-auto opacity-0"
-                onTouchStart={handleLookStart}
-                onTouchMove={handleLookMove}
-                onTouchEnd={handleLookEnd}
+                onPointerDown={handleLookStart}
+                onPointerMove={handleLookMove}
+                onPointerUp={handleLookEnd}
+                onPointerCancel={handleLookEnd}
             />
 
             {/* Movement Joystick (Left Side) */}
             <div
                 className="absolute bottom-8 left-8 w-32 h-32 bg-white/10 rounded-full border-2 border-white/20 pointer-events-auto flex items-center justify-center"
                 ref={joystickRef}
-                onTouchStart={handleJoystickStart}
-                onTouchMove={handleJoystickMove}
-                onTouchEnd={handleJoystickEnd}
+                onPointerDown={handleJoystickStart}
+                onPointerMove={handleJoystickMove}
+                onPointerUp={handleJoystickEnd}
+                onPointerCancel={handleJoystickEnd}
             >
                 <div
                     className="w-12 h-12 bg-white/40 rounded-full border-2 border-white/60 transition-transform duration-75"
@@ -141,8 +139,18 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             <button
                 aria-label="Fire"
                 className="absolute bottom-8 right-24 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all z-10"
-                onTouchStart={() => onFire(true)}
-                onTouchEnd={() => onFire(false)}
+                onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    onFire(true);
+                }}
+                onPointerUp={(e) => {
+                    e.currentTarget.releasePointerCapture(e.pointerId);
+                    onFire(false);
+                }}
+                onPointerCancel={(e) => {
+                    e.currentTarget.releasePointerCapture(e.pointerId);
+                    onFire(false);
+                }}
             >
                 <Target className="w-12 h-12 text-white" />
             </button>
