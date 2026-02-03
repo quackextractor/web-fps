@@ -1011,7 +1011,7 @@ export default function FPSGame() {
 
           {/* UI Overlays inside game area */}
           <div className="absolute inset-0 z-[60] pointer-events-none flex items-center justify-center">
-            <div className="pointer-events-auto w-full h-full flex items-center justify-center">
+            <div className="pointer-events-none w-full h-full flex items-center justify-center">
               {/* Main Menu */}
               {gameState === "mainMenu" && (
                 <MainMenu

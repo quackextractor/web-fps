@@ -20,7 +20,7 @@ export const LevelCompleteScreen: React.FC<LevelCompleteScreenProps> = ({
     onMainMenu
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-lg p-6 bg-black retro-border text-center">

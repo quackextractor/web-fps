@@ -131,7 +131,7 @@ export function SettingsMenu({
     };
 
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 z-50 overflow-y-auto select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 z-50 overflow-y-auto select-none pointer-events-auto">
             <ScanlinesOverlay enabled={localSettings.scanlinesEnabled} size={localSettings.scanlineSize} />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-6 shadow-2xl h-full md:h-auto overflow-y-auto">

@@ -23,7 +23,7 @@ export const LevelSelect: React.FC<LevelSelectProps> = ({
     onBack
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 shadow-2xl overflow-y-auto max-h-full">

@@ -14,7 +14,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onOptions
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black overflow-hidden select-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black overflow-hidden select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">

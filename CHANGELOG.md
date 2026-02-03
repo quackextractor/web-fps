@@ -2,9 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.7] - 2026-02-03
+### Fixed
+- **Mobile Controls**: Fixed an issue where the hidden menu overlay was blocking touch-to-turn swiping during gameplay.
+
 ## [0.4.6] - 2026-02-03
 ### Changed
-- **Mobile Touch Controls**: Expanded the look zone to cover the entire screen. This allows players to turn by swiping anywhere on the screen while maintaining touch priority for buttons and the movement joystick.
+- **Mobile Touch Controls**: Expanded the look zone to cover the entire screen. This allows players to turn by swiping anywhere on the screen.
 
 ## [0.4.5] - 2026-02-03
 ### Added
