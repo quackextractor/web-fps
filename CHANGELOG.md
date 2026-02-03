@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 
 
+
+## [0.4.3] - 2026-02-03
+
+### Changed
+-   **Mobile Controls Restructuring**: 
+    -   Removed legacy discrete Turn Left/Right buttons.
+    -   Implemented a full right-half swipe zone for camera rotation.
+    -   Added ID-based touch tracking to support multi-touch "claw" grips.
+    -   Improved z-index layering to allow simultaneous looking and firing.
+
+### Added
+-   **Testing Infrastructure**:
+    -   Integrated ESLint with TypeScript support for code quality.
+    -   Added unit tests for `MobileControls` component using Vitest and React Testing Library.
+
 ## [0.4.2] - 2026-02-01
 
 ### Fixed

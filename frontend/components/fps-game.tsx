@@ -105,7 +105,6 @@ export default function FPSGame() {
 
   const touchJoystickRef = useRef({ x: 0, y: 0 });
   const touchLookRef = useRef(0);
-  const touchTurnButtonsRef = useRef(0); // -1 for left, 1 for right
   const isTouchDeviceRef = useRef(false);
   const isMobile = useIsMobile();
 
@@ -460,10 +459,6 @@ export default function FPSGame() {
         touchLookRef.current = 0;
       }
 
-      // Turn Buttons
-      if (touchTurnButtonsRef.current !== 0) {
-        newAngle += touchTurnButtonsRef.current * 0.05 * settings.touchSensitivity;
-      }
 
       const { controls } = settings;
       const hasControl = (keys: string[] | undefined) => keys?.some(k => keysRef.current.has(k)) || false;
@@ -1004,7 +999,6 @@ export default function FPSGame() {
                   onMove={(v) => { touchJoystickRef.current = v; }}
                   onLook={(d) => { touchLookRef.current = d; }}
                   onFire={(f) => { mouseDownRef.current = f; }}
-                  onTurn={(t) => { touchTurnButtonsRef.current = t; }}
                   onNextWeapon={() => switchWeapon(1)}
                   onPrevWeapon={() => switchWeapon(-1)}
                 />

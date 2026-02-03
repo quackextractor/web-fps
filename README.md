@@ -10,6 +10,7 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
 -   **Visual Effects**: Scanlines, CRT effects, hurt flashes, and blood splatters.
 -   **Customizable Experience**: Adjustable resolution (up to 1440p), FOV, mouse sensitivity, and game speed.
 -   **Asset Preloading**: Integrated preloader to ensure smooth gameplay from the first frame.
+-   **Precise Mobile Controls**: Dedicated joystick and right-half swipe zone for looking.
 -   **Keyboard Remapping**: Fully customizable controls for all layouts.
 
 ## Getting Started

@@ -12,7 +12,6 @@ interface MobileControlsProps {
     onMove: (vector: { x: number; y: number }) => void;
     onLook: (delta: number) => void;
     onFire: (firing: boolean) => void;
-    onTurn: (direction: number) => void; // -1 for left, 1 for right, 0 for stop
     onNextWeapon: () => void;
     onPrevWeapon: () => void;
 }
@@ -21,7 +20,6 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     onMove,
     onLook,
     onFire,
-    onTurn,
     onNextWeapon,
     onPrevWeapon
 }) => {
@@ -29,7 +27,8 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     const [joystickPos, setJoystickPos] = useState<TouchPosition>({ x: 0, y: 0 });
     const [isMoving, setIsMoving] = useState(false);
 
-    const lastLookX = useRef<number | null>(null);
+    const lookFingerId = useRef<number | null>(null);
+    const lastLookX = useRef<number>(0);
     const { settings } = useSettings();
 
     const handleJoystickStart = (e: React.TouchEvent) => {
@@ -74,36 +73,51 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
         onMove({ x, y: -y }); // Invert Y for forward movement
     };
 
-    const handleLookMove = (e: React.TouchEvent) => {
-        const touches = Array.from(e.touches);
-        // Track look zone (middle-right of screen, excluding button areas if possible)
-        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 3 && t.clientX < window.innerWidth * 0.85);
+    const handleLookStart = (e: React.TouchEvent) => {
+        // Only grab the first finger that touches this zone if we aren't already tracking one
+        if (lookFingerId.current === null) {
+            const touch = e.changedTouches[0];
+            lookFingerId.current = touch.identifier;
+            lastLookX.current = touch.clientX;
+        }
+    };
 
-        if (lookTouch) {
-            if (lastLookX.current !== null) {
-                const deltaX = lookTouch.clientX - lastLookX.current;
-                onLook(deltaX);
-            }
-            lastLookX.current = lookTouch.clientX;
-        } else {
-            lastLookX.current = null;
+    const handleLookMove = (e: React.TouchEvent) => {
+        if (lookFingerId.current === null) return;
+
+        // Find the specific finger we are tracking
+        const touch = Array.from(e.changedTouches).find(t => t.identifier === lookFingerId.current);
+
+        if (touch) {
+            const deltaX = touch.clientX - lastLookX.current;
+            onLook(deltaX); // Send delta to Game Loop
+            lastLookX.current = touch.clientX;
         }
     };
 
     const handleLookEnd = (e: React.TouchEvent) => {
-        const touches = Array.from(e.touches);
-        const lookTouch = touches.find(t => t.clientX > window.innerWidth / 3 && t.clientX < window.innerWidth * 0.85);
-        if (!lookTouch) {
-            lastLookX.current = null;
+        if (lookFingerId.current === null) return;
+
+        const touch = Array.from(e.changedTouches).find(t => t.identifier === lookFingerId.current);
+        if (touch) {
+            lookFingerId.current = null;
         }
     };
 
     return (
         <div
             className="fixed inset-0 z-50 pointer-events-none select-none touch-none"
-            onTouchMove={handleLookMove}
-            onTouchEnd={handleLookEnd}
         >
+            {/* RIGHT: Swipe Look Zone (NEW) */}
+            {/* Covers right half, sits behind buttons (z-auto or explicit lower z) */}
+            <div
+                data-testid="look-zone"
+                className="absolute top-0 right-0 w-1/2 h-full pointer-events-auto opacity-0"
+                onTouchStart={handleLookStart}
+                onTouchMove={handleLookMove}
+                onTouchEnd={handleLookEnd}
+            />
+
             {/* Movement Joystick (Left Side) */}
             <div
                 className="absolute bottom-8 left-8 w-32 h-32 bg-white/10 rounded-full border-2 border-white/20 pointer-events-auto flex items-center justify-center"
@@ -122,29 +136,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
 
             {/* Fire Button (Right Side) */}
             <div
-                className="absolute bottom-8 right-24 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all"
+                className="absolute bottom-8 right-24 w-24 h-24 bg-red-600/30 rounded-full border-4 border-red-600/50 pointer-events-auto flex items-center justify-center active:bg-red-600/60 active:scale-95 transition-all z-10"
                 onTouchStart={() => onFire(true)}
                 onTouchEnd={() => onFire(false)}
             >
                 <span className="text-white font-bold text-xl uppercase tracking-tighter">FIRE</span>
-            </div>
-
-            {/* Turn Buttons (Rightmost Side) */}
-            <div className="absolute right-4 bottom-8 flex flex-col gap-4 pointer-events-auto">
-                <button
-                    className="w-16 h-16 bg-white/10 rounded-full border-2 border-white/20 flex items-center justify-center active:bg-white/30 active:scale-95 transition-all"
-                    onTouchStart={() => onTurn(-1)}
-                    onTouchEnd={() => onTurn(0)}
-                >
-                    <span className="text-white text-2xl">←</span>
-                </button>
-                <button
-                    className="w-16 h-16 bg-white/10 rounded-full border-2 border-white/20 flex items-center justify-center active:bg-white/30 active:scale-95 transition-all"
-                    onTouchStart={() => onTurn(1)}
-                    onTouchEnd={() => onTurn(0)}
-                >
-                    <span className="text-white text-2xl">→</span>
-                </button>
             </div>
 
             {/* Weapon Switch (Top Right Side) */}
