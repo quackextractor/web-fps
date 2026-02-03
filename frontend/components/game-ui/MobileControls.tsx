@@ -111,11 +111,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
         <div
             className="fixed inset-0 z-50 pointer-events-none select-none touch-none"
         >
-            {/* RIGHT: Swipe Look Zone (NEW) */}
-            {/* Covers right half, sits behind buttons (z-auto or explicit lower z) */}
+            {/* Full screen Look Zone */}
+            {/* Covers the entire screen, sits behind buttons (z-auto or explicit lower z) */}
             <div
                 data-testid="look-zone"
-                className="absolute top-0 right-0 w-1/2 h-full pointer-events-auto opacity-0"
+                className="absolute inset-0 pointer-events-auto opacity-0"
                 onTouchStart={handleLookStart}
                 onTouchMove={handleLookMove}
                 onTouchEnd={handleLookEnd}

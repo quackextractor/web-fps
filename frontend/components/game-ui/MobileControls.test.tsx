@@ -40,6 +40,33 @@ describe('MobileControls', () => {
         expect(onLook).toHaveBeenCalledWith(50);
     });
 
+    it('calls onLook when swiping on the left side of the screen', () => {
+        const onLook = vi.fn();
+        const { getByTestId } = render(
+            <MobileControls
+                onMove={() => { }}
+                onLook={onLook}
+                onFire={() => { }}
+                onPause={() => { }}
+                onNextWeapon={() => { }}
+                onPrevWeapon={() => { }}
+            />
+        );
+
+        const lookZone = getByTestId('look-zone');
+
+        // Touch on the left side (e.g., clientX: 100)
+        fireEvent.touchStart(lookZone, {
+            changedTouches: [{ identifier: 1, clientX: 100, clientY: 300 }]
+        });
+
+        fireEvent.touchMove(lookZone, {
+            changedTouches: [{ identifier: 1, clientX: 150, clientY: 300 }]
+        });
+
+        expect(onLook).toHaveBeenCalledWith(50);
+    });
+
     it('calls onFire when pressing the FIRE button', () => {
         const onFire = vi.fn();
         const { getByLabelText } = render(
