@@ -214,15 +214,16 @@ erDiagram
     PLAYER ||--|{ UNLOCKED_WEAPONS : has
     PLAYER ||--|| PROGRESS : tracks
     PLAYER ||--|{ FACTORY_MACHINES : owns
-    GAME_SYSTEM ||--|{ LEADERBOARD_ENTRY : records
+    PLAYER ||--o{ LEADERBOARD_ENTRY : achieves
 
     PLAYER {
-        string id
+        string id PK
         string name
         timestamp lastLogin
     }
 
     INVENTORY {
+        string playerId FK
         int credits "Money ($)"
         int redOre "Raw Imp Resource"
         int greenOre "Raw Demon Resource"
@@ -231,7 +232,8 @@ erDiagram
     }
 
     FACTORY_MACHINES {
-        string id
+        string id PK
+        string playerId FK
         string type "smelter_basic, drill_mk1"
         int level
         float efficiency
@@ -239,23 +241,26 @@ erDiagram
     }
 
     UNLOCKED_WEAPONS {
+        string playerId FK
         string weaponType "Fist, Pistol, Shotgun"
         boolean equipped
     }
 
     PROGRESS {
+        string playerId FK
         int highestLevelCompleted
         int totalKills
         int totalDeaths
     }
 
     LEADERBOARD_ENTRY {
-        string playerName
-        int totalNetWorth
-        int highestLevel
-        date recordDate
+        string id PK
+        string playerId FK
+        string leaderboardType "NetWorth, TopKills, Speedrun"
+        int rank
+        int score
+        timestamp recordedAt
     }
-
 ```
 
 **JSON Schema (`fps-savegame`):**
