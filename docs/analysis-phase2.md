@@ -209,46 +209,48 @@ Since this is a React app using `localStorage`, the data model is a JSON object 
 **Entity Relationship Diagram:**
 
 ```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#fff',
+      'primaryTextColor': '#2e3440',
+      'lineColor': '#5e81ac',
+      'tertiaryColor': '#f0f0f0',
+      'fontSize': '11px'
+    }
+  }
+}%%
 erDiagram
-    PLAYER ||--|| INVENTORY : holds
-    PLAYER ||--|{ UNLOCKED_WEAPONS : has
-    PLAYER ||--|| PROGRESS : tracks
-    PLAYER ||--|{ FACTORY_MACHINES : owns
-    PLAYER ||--o{ LEADERBOARD_ENTRY : achieves
+    %% --- UPSTREAM ENTITIES (Rendered Above Player) ---
+    INVENTORY ||--|| PLAYER : "is held by"
+    PROGRESS ||--|| PLAYER : "tracks"
+    LEADERBOARD_ENTRY }o--|| PLAYER : "achieved by"
 
+    %% --- CENTRAL NODE ---
     PLAYER {
         string id PK
         string name
         timestamp lastLogin
     }
 
+    %% --- DOWNSTREAM ENTITIES (Rendered Below Player) ---
+    PLAYER ||--|{ UNLOCKED_WEAPONS : has
+    PLAYER ||--|{ FACTORY_MACHINES : owns
+
+    %% --- DEFINITIONS ---
     INVENTORY {
         string playerId FK
-        int credits "Money ($)"
-        int redOre "Raw Imp Resource"
-        int greenOre "Raw Demon Resource"
-        int ironBars "Refined Material"
-        int plasmoidBars "Refined Rare Material"
-    }
-
-    FACTORY_MACHINES {
-        string id PK
-        string playerId FK
-        string type "smelter_basic, drill_mk1"
-        int level
-        float efficiency
-        timestamp lastCollected
-    }
-
-    UNLOCKED_WEAPONS {
-        string playerId FK
-        string weaponType "Fist, Pistol, Shotgun"
-        boolean equipped
+        int credits
+        int redOre
+        int greenOre
+        int ironBars
+        int plasmoidBars
     }
 
     PROGRESS {
         string playerId FK
-        int highestLevelCompleted
+        int highestLevel
         int totalKills
         int totalDeaths
     }
@@ -256,10 +258,23 @@ erDiagram
     LEADERBOARD_ENTRY {
         string id PK
         string playerId FK
-        string leaderboardType "NetWorth, TopKills, Speedrun"
+        string type
         int rank
         int score
-        timestamp recordedAt
+    }
+
+    UNLOCKED_WEAPONS {
+        string playerId FK
+        string weaponType
+        boolean equipped
+    }
+
+    FACTORY_MACHINES {
+        string id PK
+        string playerId FK
+        string type
+        int level
+        float efficiency
     }
 ```
 
