@@ -8,134 +8,36 @@ I have integrated the **Login/Registration** (adapted as Profile/Save Management
 
 ## 1. User Screens (Wireframes)
 
-*Note: Visual wireframes to be inserted at `!!!!PLACEHOLDER!!!!` below. Text descriptions of required screens follow:*
+### A. Login / Profile Management (State: `login`)
 
-### A. Login / Profile Management (State: `login`) [NEW]
-
-* **Purpose:** Meets "Login/Registration" requirement.
-* **Visuals:** Industrial security checkpoint aesthetic.
-* **Elements:**
-* Input Field: "Enter Employee ID (Name)"
-* [BUTTON] **PUNCH IN** (Create New Game/Profile)
-* List: "Existing Files" (Load Game)
-
-
-
+![[login.png]]
 ### B. Main Menu (State: `mainMenu`)
 
-* **Visuals:** Retro scanlines, animated logo "INFERNO FACTORY".
-* **Elements:**
-* [BUTTON] **ENTER FACTORY** (Play)
-* [BUTTON] **LEADERBOARD** (View High Scores)
-* [BUTTON] **SETTINGS**
-* [BUTTON] **LOGOUT** (Back to Profile)
+!!!!! ADD !!!!!
+### C. Leaderboard (State: `leaderboard`)
 
-
-
-### C. Leaderboard (State: `leaderboard`) [NEW]
-
-* **Purpose:** Meets "Leaderboard" requirement.
-* **Visuals:** Digital scoreboard/clipboard style.
-* **Elements:**
-* **Top Earners:** List of profiles ranked by Total Net Worth.
-* **Survivor Records:** List of runs ranked by Kills/Ore.
-* [BUTTON] **BACK TO MENU**
-
-
-
+![[leaderboard.png]]
 ### D. Factory Hub (Dashboard) (State: `factory`)
 
-* **Top Bar:** Credits & Resources.
-* **Main View:** Grid representation of machines.
-* **Bottom UI:** [BUILD] | [ARMORY] | [DEPLOY]
-
+![[factory.png]]
 ### E. Mission Briefing (State: `levelSelect`)
 
-* Map Preview, Risk Level, Resource Forecast, [START RUN].
+!!!!! ADD !!!!!
 
 ### F. Active Gameplay (FPS) (State: `playing`)
 
-* FPS View + Loot Bag HUD.
-
+![[hud.png]]
 ### G. Post-Run Summary (State: `summary`)
 
-* Mission Outcome, Loot Table, [RETURN TO FACTORY].
-
-!!!!PLACEHOLDER!!!!
+![[summary.png]]
 
 ---
 
 ## 2. User Flow
 
-This diagram illustrates the player journey, including the new Login and Leaderboard loops.
+This diagram illustrates the player journey, including the Login and Leaderboard loops.
 
-```mermaid
-graph TD
-    %% Nodes
-    Start((START APP))
-    Login[<b>LOGIN / REGISTER</b><br/>Create or Load Profile]
-    Menu[Main Menu]
-    Leaderboard[<b>LEADERBOARD</b><br/>High Scores]
-    Settings[Settings / Options]
-
-    subgraph Factory_Loop ["Safe Zone: The Factory"]
-        Hub["<b>FACTORY HUB</b><br/>Manage Base & Economy"]
-        Build["Build Menu<br/>(Buy Machines)"]
-        Armory["Armory<br/>(Unlock Weapons)"]
-        Process(Passive Resource Processing)
-    end
-
-    subgraph Action_Loop ["Danger Zone: The Mines"]
-        LevelSel["Mission Select<br/>Choose Difficulty"]
-        FPS["<b>FPS GAMEPLAY</b><br/>Kill Demons & Collect Ore"]
-        Loot[Loot Collection]
-        Death{Player Died?}
-        Exit{Exit Reached?}
-    end
-
-    Summary["Mission Summary<br/>Transfer Loot to Stash"]
-
-    %% Connections
-    Start --> Login
-    Login --> Menu
-    Menu --> Settings & Leaderboard
-    Settings & Leaderboard --> Menu
-    Menu --> Hub
-    Menu -- LOGOUT --> Login
-
-    %% Factory Interactions
-    Hub --> Build
-    Build -->|Spend Credits| Hub
-    Hub --> Armory
-    Armory -->|Spend Refined Bars| Hub
-    Hub -.->|Background Logic| Process
-    Process -.->|Generate Items| Hub
-
-    %% Transition to Action
-    Hub -->|DEPLOY| LevelSel
-    LevelSel --> FPS
-
-    %% Action Loop
-    FPS --> Loot
-    Loot --> FPS
-    FPS --> Death
-    FPS --> Exit
-
-    %% Outcomes
-    Death -- YES --> Summary
-    Exit -- YES --> Summary
-
-    Summary -->|Return with Loot| Hub
-
-    %% Styling
-    style Factory_Loop fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    style Action_Loop fill:#fbe9e7,stroke:#bf360c,stroke-width:2px
-    style Hub fill:#b3e5fc,stroke:#0277bd,stroke-width:4px
-    style FPS fill:#ffccbc,stroke:#d84315,stroke-width:4px
-    style Login fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
-    style Leaderboard fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
-
-```
+![[user_journey.png]]
 
 ---
 
@@ -208,75 +110,7 @@ Since this is a React app using `localStorage`, the data model is a JSON object 
 
 **Entity Relationship Diagram:**
 
-```mermaid
-%%{
-  init: {
-    'theme': 'base',
-    'themeVariables': {
-      'primaryColor': '#fff',
-      'primaryTextColor': '#2e3440',
-      'lineColor': '#5e81ac',
-      'tertiaryColor': '#f0f0f0',
-      'fontSize': '11px'
-    }
-  }
-}%%
-erDiagram
-    %% --- UPSTREAM ENTITIES (Rendered Above Player) ---
-    INVENTORY ||--|| PLAYER : "is held by"
-    PROGRESS ||--|| PLAYER : "tracks"
-    LEADERBOARD_ENTRY }o--|| PLAYER : "achieved by"
-
-    %% --- CENTRAL NODE ---
-    PLAYER {
-        string id PK
-        string name
-        timestamp lastLogin
-    }
-
-    %% --- DOWNSTREAM ENTITIES (Rendered Below Player) ---
-    PLAYER ||--|{ UNLOCKED_WEAPONS : has
-    PLAYER ||--|{ FACTORY_MACHINES : owns
-
-    %% --- DEFINITIONS ---
-    INVENTORY {
-        string playerId FK
-        int credits
-        int redOre
-        int greenOre
-        int ironBars
-        int plasmoidBars
-    }
-
-    PROGRESS {
-        string playerId FK
-        int highestLevel
-        int totalKills
-        int totalDeaths
-    }
-
-    LEADERBOARD_ENTRY {
-        string id PK
-        string playerId FK
-        string type
-        int rank
-        int score
-    }
-
-    UNLOCKED_WEAPONS {
-        string playerId FK
-        string weaponType
-        boolean equipped
-    }
-
-    FACTORY_MACHINES {
-        string id PK
-        string playerId FK
-        string type
-        int level
-        float efficiency
-    }
-```
+![[er_diagram.png]]
 
 **JSON Schema (`fps-savegame`):**
 
@@ -321,7 +155,7 @@ These are the core TypeScript functions needed to implement the logic, located i
 * `finalizeRun(won: boolean): void` (Transfers temp inventory to permanent storage).
 
 
-4. **`ProfileSystem.ts`** [NEW]
+1. **`ProfileSystem.ts`**
 * `createProfile(name: string): void`
 * `saveHighScore(score: number): void`
 
@@ -342,7 +176,7 @@ Divided into sprints (1 Sprint = approx. 1 week of student work).
 ### Sprint 2: The Mining Loop (Loot)
 
 * **Task 2.1:** Modify `Enemy` class to carry loot data.
-* **Task 2.2:** Create new Sprite assets for "Red Ore" and "Green Ore" pickups.
+* **Task 2.2:** Create Sprite assets for "Red Ore" and "Green Ore" pickups.
 * **Task 2.3:** Update `HUD` to show "Loot Collected" during gameplay.
 * **Task 2.4:** Implement `EndGameSummary` screen to calculate retained loot.
 
@@ -357,7 +191,7 @@ Divided into sprints (1 Sprint = approx. 1 week of student work).
 
 ## 8. Workload Estimation (Person-Hours)
 
-Based on the complexity of the existing `web_game_v0-4-2.txt` code. *Updated to include new required screens.*
+Based on the complexity of the existing `web_game_v0-4-2.txt` code.
 
 | Task Group | Specific Task | Est. Hours | Notes |
 | --- | --- | --- | --- |
