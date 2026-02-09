@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2026-02-09
+### Added
+- **Online Progress Saving (Wireframes)**: Updated the login wireframe to include Username and Password fields, a registration path, and a cloud sync status indicator.
+- **Local Fallback**: Maintained offline local save loading as a fallback in the updated login UI.
+
 ## [0.5.0] - 2026-02-03
 ### Changed
 - **Default Resolution**: Set the default game resolution to "Ultra Retro" (320x240) for a more authentic retro experience.
