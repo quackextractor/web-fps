@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2] - 2026-02-09
+### Added
+- **Wireframe Expansion (Phase 2)**: Added "Main Menu" and "Mission Briefing" screens to `wireframes.html`.
+- **Wireframe Re-organization**: Re-ordered and re-labeled existing wireframes to align with the complete user journey defined in `analysis-phase2.md`.
+
+
 ## [0.5.1] - 2026-02-09
 ### Added
 - **Online Progress Saving (Wireframes)**: Updated the login wireframe to include Username and Password fields, a registration path, and a cloud sync status indicator.

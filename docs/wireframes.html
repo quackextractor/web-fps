@@ -603,8 +603,113 @@
         </div>
     </div>
 
+    <div class="screen-container" id="main-menu-screen">
+        <div class="screen-label">B. MAIN MENU</div>
+        <div
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 40px;">
+            <div style="text-align: center;">
+                <h1 style="font-size: 80px; font-weight: 900; margin: 0; letter-spacing: 15px; color: var(--ink);">
+                    INFERNO</h1>
+                <div
+                    style="background: var(--accent-alert); color: white; padding: 5px 20px; font-weight: bold; transform: skew(-15deg); display: inline-block;">
+                    DESCENT INTO DARKNESS</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; width: 300px;">
+                <div class="btn primary">FACTORY</div>
+                <div class="btn">LEVEL SELECT</div>
+                <div class="btn">GLOBAL LEADERBOARD</div>
+                <div class="btn">OPTIONS</div>
+                <div class="btn danger">LOGOUT</div>
+            </div>
+
+            <div style="position: absolute; bottom: 20px; right: 20px; font-size: 10px; color: #666;">
+                VERSION 0.5.2 | CORP-AUTH BYPASS ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <div class="screen-container" id="leaderboard-screen">
+        <div class="screen-label">C. LEADERBOARD</div>
+
+        <div class="leaderboard-wrapper">
+            <h2 style="text-align: center; border-bottom: 4px double black; padding-bottom: 10px;">GLOBAL PERFORMANCE
+            </h2>
+
+            <div style="display: flex; gap: 40px; height: 100%;">
+
+                <div style="flex: 1;">
+                    <h3 style="background: black; color: white; padding: 5px; margin-bottom: 0;">TOP NET WORTH</h3>
+                    <table class="data-table">
+                        <tr>
+                            <th>#</th>
+                            <th>OPERATOR</th>
+                            <th>VALUE</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>BOSS_MAN</td>
+                            <td>$9,999,999</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>SpeedRun</td>
+                            <td>$50,420</td>
+                        </tr>
+                        <tr style="border: 2px solid blue;">
+                            <td>3</td>
+                            <td>WORKER_01</td>
+                            <td>$4,500</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Noob_77</td>
+                            <td>$120</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="flex: 1;">
+                    <h3 style="background: var(--accent-alert); color: white; padding: 5px; margin-bottom: 0;">MOST
+                        KILLS</h3>
+                    <table class="data-table">
+                        <tr>
+                            <th>#</th>
+                            <th>OPERATOR</th>
+                            <th>KILLS</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>DOOM_GUY</td>
+                            <td>666</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>QuakeRef</td>
+                            <td>142</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>WORKER_01</td>
+                            <td>24</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Pacifist</td>
+                            <td>0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top: auto; text-align: center;">
+                <div class="btn">CLOSE TERMINAL</div>
+            </div>
+        </div>
+    </div>
+
     <div class="screen-container" id="factory-screen">
-        <div class="screen-label">B. FACTORY HUB</div>
+        <div class="screen-label">D. FACTORY HUB</div>
 
         <div class="hud-top">
             <div><strong>EMP:</strong> WORKER_01</div>
@@ -664,7 +769,7 @@
     </div>
 
     <div class="screen-container" id="build-screen">
-        <div class="screen-label">C. PIPELINE CONFIG (LINE 1)</div>
+        <div class="screen-label">D.1. PIPELINE CONFIG (LINE 1)</div>
 
         <div class="power-readout">
             <div style="font-size: 14px; font-weight: bold; width: 100px;">POWER LOAD</div>
@@ -753,7 +858,7 @@
     </div>
 
     <div class="screen-container" id="armory-screen">
-        <div class="screen-label">D. PROGRESSION (ARMORY)</div>
+        <div class="screen-label">D.2. PROGRESSION (ARMORY)</div>
 
         <div class="armory-header">
             <div><strong>WEAPON FABRICATION</strong></div>
@@ -788,6 +893,54 @@
 
         <div style="padding: 15px; text-align: center;">
             <div class="btn" style="background: white;">RETURN TO HUB</div>
+        </div>
+    </div>
+
+    <div class="screen-container" id="briefing-screen">
+        <div class="screen-label">E. MISSION BRIEFING</div>
+        <div style="display: flex; flex-direction: column; height: 100%;">
+            <div style="background: black; color: white; padding: 20px; border-bottom: 4px solid var(--accent-alert);">
+                <h2 style="margin: 0;">ZONE 04: THE SMELTING REFINERY</h2>
+            </div>
+
+            <div style="flex: 1; display: flex; padding: 30px; gap: 30px;">
+                <div
+                    style="flex: 1; border: 4px solid black; background: #333; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <div style="color: #00ff00; font-family: monospace; font-size: 10px; padding: 10px;">
+                        [ TOP-DOWN TACTICAL OVERLAY ]<br><br>
+                        - RADAR ACTIVE<br>
+                        - HEAT SIGNATURES DETECTED<br>
+                        - ORE DENSITY: HIGH
+                    </div>
+                    <div style="position: absolute; top: 10px; left: 10px; color: white; font-size: 8px;">SEC-CAM_09
+                    </div>
+                </div>
+
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <div style="font-weight: bold; border-bottom: 2px solid black; margin-bottom: 5px;">OBJECTIVES:
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 14px;">
+                            <li>Infiltrate the refinery lower levels.</li>
+                            <li>Extract at least 40 units of Iron Ore.</li>
+                            <li>Neutralize any local demonic infestation.</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        style="background: #eee; border: 2px solid black; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                        <div><strong>HAZARD:</strong> <span style="color: red;">CRITICAL</span></div>
+                        <div><strong>LOOT BAL:</strong> 1.5x</div>
+                        <div><strong>EST. TIME:</strong> 4 - 8 MIN</div>
+                        <div><strong>PERM-DEATH:</strong> ACTIVE</div>
+                    </div>
+
+                    <div style="margin-top: auto; display: flex; gap: 10px;">
+                        <div class="btn primary" style="flex: 2;">DEPLOY IMMEDIATELY</div>
+                        <div class="btn" style="flex: 1;">ABORT</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -831,84 +984,7 @@
         </div>
     </div>
 
-    <div class="screen-container" id="leaderboard-screen">
-        <div class="screen-label">F. LEADERBOARD</div>
 
-        <div class="leaderboard-wrapper">
-            <h2 style="text-align: center; border-bottom: 4px double black; padding-bottom: 10px;">GLOBAL PERFORMANCE
-            </h2>
-
-            <div style="display: flex; gap: 40px; height: 100%;">
-
-                <div style="flex: 1;">
-                    <h3 style="background: black; color: white; padding: 5px; margin-bottom: 0;">TOP NET WORTH</h3>
-                    <table class="data-table">
-                        <tr>
-                            <th>#</th>
-                            <th>OPERATOR</th>
-                            <th>VALUE</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>BOSS_MAN</td>
-                            <td>$9,999,999</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>SpeedRun</td>
-                            <td>$50,420</td>
-                        </tr>
-                        <tr style="border: 2px solid blue;">
-                            <td>3</td>
-                            <td>WORKER_01</td>
-                            <td>$4,500</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Noob_77</td>
-                            <td>$120</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div style="flex: 1;">
-                    <h3 style="background: var(--accent-alert); color: white; padding: 5px; margin-bottom: 0;">MOST
-                        KILLS</h3>
-                    <table class="data-table">
-                        <tr>
-                            <th>#</th>
-                            <th>OPERATOR</th>
-                            <th>KILLS</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>DOOM_GUY</td>
-                            <td>666</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>QuakeRef</td>
-                            <td>142</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>WORKER_01</td>
-                            <td>24</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Pacifist</td>
-                            <td>0</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div style="margin-top: auto; text-align: center;">
-                <div class="btn">CLOSE TERMINAL</div>
-            </div>
-        </div>
-    </div>
 
     <div class="screen-container" id="summary-screen">
         <div class="screen-label">G. POST-RUN SUMMARY</div>
