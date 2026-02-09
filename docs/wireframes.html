@@ -896,8 +896,60 @@
         </div>
     </div>
 
+    <div class="screen-container" id="mission-selection-screen">
+        <div class="screen-label">E. MISSION SELECTION</div>
+        <div style="padding: 40px; display: flex; flex-direction: column; gap: 30px; height: 100%;">
+            <div style="border-bottom: 4px solid black; padding-bottom: 10px;">
+                <h2 style="margin: 0;">AVAILABLE EXPEDITIONS</h2>
+                <div style="font-size: 12px; color: #666;">SELECT DEPLOYMENT ZONE</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; overflow-y: auto;">
+                <div class="btn"
+                    style="height: 120px; display: flex; flex-direction: column; justify-content: center; background: #eee; border-color: var(--accent-alert);">
+                    <div style="font-weight: 900;">ZONE 04: THE SMELTING REFINERY</div>
+                    <div style="font-size: 10px; color: #555; margin-top: 5px;">HAZARD: CRITICAL | YIELD: 1.5x</div>
+                    <div style="font-size: 9px; font-weight: normal; margin-top: 10px; color: var(--accent-alert);">[
+                        READY FOR DEPLOYMENT ]</div>
+                </div>
+
+                <div class="btn disabled"
+                    style="height: 120px; display: flex; flex-direction: column; justify-content: center; background: #ddd; opacity: 0.7;">
+                    <div style="font-weight: 900;">ZONE 05: DARK MATTER CORE</div>
+                    <div style="font-size: 10px; color: #555; margin-top: 5px;">HAZARD: UNKNOWN | YIELD: 3.0x</div>
+                    <div style="font-size: 9px; font-weight: normal; margin-top: 10px; color: #777;">[ LOCKED - REQ LVL
+                        5 ]</div>
+                </div>
+
+                <div class="btn disabled"
+                    style="height: 120px; display: flex; flex-direction: column; justify-content: center; background: #ddd; opacity: 0.7;">
+                    <div style="font-weight: 900;">ZONE 06: ABYSSAL ARCHIVE</div>
+                    <div style="font-size: 10px; color: #555; margin-top: 5px;">HAZARD: LETHAL | YIELD: ?.?x</div>
+                    <div style="font-size: 9px; font-weight: normal; margin-top: 10px; color: #777;">[ LOCKED - REQ LVL
+                        10 ]</div>
+                </div>
+
+                <div class="machine-card hazard-stripe"
+                    style="height: 120px; justify-content: center; align-items: center;">
+                    <div
+                        style="background: white; padding: 5px; border: 1px solid black; font-weight: bold; font-size: 10px;">
+                        CLASSIFIED</div>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-top: 4px solid black; padding-top: 20px;">
+                <div class="btn">BACK TO HUB</div>
+                <div style="font-size: 10px; text-align: right;">
+                    LAST SYNC: 2026-02-09 12:20<br>
+                    ALL SYSTEMS NOMINAL
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="screen-container" id="briefing-screen">
-        <div class="screen-label">E. MISSION BRIEFING</div>
+        <div class="screen-label">E.1. MISSION BRIEFING</div>
         <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="background: black; color: white; padding: 20px; border-bottom: 4px solid var(--accent-alert);">
                 <h2 style="margin: 0;">ZONE 04: THE SMELTING REFINERY</h2>

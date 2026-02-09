@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.5.2] - 2026-02-09
 ### Added
-- **Wireframe Expansion (Phase 2)**: Added "Main Menu" and "Mission Briefing" screens to `wireframes.html`.
+- **Wireframe Expansion (Phase 2)**: Added "Main Menu", "Mission Selection (Level Select)", and "Mission Briefing" screens to `wireframes.html`.
 - **Wireframe Re-organization**: Re-ordered and re-labeled existing wireframes to align with the complete user journey defined in `analysis-phase2.md`.
 
 

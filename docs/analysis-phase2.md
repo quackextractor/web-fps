@@ -1,9 +1,3 @@
-Here is the updated **Phase 2: Game Design & Implementation Plan**.
-
-I have integrated the **Login/Registration** (adapted as Profile/Save Management) and **Leaderboard** into the Screen Descriptions, User Flow, Data Model, and Workload Estimation to strictly meet the assignment requirements.
-
----
-
 # Phase 2: Game Design & Implementation Plan
 
 ## 1. User Screens (Wireframes)
@@ -13,21 +7,25 @@ I have integrated the **Login/Registration** (adapted as Profile/Save Management
 ![[login.png]]
 ### B. Main Menu (State: `mainMenu`)
 
-!!!!! ADD !!!!!
+![[title.png]]
 ### C. Leaderboard (State: `leaderboard`)
 
 ![[leaderboard.png]]
 ### D. Factory Hub (Dashboard) (State: `factory`)
 
 ![[factory.png]]
-### E. Mission Briefing (State: `levelSelect`)
+### E. Expedition Select (State: `levelSelect`)
 
-!!!!! ADD !!!!!
+![[level_select.png]]
 
-### F. Active Gameplay (FPS) (State: `playing`)
+### F. Mission Briefing (State: `levelOverview`)
+
+![[level_overview.png]]
+
+### G. Active Gameplay (FPS) (State: `playing`)
 
 ![[hud.png]]
-### G. Post-Run Summary (State: `summary`)
+### H. Post-Run Summary (State: `summary`)
 
 ![[summary.png]]
 
