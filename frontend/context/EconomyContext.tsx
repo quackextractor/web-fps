@@ -208,7 +208,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             if (!response.ok) {
                 const message = await response.text();
                 setCloudStatus("error");
-                setCloudError(message || "Invalid credentials");
+                setCloudError("Invalid credentials");
                 return false;
             }
 
