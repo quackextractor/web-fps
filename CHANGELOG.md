@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.5.24] - 2026-03-01 [Author: Tobias Mrazek]
+### Added
+- ** factory ui **: Fixing UI to match wireframes.
+
 ## [0.5.23] - 2026-03-01 [Author: Dominik Hoch]
 ### Added
 - Migrated database from local SQLite to Supabase (PostgreSQL).
