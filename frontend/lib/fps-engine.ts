@@ -204,7 +204,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
   },
   [EnemyType.CACODEMON]: {
     name: 'Cacodemon',
-    health: 400,
+    health: 200,
     speed: 0.022,
     damage: 25,
     attackCooldown: 2000,
@@ -217,7 +217,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
   },
   [EnemyType.BARON]: {
     name: 'Baron of Hell',
-    health: 1000,
+    health: 500,
     speed: 0.015,
     damage: 45,
     attackCooldown: 2500,
@@ -243,7 +243,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
   },
   [EnemyType.HELLKNIGHT]: {
     name: 'Hell Knight',
-    health: 500,
+    health: 300,
     speed: 0.028,
     damage: 35,
     attackCooldown: 1800,
@@ -256,7 +256,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
   },
   [EnemyType.CYBERDEMON]: {
     name: 'Cyberdemon',
-    health: 4000,
+    health: 1500,
     speed: 0.01,
     damage: 80,
     attackCooldown: 600,

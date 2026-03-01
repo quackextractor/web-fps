@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.3] - 2026-03-01
+### Changed
+- **Enemy Balance**: Nerfed elite enemies' health to improve gameplay balance.
+    - **Cyberdemon**: Reduced health from 4000 to 1500.
+    - **Baron of Hell**: Reduced health from 1000 to 500.
+    - **Hell Knight**: Reduced health from 500 to 300.
+    - **Cacodemon**: Reduced health from 400 to 200.
+
 ## [0.5.2] - 2026-02-09
 ### Added
 - **Wireframe Expansion (Phase 2)**: Added "Main Menu", "Mission Selection (Level Select)", and "Mission Briefing" screens to `wireframes.html`.
