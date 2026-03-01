@@ -23,9 +23,13 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
     npm install
     ```
 
-2.  **Database Setup (New in 0.5.4)**:
-    Since the application now features an online Tycoon progression system, you must initialize the local SQLite database via Prisma before starting the game:
+2.  **Database Setup (Supabase)**:
+    The application now uses Supabase (PostgreSQL) for the online Tycoon progression system.
+    - Create a `.env` file in the `frontend` directory based on the Supabase dashboard (ORMs -> Prisma tab).
+    - Ensure you have `DATABASE_URL` (pooled) and `DIRECT_URL` (direct) configured.
+    - Initialize the database schema:
     ```bash
+    npx prisma generate
     npx prisma db push
     ```
 
