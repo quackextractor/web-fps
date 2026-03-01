@@ -100,6 +100,7 @@ export default function FPSGame() {
   const frameCountRef = useRef(0);
   const lastFPSTimeRef = useRef(0);
   const ragdollManagerRef = useRef(new RagdollManager());
+  const runLootRef = useRef<{ [key: string]: number }>({ ore_red: 0, ore_green: 0 });
 
   const [, forceUpdate] = useState(0);
   const keysRef = useRef<Set<string>>(new Set());
@@ -201,6 +202,7 @@ export default function FPSGame() {
       playerRef.current = createInitialPlayer();
       weaponsUnlockedRef.current = new Set(savedProgress.unlockedWeapons);
       totalKillsRef.current = 0;
+      runLootRef.current = { ore_red: 0, ore_green: 0 };
       // Store initial state for restart
       previousLevelWeaponsRef.current = new Set(savedProgress.unlockedWeapons);
       previousLevelAmmoRef.current = { [AmmoType.BULLETS]: 50, [AmmoType.SHELLS]: 0 };
@@ -208,6 +210,9 @@ export default function FPSGame() {
       // Store weapons/ammo from previous level completion
       previousLevelWeaponsRef.current = new Set(weaponsUnlockedRef.current);
       previousLevelAmmoRef.current = { ...playerRef.current.ammo };
+      // Keep runLoot for summary if needed, but usually nextLevel is called after summary
+      // Let's reset it here as well for the new level
+      runLootRef.current = { ore_red: 0, ore_green: 0 };
     }
 
     playerRef.current.x = level.startX;
@@ -584,6 +589,12 @@ export default function FPSGame() {
               weaponsUnlockedRef.current.add(WeaponType.CHAINSAW);
               playerRef.current.weapon = WeaponType.CHAINSAW;
               break;
+            case PickupType.ORE_RED:
+              runLootRef.current.ore_red += 1;
+              break;
+            case PickupType.ORE_GREEN:
+              runLootRef.current.ore_green += 1;
+              break;
           }
         }
       }
@@ -592,6 +603,16 @@ export default function FPSGame() {
       const exitDist = getDistance(level.exitX, level.exitY, newX, newY);
       const aliveEnemies = enemiesRef.current.filter((e) => e.state !== "dead").length;
       if (exitDist < 1 && aliveEnemies === 0) {
+        // Cloud Handoff: Add resources and save to cloud
+        const { ore_red, ore_green } = runLootRef.current;
+        if (ore_red > 0) addResource("ore_red", ore_red);
+        if (ore_green > 0) addResource("ore_green", ore_green);
+        
+        // Sync with cloud immediately
+        if (isAuthenticated) {
+          void forceCloudSave();
+        }
+
         setGameState("levelComplete");
         return;
       }
@@ -599,11 +620,7 @@ export default function FPSGame() {
       // Update enemies AI
       const currentPlayer = playerRef.current;
       for (const enemy of enemiesRef.current) {
-        if (enemy.state === "dead") {
-          enemy.animFrame++;
-          continue;
-        }
-
+        const wasDead = enemy.state === "dead";
         const now = performance.now();
 
         const result = updateEnemyAI(
@@ -615,6 +632,24 @@ export default function FPSGame() {
           now,
           projectileIdRef.current
         );
+
+        if (result.dropType !== undefined) {
+          const nextPickupId = pickupsRef.current.length > 0 
+            ? Math.max(...pickupsRef.current.map(p => p.id)) + 1 
+            : 0;
+          pickupsRef.current.push({
+            id: nextPickupId,
+            x: enemy.x,
+            y: enemy.y,
+            type: result.dropType,
+            collected: false
+          });
+        }
+
+        if (enemy.state === "dead" && wasDead) {
+          enemy.animFrame++;
+          continue;
+        }
 
         if (result.spawnProjectile) {
           projectileIdRef.current++;
@@ -1024,6 +1059,7 @@ export default function FPSGame() {
                 isMobile={isMobile || isTouchDeviceRef.current}
                 levelName={LEVELS[currentLevel]?.name || "Unknown"}
                 weaponsUnlocked={weaponsUnlockedRef.current}
+                runLoot={runLootRef.current}
               />
               <Crosshair style={settings.crosshairStyle} />
               {isTouchDeviceRef.current && (

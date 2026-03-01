@@ -290,6 +290,8 @@ export enum PickupType {
   WEAPON_CHAINGUN = 5,
   WEAPON_CHAINSAW = 6,
   MEGAHEALTH = 7,
+  ORE_RED = 8,
+  ORE_GREEN = 9,
 }
 
 export interface Pickup {
@@ -313,6 +315,8 @@ export const PICKUP_CONFIG: Record<PickupType, {
   [PickupType.WEAPON_CHAINGUN]: { name: 'Chaingun', color: '#666666', value: 0 },
   [PickupType.WEAPON_CHAINSAW]: { name: 'Chainsaw', color: '#ff0000', value: 0 },
   [PickupType.MEGAHEALTH]: { name: 'Megahealth', color: '#0000ff', value: 100 },
+  [PickupType.ORE_RED]: { name: 'Red Ore', color: '#ff4444', value: 1 },
+  [PickupType.ORE_GREEN]: { name: 'Green Ore', color: '#44ff44', value: 1 },
 };
 
 export interface Level {
