@@ -10,7 +10,7 @@ This document outlines the roles, responsibilities, and implementation plan for 
 ---
 
 
-### **Person 1: Gameplay & Systems (FPS Engine)**
+### **Pavlo Kosov: Gameplay & Systems (FPS Engine)**
 
 **Focus:** Modifying the core `fps-engine.ts` raycasting engine to handle the new "Mining Loop" and bridging the engine state to the UI layer. 
 
@@ -181,23 +181,23 @@ This document outlines the roles, responsibilities, and implementation plan for 
 
 | Team Member | Phase | Task Description | Estimated Hours |
 | :--- | :--- | :--- | :--- |
-| **Person 1: Gameplay & Systems** | **MVP** | Loot Dropping Logic (5h), Connecting Factory to FPS (6h). | 11h |
+| **Kosov: Gameplay & Systems** | **MVP** | Loot Dropping Logic (5h), Connecting Factory to FPS (6h). | 11h |
 | | **Should Have** | Summary/Loot Screen (4h), Draw Ore/Bar Sprites (3h). | 7h |
 | | **Nice to Have** | Death risk mechanic penalty to halve run inventory. | 2h |
 | | **PERSON 1 TOTAL** | | **20h** |
-| **Person 2: Economy & State** | **MVP** | Economy System Context (8h), Save System/Migration (4h). | 12h |
+| **Houdek: Economy & State** | **MVP** | Economy System Context (8h), Save System/Migration (4h). | 12h |
 | | **Should Have** | Offline fallbacks to local storage, Passive ore processing logic. | 5h |
 | | **Nice to Have** | Offline progress calculation based on time elapsed. | 3h |
 | | **PERSON 2 TOTAL** | | **20h** |
-| **Person 3: Frontend Developer** | **MVP** | Factory Hub (6h), Login/Profile (4h), Leaderboard (3h), Armory UI. | 17h |
+| **Mrázek: Frontend Developer** | **MVP** | Factory Hub (6h), Login/Profile (4h), Leaderboard (3h), Armory UI. | 17h |
 | | **Should Have** | Mission Select UI overhaul with hazard levels. | 4h |
 | | **Nice to Have** | CSS visual feedback animations (e.g., spinning gears). | 2h |
 | | **PERSON 3 TOTAL**| | **23h** |
-| **Person 4: Network & Backend** | **MVP** | DB provisioning, user schema, CRUD endpoints (Overlaps w/ Save System). | 6h |
+| **Hoch: Network & Backend** | **MVP** | DB provisioning, user schema, CRUD endpoints (Overlaps w/ Save System). | 6h |
 | | **Should Have** | Vercel analytics, JWT authentication, UptimeRobot. | 4h |
 | | **Nice to Have** | "Visiting Tycoons" read-only profile endpoint. | 3h |
 | | **PERSON 4 TOTAL** | | **13h** |
-| **Team Leader (Slezák)** | **MVP** | Balancing Costs vs. Drop Rates (4h), Repository & Backlog tracking. | 6h |
+| **Slezák: Team Leader** | **MVP** | Balancing Costs vs. Drop Rates (4h), Repository & Backlog tracking. | 6h |
 | | **Should Have** | Performance optimization profiling, Code reviews (TypeScript/ESLint). | 5h |
 | | **Nice to Have** | Primary responder for hot-fixing and bug resolution. | 4h |
 | | **LEADER TOTAL** | | **15h** |
