@@ -2,21 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.5.20] - 2026-03-01
+## [0.5.21] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
-- **[Author: Tobias Mrazek] login ui**: Added the forgery and factory ui pages and menu buttons leading there.
+- ** login ui **: Added the forgery and factory ui pages and menu buttons leading there.
 
-## [0.5.19] - 2026-03-01
+## [0.5.20] - 2026-03-01 [Author: Tobias Mrazek]
 ### Fixed
-- **[Author: Tobias Mrazek] login ui**: Fixes to login ui.
+- ** login ui **: Fixes to login ui.
 
-## [0.5.18] - 2026-03-01
+## [0.5.19] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
-- **[Author: Tobias Mrazek] leaderboard ui**: Added the leaderboard UI page and menu button leading there.
+- ** leaderboard ui **: Added the leaderboard UI page and menu button leading there.
 
-## [0.5.17] - 2026-03-01
+## [0.5.18] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
-- **[Author: Tobias Mrazek] login ui**: Added the login UI page and menu button leading there.
+- ** login ui **: Added the login UI page and menu button leading there.
 
 ## [0.5.17] - 2026-03-01 [Author: Dominik Hoch]
 ### Added
