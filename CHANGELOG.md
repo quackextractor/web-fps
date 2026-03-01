@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-03-01
+### Added
+- **Online Database MVP (Person 4: Dominik Hoch)**: 
+  - Integrated Prisma ORM with SQLite for local development server.
+  - Added `User` table to store player progress, net worth, and kills.
+  - Created `POST /api/save` and `GET /api/save` endpoints with JWT authentication for secure cloud saving and loading.
+  - Implemented `GET /api/leaderboard` to fetch the top 10 richest/most lethal players.
+  - Implemented `GET /api/profile/[username]/factory` for visiting other Tycoon setups.
+  - Setup Vitest and wrote complete API route integration tests.
+
 ## [0.5.3] - 2026-03-01
 ### Changed
 - **Enemy Balance**: Nerfed elite enemies' health to improve gameplay balance.
