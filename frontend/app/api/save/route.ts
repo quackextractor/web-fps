@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { BACKEND_CONFIG } from '@/config/backend/server.config';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'super-secret-key-for-dev');
 
@@ -21,11 +22,11 @@ export async function POST(req: Request) {
         });
 
         const saveDataJSON = JSON.stringify({
-            credits: credits || 0,
-            inventory: inventory || {},
-            machines: machines || [],
-            unlockedWeapons: unlockedWeapons || [],
-            highestLevelCompleted: highestLevelCompleted || 0
+            credits: credits || BACKEND_CONFIG.PLAYER_DEFAULTS.CREDITS,
+            inventory: inventory || BACKEND_CONFIG.PLAYER_DEFAULTS.INVENTORY,
+            machines: machines || BACKEND_CONFIG.PLAYER_DEFAULTS.MACHINES,
+            unlockedWeapons: unlockedWeapons || BACKEND_CONFIG.PLAYER_DEFAULTS.UNLOCKED_WEAPONS,
+            highestLevelCompleted: highestLevelCompleted || BACKEND_CONFIG.PLAYER_DEFAULTS.HIGHEST_LEVEL_COMPLETED
         });
 
         if (user) {
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
             });
         } else {
             // New user: create account
-            const salt = await bcrypt.genSalt(10);
+            const salt = await bcrypt.genSalt(BACKEND_CONFIG.AUTH.SALT_ROUNDS);
             const passwordHash = await bcrypt.hash(password, salt);
 
             user = await prisma.user.create({
@@ -54,8 +55,8 @@ export async function POST(req: Request) {
                     username,
                     passwordHash,
                     saveData: saveDataJSON,
-                    netWorth: net_worth || 0,
-                    kills: kills || 0,
+                    netWorth: net_worth || BACKEND_CONFIG.PLAYER_DEFAULTS.NET_WORTH,
+                    kills: kills || BACKEND_CONFIG.PLAYER_DEFAULTS.KILLS,
                 }
             });
         }
@@ -63,15 +64,15 @@ export async function POST(req: Request) {
         // Set JWT Cookie
         const token = await new SignJWT({ id: user.id, username: user.username })
             .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('30d')
+            .setExpirationTime(BACKEND_CONFIG.AUTH.JWT_EXPIRATION)
             .sign(JWT_SECRET);
 
         const cookieStore = await cookies();
-        cookieStore.set('auth_token', token, {
+        cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 30 * 24 * 60 * 60 // 30 days
+            maxAge: BACKEND_CONFIG.AUTH.COOKIE_MAX_AGE
         });
 
         return NextResponse.json({ success: true, message: 'Saved successfully', saveData: JSON.parse(user.saveData) });
@@ -84,7 +85,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     try {
         const cookieStore = await cookies();
-        const token = cookieStore.get('auth_token')?.value;
+        const token = cookieStore.get(BACKEND_CONFIG.AUTH.COOKIE_NAME)?.value;
 
         if (!token) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

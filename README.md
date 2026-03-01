@@ -12,6 +12,7 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
 -   **Asset Preloading**: Integrated preloader to ensure smooth gameplay from the first frame.
 -   **Precise Mobile Controls**: Dedicated joystick and right-half swipe zone for looking.
 -   **Keyboard Remapping**: Fully customizable controls for all layouts.
+-   **Centralized Backend Config**: Externalized all network and server settings (Person 4 role) to `config/backend/server.config.ts` for easy maintenance.
 
 ## Getting Started
 

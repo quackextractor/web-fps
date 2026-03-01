@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { BACKEND_CONFIG } from '@/config/backend/server.config';
 
 export async function GET() {
     try {
@@ -14,7 +15,7 @@ export async function GET() {
                 { netWorth: 'desc' },
                 { kills: 'desc' },
             ],
-            take: 10,
+            take: BACKEND_CONFIG.LEADERBOARD.LIMIT,
         });
 
         return NextResponse.json({ success: true, leaderboard: users });
