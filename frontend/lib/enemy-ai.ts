@@ -1,4 +1,4 @@
-import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOfSight, getDistance, Projectile, EnemyType, getProjectileColor, normalizeAngle } from './fps-engine';
+import { Enemy, Player, Point, ENEMY_CONFIG, checkCollision, findPath, hasLineOfSight, getDistance, Projectile, EnemyType, getProjectileColor, normalizeAngle, PickupType } from './fps-engine';
 
 const ENEMY_RADIUS = 0.3;
 const SEPARATION_RADIUS = 0.8;
@@ -9,6 +9,7 @@ export interface AIResult {
     spawnProjectile?: Projectile;
     playSound?: 'hurt' | 'shoot';
     damagePlayer?: number;
+    dropType?: PickupType;
 }
 
 export function updateEnemyAI(
@@ -24,6 +25,14 @@ export function updateEnemyAI(
 
     // 1. Dead Check
     if (enemy.state === 'dead') {
+        if (enemy.animFrame === 0) {
+            // Drop logic on first frame of death
+            if (enemy.type === EnemyType.IMP) {
+                result.dropType = PickupType.ORE_RED;
+            } else if (enemy.type === EnemyType.DEMON) {
+                result.dropType = PickupType.ORE_GREEN;
+            }
+        }
         enemy.animFrame++;
         return result;
     }

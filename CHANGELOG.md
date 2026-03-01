@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.23] - 2026-03-01 [Author: Dominik Hoch]
+### Added
+- Migrated database from local SQLite to Supabase (PostgreSQL).
+- Implemented connection pooling for serverless compatibility (Vercel).
+- Added `DIRECT_URL` support for Prisma migrations.
+- Added `JWT_SECRET` for secure player session management.
+
+### Changed
+- Updated `prisma/schema.prisma` to use the `postgresql` provider.
+- Enhanced `User` model with `createdAt` and `updatedAt` timestamps.
+- Updated `README.md` with new Supabase setup instructions.
+
+
+## [0.5.22] - 2026-03-01 [Author: Pavlo Kosov]
+### Added
+- ** Loot Configuration **: Added `PickupType.ORE_RED` and `PickupType.ORE_GREEN` to the engine to support the new mining loop mechanics.
+- ** Drop Logic **: Implemented enemy death drops where Imps drop Red Ore and Demons drop Green Ore, automatically spawning pickups at their death location.
+- ** Collection Logic **: Updated pickup collision to track collected `ORE_RED` and `ORE_GREEN` in a new `runLootRef` state for the current level run.
+- ** HUD Integration **: Added loot metrics display to the HUD, showing current run's red and green ore counts.
+- ** Cloud Handoff **: Implemented resource synchronization on level completion, adding collected loot to the global economy and triggering a cloud save.
+
 ## [0.5.21] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
 - ** login ui **: Added the forgery and factory ui pages and menu buttons leading there.

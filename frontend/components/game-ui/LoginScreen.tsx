@@ -14,7 +14,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
     const [password, setPassword] = useState("");
     const [localError, setLocalError] = useState("");
 
-    const handleSubmit = async () => {
+    const handleLogin = async () => {
         setLocalError("");
 
         if (username.trim().length === 0) {
@@ -49,15 +49,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
                     className="retro-text text-2xl md:text-4xl text-red-600 mb-4 text-center tracking-tighter"
                     style={{ textShadow: "4px 4px 0px #300000" }}
                 >
-                    AUTHORIZED ACCESS TERMINAL
+                    <p>INFERNO CORP.</p>
+                    <p className="text-xs text-gray-400" style={{ fontSize: "0.75rem", marginTop: "0.25rem" }}>AUTHORIZED ACCESS TERMINAL</p>
                 </h2>
 
-                <p className="retro-text text-xs md:text-sm text-gray-300 text-center mb-8 tracking-widest">
-                    ENTER CREDENTIALS TO LOAD CLOUD PROFILE
-                </p>
-
                 <div className="flex flex-col gap-4 mb-6">
-                    <label className="retro-text text-xs text-red-400" htmlFor="login-username">USERNAME</label>
+                    <label className="retro-text text-xs text-red-400" htmlFor="login-username">&gt; WORKER ID / USERNAME:</label>
                     <input
                         id="login-username"
                         value={username}
@@ -66,7 +63,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
                         autoComplete="username"
                     />
 
-                    <label className="retro-text text-xs text-red-400" htmlFor="login-password">PASSWORD</label>
+                    <label className="retro-text text-xs text-red-400" htmlFor="login-password">&gt; ENCRYPTED PASSWORD:</label>
                     <input
                         id="login-password"
                         type="password"
@@ -86,7 +83,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <MenuButton onClick={handleSubmit}>LOGIN AND LOAD</MenuButton>
+                    <div className="flex gap-3">
+                        <MenuButton onClick={handleLogin}>PUNCH IN</MenuButton>
+                        {/* <MenuButton onClick={handleRegister} variant="secondary">REGISTER</MenuButton> */}
+                    </div>
                     <MenuButton onClick={onBack} variant="secondary">BACK TO MAIN MENU</MenuButton>
                 </div>
             </div>

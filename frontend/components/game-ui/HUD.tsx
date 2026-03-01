@@ -11,6 +11,7 @@ interface HUDProps {
     levelName: string;
     weaponsUnlocked: Set<WeaponType>;
     isMobile?: boolean;
+    runLoot?: { ore_red: number; ore_green: number };
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -23,6 +24,7 @@ export const HUD: React.FC<HUDProps> = ({
     levelName,
     weaponsUnlocked,
     isMobile = false,
+    runLoot = { ore_red: 0, ore_green: 0 },
 }) => {
     const currentWeapon = WEAPON_CONFIG[weapon];
     const currentAmmo = currentWeapon.ammoType !== null ? ammo[currentWeapon.ammoType] : null;
@@ -97,11 +99,26 @@ export const HUD: React.FC<HUDProps> = ({
                         {levelName}
                     </span>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                    <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20 text-red-400">
-                        KILLS: {kills}
-                    </span>
-                </div>
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20 text-red-400">
+                            KILLS: {kills}
+                        </span>
+                        {/* Run Loot Display */}
+                        {(runLoot.ore_red > 0 || runLoot.ore_green > 0) && (
+                            <div className="flex gap-2 mt-1">
+                                {runLoot.ore_red > 0 && (
+                                    <span className="text-[clamp(10px,1.5vw,14px)] bg-black/50 px-2 py-1 rounded border border-red-500/50 text-red-400">
+                                        RED: {runLoot.ore_red}
+                                    </span>
+                                )}
+                                {runLoot.ore_green > 0 && (
+                                    <span className="text-[clamp(10px,1.5vw,14px)] bg-black/50 px-2 py-1 rounded border border-green-500/50 text-green-400">
+                                        GREEN: {runLoot.ore_green}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                    </div>
             </div>
 
             {/* Bottom Bar - Status */}
