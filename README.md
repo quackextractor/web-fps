@@ -1,0 +1,55 @@
+# INFERNO - Descent Into Darkness
+
+A high-performance retro raycasting 3D FPS built with React, Next.js, and a custom Canvas engine.
+
+## Features
+-   **Proprietary Raycasting Engine**: Custom-built engine with texture mapping, sprite rendering, and distance shading.
+-   **Advanced AI**: 8 unique enemy types with pathfinding, state-based behavior, and distinct attack patterns.
+-   **Arsenal of Weapons**: Fist, Chainsaw, Pistol, Shotgun, and Chaingun.
+-   **Physics-Based Ragdolls**: Dynamic gore system with adjustable multipliers and auto-clear functionality.
+-   **Visual Effects**: Scanlines, CRT effects, hurt flashes, and blood splatters.
+-   **Customizable Experience**: Adjustable resolution (up to 1440p), FOV, mouse sensitivity, and game speed.
+-   **Asset Preloading**: Integrated preloader to ensure smooth gameplay from the first frame.
+-   **Precise Mobile Controls**: Dedicated joystick and right-half swipe zone for looking.
+-   **Keyboard Remapping**: Fully customizable controls for all layouts.
+-   **Centralized Backend Config**: Externalized all network and server settings (Person 4 role) to `config/backend/server.config.ts` for easy maintenance.
+
+## Getting Started
+
+1.  **Clone and Install**:
+    ```bash
+    git clone https://github.com/quackextractor/web-fps.git
+    cd web-fps/frontend
+    npm install
+    ```
+
+2.  **Database Setup (New in 0.5.4)**:
+    Since the application now features an online Tycoon progression system, you must initialize the local SQLite database via Prisma before starting the game:
+    ```bash
+    npx prisma db push
+    ```
+
+3.  **Launch Developer Server**:
+    ```bash
+    npm run dev
+    ```
+
+### New APIs (v0.5.4+)
+The game now supports a public Tycoon/Factory saving system powered by Prisma and JWTs:
+- `POST /api/save` - Save player progress (JSON, requires hash on first attempt, JWT on updates)
+- `GET /api/save` - Load protected player progress (JSON, requires JWT cookie)
+- `GET /api/leaderboard` - Fetch the top 10 players based on Net Worth and Kills
+- `GET /api/profile/[username]/factory` - Fetch a public view of a player's factory layout
+
+3.  **Venture Forth**:
+    Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+## Controls
+-   **Remappable**: All controls can be customized in the OPTIONS menu.
+-   **DEFAULT WASD**: Move & Strafe
+-   **Mouse**: View rotation
+-   **Left Click / Space**: Attack
+-   **1-5**: Select Weapon
+-   **R**: Restart Level
+-   **ESC**: Pause / Options
+-   **P**: Toggle Debug Mode
