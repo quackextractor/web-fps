@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.28] - 2026-03-01 [Author: Tobias Mrazek]
+### Added
+- ** explicit loggout ui **: Add explicit logout option.
+
 ## [0.5.27] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
 - ** ui **: Small fixes and changes to the level select ui.

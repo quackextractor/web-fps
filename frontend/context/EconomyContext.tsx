@@ -29,6 +29,7 @@ interface EconomyContextType {
     cloudError: string;
     isAuthenticated: boolean;
     login: (username: string, password: string) => Promise<boolean>;
+    logout: () => void;
     refreshFromCloud: () => Promise<boolean>;
     forceCloudSave: (netWorth?: number, kills?: number) => Promise<boolean>;
     addResource: (resource: string, amount: number) => void;
@@ -224,6 +225,16 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         }
     }, [applySaveData]);
 
+    const logout = useCallback(() => {
+        credentialsRef.current = { username: "" };
+        setUsername("");
+        setNetWorth(0);
+        setKills(0);
+        setSaveData(initialSaveData);
+        setCloudStatus("idle");
+        setCloudError("");
+    }, []);
+
     useEffect(() => {
         if (!isAuthenticated) {
             return;
@@ -358,6 +369,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             cloudError,
             isAuthenticated,
             login,
+            logout,
             refreshFromCloud,
             forceCloudSave,
             addResource,
@@ -374,6 +386,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         kills,
         login,
+        logout,
         netWorth,
         refreshFromCloud,
         saveData,

@@ -7,6 +7,8 @@ interface MainMenuProps {
     onSelectLevel: () => void;
     onOptions: () => void;
     onLogin: () => void;
+    onLogout: () => void;
+    isAuthenticated: boolean;
     onFactory: () => void;
     onArmory: () => void;
     onLeaderboard: () => void;
@@ -17,6 +19,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onSelectLevel,
     onOptions,
     onLogin,
+    onLogout,
+    isAuthenticated,
     onFactory,
     onArmory,
     onLeaderboard,
@@ -52,8 +56,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             ARMORY
                         </MenuButton>
                     </div>
-                    <MenuButton onClick={onLogin} variant="secondary">
-                        LOGIN TERMINAL
+                    <MenuButton onClick={isAuthenticated ? onLogout : onLogin} variant="secondary">
+                        {isAuthenticated ? "LOGOUT" : "LOGIN TERMINAL"}
                     </MenuButton>
                     <MenuButton onClick={onOptions} variant="secondary">
                         OPTIONS

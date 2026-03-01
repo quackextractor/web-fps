@@ -65,7 +65,7 @@ export default function FPSGame() {
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
   const { registerClearRagdolls } = useGameActions();
-  const { isAuthenticated, forceCloudSave, addResource } = useEconomy();
+  const { isAuthenticated, logout, forceCloudSave, addResource } = useEconomy();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -1079,6 +1079,8 @@ export default function FPSGame() {
                   onStartGame={startGame}
                   onSelectLevel={() => setGameState("levelSelect")}
                   onLogin={() => setGameState("login")}
+                  onLogout={logout}
+                  isAuthenticated={isAuthenticated}
                   onFactory={openFactory}
                   onArmory={openArmory}
                   onLeaderboard={() => setGameState("leaderboard")}
