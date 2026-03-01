@@ -45,7 +45,7 @@ This document outlines the roles, responsibilities, and implementation plan for 
 ---
 
 
-### **Person 2: Economy & State (Game Logic)**
+### **Filip Houdek: Economy & State (Game Logic)**
 
 **Focus:** The global economy math, central state, and the network-sync architecture. 
 
