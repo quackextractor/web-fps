@@ -203,10 +203,10 @@ export class GameRenderer {
             const wallTop = (SCREEN_HEIGHT - wallHeight) / 2;
 
             // Texture Mapping
-            let texturePath = level.wallTextures?.[wallType];
-            let texture: any = texturePath ? this.textures.get(texturePath) : null;
+            const texturePath = level.wallTextures?.[wallType];
+            const texture = texturePath ? this.textures.get(texturePath) : null;
 
-            if (texture && texture.complete) {
+            if (texture && ('complete' in texture ? texture.complete : true)) {
                 let wallX;
                 if (side === 0) wallX = hitY; // If hit vertical wall, use Y
                 else wallX = hitX;            // If hit horizontal wall, use X

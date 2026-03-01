@@ -25,7 +25,6 @@ describe('GET /api/leaderboard', () => {
             { username: 'Player2', netWorth: 800, kills: 60 },
         ];
 
-        // @ts-ignore
         prisma.user.findMany.mockResolvedValue(mockUsers);
 
         const response = await getLeaderboard();
@@ -35,7 +34,6 @@ describe('GET /api/leaderboard', () => {
         expect(data.success).toBe(true);
         expect(data.leaderboard).toEqual(mockUsers);
 
-        // @ts-ignore
         expect(prisma.user.findMany).toHaveBeenCalledWith({
             select: { username: true, netWorth: true, kills: true },
             orderBy: [{ netWorth: 'desc' }, { kills: 'desc' }],
@@ -44,7 +42,8 @@ describe('GET /api/leaderboard', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-        // @ts-ignore
+        // @ts-expect-error mock
+        // @ts-expect-error mock
         prisma.user.findMany.mockRejectedValue(new Error('DB Error'));
 
         const response = await getLeaderboard();

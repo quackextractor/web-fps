@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.5.13] - 2026-03-01
+### Fixed
+- **[Author: Dominik Hoch] Github Actions CI Pipeline**: Resolved a breaking bug where the Next.js production server choked on Prisma's experimental V7 branch. Successfully reverted and stabilized database connections on Prisma V5.
+- **[Author: Dominik Hoch] Legacy Code Typing**: Brought older project scripts and the GameRenderer class into strict ESLint/TypeScript compliance to satisfy the remote CI/CD automated pipeline checks.
+
 ## [0.5.12] - 2026-03-01
 ### Fixed
 - **[Author: Dominik Hoch] JWT Expiration Bug**: Fixed a mistake where I accidentally set the JWT cookie expiration to 30 seconds instead of 30 days. Players were getting randomly logged out in the middle of a raid.

@@ -64,11 +64,11 @@ describe('POST /api/save', () => {
             kills: 5
         };
 
-        // @ts-ignore
+        // @ts-expect-error mock
         prisma.user.findUnique.mockResolvedValue(mockUser);
         vi.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
 
-        // @ts-ignore
+        // @ts-expect-error mock
         prisma.user.update.mockResolvedValue({
             ...mockUser,
             saveData: JSON.stringify({
@@ -98,7 +98,6 @@ describe('POST /api/save', () => {
 
         expect(response.status).toBe(200);
         expect(data.success).toBe(true);
-        // @ts-ignore
         expect(prisma.user.update).toHaveBeenCalled();
     });
 });
