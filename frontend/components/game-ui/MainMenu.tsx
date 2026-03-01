@@ -41,12 +41,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     <MenuButton onClick={onSelectLevel} variant="secondary">
                         SELECT LEVEL
                     </MenuButton>
-                        <MenuButton onClick={onLogin} variant="secondary">
-                            LOGIN TERMINAL
-                        </MenuButton>
-                        <MenuButton onClick={onLeaderboard} variant="secondary">
-                            LEADERBOARD
-                        </MenuButton>
+                    <MenuButton onClick={onLeaderboard} variant="secondary">
+                        GLOBAL LEADERBOARD
+                    </MenuButton>
                     <div className="flex gap-3"> 
                         <MenuButton onClick={onFactory} variant="secondary">
                             FACTORY HUB
@@ -55,6 +52,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             ARMORY
                         </MenuButton>
                     </div>
+                    <MenuButton onClick={onLogin} variant="secondary">
+                        LOGIN TERMINAL
+                    </MenuButton>
                     <MenuButton onClick={onOptions} variant="secondary">
                         OPTIONS
                     </MenuButton>

@@ -58,32 +58,61 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
                     <p className="retro-text text-xs text-center text-yellow-500 mb-8">FAILED TO LOAD LEADERBOARD</p>
                 )}
 
+                <h4 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                    TOP NET WORTH
+                </h4>
                 {status === "ready" && (
                     <div className="retro-border bg-gray-950 mb-8 overflow-hidden">
-                        <div className="grid grid-cols-12 border-b border-gray-800 px-3 py-2 retro-text text-[10px] text-red-400">
+                        <div className="grid grid-cols-11 border-b border-gray-800 px-3 py-2 retro-text text-[10px] text-red-400">
                             <div className="col-span-2">RANK</div>
                             <div className="col-span-5">PLAYER</div>
                             <div className="col-span-3 text-right">NET WORTH</div>
-                            <div className="col-span-2 text-right">KILLS</div>
                         </div>
 
                         {entries.length === 0 && (
                             <div className="px-3 py-4 retro-text text-xs text-gray-400 text-center">NO RECORDS FOUND</div>
                         )}
 
-                        {entries.map((entry, idx) => (
-                            <div key={`${entry.username}-${idx}`} className="grid grid-cols-12 px-3 py-2 border-b border-gray-900 retro-text text-xs text-white">
+                        {[...entries].sort((left, right) => (right.netWorth - left.netWorth)).map((entry, idx) => (
+                            <div key={`${entry.username}-${idx}`} className="grid grid-cols-11 px-3 py-2 border-b border-gray-900 retro-text text-xs text-white">
                                 <div className="col-span-2">#{idx + 1}</div>
                                 <div className="col-span-5 truncate">{entry.username}</div>
                                 <div className="col-span-3 text-right">${entry.netWorth}</div>
-                                <div className="col-span-2 text-right">{entry.kills}</div>
                             </div>
                         ))}
+
+
+                    </div>
+                )}
+                <h4 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                    MOST KILLS
+                </h4>
+                {status === "ready" && (
+                    <div className="retro-border bg-gray-950 mb-8 overflow-hidden">
+                        <div className="grid grid-cols-11 border-b border-gray-800 px-3 py-2 retro-text text-[10px] text-red-400">
+                            <div className="col-span-2">RANK</div>
+                            <div className="col-span-5">PLAYER</div>
+                            <div className="col-span-3 text-right">KILLS</div>
+                        </div>
+
+                        {entries.length === 0 && (
+                            <div className="px-3 py-4 retro-text text-xs text-gray-400 text-center">NO RECORDS FOUND</div>
+                        )}
+
+                        {[...entries].sort((left, right) => (right.kills - left.kills)).map((entry, idx) => (
+                            <div key={`${entry.username}-${idx}`} className="grid grid-cols-11 px-3 py-2 border-b border-gray-900 retro-text text-xs text-white">
+                                <div className="col-span-2">#{idx + 1}</div>
+                                <div className="col-span-5 truncate">{entry.username}</div>
+                                <div className="col-span-3 text-right">${entry.kills}</div>
+                            </div>
+                        ))}
+
+
                     </div>
                 )}
 
                 <div className="w-full md:w-1/3 mx-auto">
-                    <MenuButton onClick={onBack} variant="danger">BACK</MenuButton>
+                    <MenuButton onClick={onBack} variant="primary">CLOSE TERMINAL</MenuButton>
                 </div>
             </div>
         </div>
