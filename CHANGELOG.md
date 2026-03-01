@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [0.5.17] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Centralized Backend Configuration**: Created `frontend/config/backend/server.config.ts` to manage API limits, JWT security settings, and player default values, improving maintainability and security.
+### Changed
+- **[Author: Dominik Hoch] API Configuration Refactor**: Updated the leaderboard and factory profile API routes to consume centralized settings instead of hardcoded values.
+### Fixed
+- **[Author: Dominik Hoch] Documentation Sync**: Updated `README.md` and internal references to align with the new backend configuration structure.
+
 ## [0.5.16] - 2026-03-01
 ### Fixed
 - **[Author: Dominik Hoch] Stable Vercel Build Pipeline**: Replaced the Vercel `postinstall` hook with an explicit `"build": "prisma generate && next build"` script in `package.json`, securely ensuring that the serverless cloud environment correctly synthesizes database clients before compiling the frontend.
