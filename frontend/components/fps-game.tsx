@@ -35,10 +35,15 @@ import { PauseMenu } from "./game-ui/PauseMenu";
 import { DeathScreen } from "./game-ui/DeathScreen";
 import { LevelCompleteScreen } from "./game-ui/LevelCompleteScreen";
 import { VictoryScreen } from "./game-ui/VictoryScreen";
+import { LoginScreen } from "./game-ui/LoginScreen";
+import { FactoryHub } from "./game-ui/FactoryHub";
+import { Armory } from "./game-ui/Armory";
+import { Leaderboard } from "./game-ui/Leaderboard";
 import { HUD } from "./game-ui/HUD";
 import { EffectsLayer } from "./game-ui/EffectsLayer";
 import { Crosshair } from "./game-ui/Crosshair";
 import { useGameActions } from "@/context/GameActionContext";
+import { useEconomy } from "@/context/EconomyContext";
 import { AssetPreloader } from "./AssetPreloader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileControls } from "./game-ui/MobileControls";
@@ -47,7 +52,7 @@ const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
 const TICK_RATE = 1000 / 60;
 
-type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete";
+type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard";
 
 export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,6 +65,7 @@ export default function FPSGame() {
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
   const { registerClearRagdolls } = useGameActions();
+  const { isAuthenticated, forceCloudSave } = useEconomy();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -272,6 +278,22 @@ export default function FPSGame() {
       setGameState("victory");
     }
   }, [loadLevel]);
+
+  const openFactory = useCallback(() => {
+    if (!isAuthenticated) {
+      setGameState("login");
+      return;
+    }
+    setGameState("factory");
+  }, [isAuthenticated]);
+
+  const openArmory = useCallback(() => {
+    if (!isAuthenticated) {
+      setGameState("login");
+      return;
+    }
+    setGameState("armory");
+  }, [isAuthenticated]);
 
   const unlockAllLevels = useCallback(() => {
     setSavedProgress(prev => ({
@@ -764,6 +786,14 @@ export default function FPSGame() {
           setGameState(previousGameStateRef.current);
         } else if (gameStateRef.current === "levelSelect") {
           setGameState("mainMenu");
+        } else if (gameStateRef.current === "login") {
+          setGameState("mainMenu");
+        } else if (gameStateRef.current === "factory") {
+          setGameState("mainMenu");
+        } else if (gameStateRef.current === "armory") {
+          setGameState("factory");
+        } else if (gameStateRef.current === "leaderboard") {
+          setGameState("mainMenu");
         }
       }
 
@@ -1017,10 +1047,42 @@ export default function FPSGame() {
                 <MainMenu
                   onStartGame={startGame}
                   onSelectLevel={() => setGameState("levelSelect")}
+                  onLogin={() => setGameState("login")}
+                  onFactory={openFactory}
+                  onArmory={openArmory}
+                  onLeaderboard={() => setGameState("leaderboard")}
                   onOptions={() => {
                     setPreviousGameState("mainMenu");
                     setGameState("settings");
                   }}
+                />
+              )}
+
+              {gameState === "login" && (
+                <LoginScreen
+                  onBack={() => setGameState("mainMenu")}
+                  onSuccess={() => setGameState("factory")}
+                />
+              )}
+
+              {gameState === "factory" && (
+                <FactoryHub
+                  onBack={() => setGameState("mainMenu")}
+                  onOpenArmory={() => setGameState("armory")}
+                  onOpenLeaderboard={() => setGameState("leaderboard")}
+                  onDeploy={() => setGameState("levelSelect")}
+                />
+              )}
+
+              {gameState === "armory" && (
+                <Armory
+                  onBack={() => setGameState("factory")}
+                />
+              )}
+
+              {gameState === "leaderboard" && (
+                <Leaderboard
+                  onBack={() => setGameState("mainMenu")}
                 />
               )}
 
@@ -1077,7 +1139,10 @@ export default function FPSGame() {
                   kills={killsRef.current}
                   health={player.health}
                   isLastLevel={currentLevel >= LEVELS.length - 1}
-                  onNextLevel={nextLevel}
+                  onNextLevel={async () => {
+                    await forceCloudSave(player.health, totalKillsRef.current + killsRef.current);
+                    nextLevel();
+                  }}
                   onMainMenu={() => setGameState("mainMenu")}
                 />
               )}

@@ -6,12 +6,20 @@ interface MainMenuProps {
     onStartGame: (levelIndex: number) => void;
     onSelectLevel: () => void;
     onOptions: () => void;
+    onLogin: () => void;
+    onFactory: () => void;
+    onArmory: () => void;
+    onLeaderboard: () => void;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({
     onStartGame,
     onSelectLevel,
-    onOptions
+    onOptions,
+    onLogin,
+    onFactory,
+    onArmory,
+    onLeaderboard,
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black overflow-hidden select-none pointer-events-auto">
@@ -33,6 +41,20 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     <MenuButton onClick={onSelectLevel} variant="secondary">
                         SELECT LEVEL
                     </MenuButton>
+                        <MenuButton onClick={onLogin} variant="secondary">
+                            LOGIN TERMINAL
+                        </MenuButton>
+                        <MenuButton onClick={onLeaderboard} variant="secondary">
+                            LEADERBOARD
+                        </MenuButton>
+                    <div className="flex gap-3"> 
+                        <MenuButton onClick={onFactory} variant="secondary">
+                            FACTORY HUB
+                        </MenuButton>
+                        <MenuButton onClick={onArmory} variant="secondary">
+                            ARMORY
+                        </MenuButton>
+                    </div>
                     <MenuButton onClick={onOptions} variant="secondary">
                         OPTIONS
                     </MenuButton>

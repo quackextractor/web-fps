@@ -4,6 +4,7 @@ import { Press_Start_2P } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/hooks/use-settings'
 import { GameActionProvider } from '@/context/GameActionContext'
+import { EconomyProvider } from '@/context/EconomyContext'
 import { OrientationLock } from '@/components/game-ui/OrientationLock'
 import './globals.css'
 
@@ -49,8 +50,10 @@ export default function RootLayout({
       <body className={`${pressStart2P.variable} antialiased`}>
         <SettingsProvider>
           <GameActionProvider>
-            <OrientationLock />
-            {children}
+            <EconomyProvider>
+              <OrientationLock />
+              {children}
+            </EconomyProvider>
           </GameActionProvider>
         </SettingsProvider>
         <Analytics />
