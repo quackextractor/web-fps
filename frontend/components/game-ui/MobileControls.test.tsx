@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 import { MobileControls } from './MobileControls';
 import React from 'react';
 
@@ -13,6 +13,10 @@ vi.mock('@/hooks/use-settings', () => ({
 }));
 
 describe('MobileControls', () => {
+    afterEach(() => {
+        cleanup();
+    });
+
     it('calls onLook when swiping in the look zone', () => {
         const onLook = vi.fn();
         const { getByTestId } = render(

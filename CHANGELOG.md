@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.5.16] - 2026-03-01
+### Fixed
+- **[Author: Dominik Hoch] Stable Vercel Build Pipeline**: Replaced the Vercel `postinstall` hook with an explicit `"build": "prisma generate && next build"` script in `package.json`, securely ensuring that the serverless cloud environment correctly synthesizes database clients before compiling the frontend.
+- **[Author: Dominik Hoch] Vitest React JSDOM Hang**: Resolved an issue where the `MobileControls.test.tsx` crashed or hung indefinitely due to a missing DOM environment. Bootstrapped Vitest with `jsdom`, disabled watch mode (`vitest run`), and implemented test cleanup to guarantee CI/CD remote testing passes with 100% success rate.
+
+## [0.5.15] - 2026-03-01
+### Fixed
+- **[Author: Dominik Hoch] Prisma Vercel Generation**: Fixed an issue where Vercel could not find the `@prisma/client` bindings because they are dynamically generated. Added a `"postinstall": "prisma generate"` script to `package.json` to ensure the cloud server builds the database client before constructing the application.
+
 ## [0.5.14] - 2026-03-01
 ### Fixed
 - **[Author: Dominik Hoch] Vercel Deployment Crash**: Fixed a critical Next.js App Router bug where `GET /api/leaderboard` and `GET /api/profile/[username]/factory` were being statically evaluated (SSG) during the Vercel build step, causing Prisma to look for a non-existent database. Added `export const dynamic = 'force-dynamic';` to opt out of SSG for database routes.
