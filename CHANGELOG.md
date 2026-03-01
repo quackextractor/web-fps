@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.26] - 2026-03-01 [Author: Dominik Hoch]
+### Fixed
+- ** Vercel Deployment **: Fixed a critical build-time crash caused by module-level environment variable enforcement.
+- ** Route Dynamics **: Enforced `force-dynamic` on all security-sensitive API routes to ensure correct behavior in serverless environments.
+
 ## [0.5.25] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
 - ** Security Refactor (API Save Flow) **: Addressed critical security vulnerabilities reported by the team.

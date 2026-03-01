@@ -6,14 +6,17 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
 
-const JWT_SECRET_STR = process.env.JWT_SECRET;
-if (!JWT_SECRET_STR && process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET environment variable is required in production');
+function getJwtSecret() {
+    const secret = process.env.JWT_SECRET;
+    if (!secret && process.env.NODE_ENV === 'production') {
+        throw new Error('JWT_SECRET environment variable is required in production');
+    }
+    return new TextEncoder().encode(secret || 'dev-secret-fallback-only-for-local');
 }
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'dev-secret-fallback-only-for-local');
 
 export async function POST(req: Request) {
     try {
+        const JWT_SECRET = getJwtSecret();
         const cookieStore = await cookies();
         const token = cookieStore.get(BACKEND_CONFIG.AUTH.COOKIE_NAME)?.value;
 
@@ -96,6 +99,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
     try {
+        const JWT_SECRET = getJwtSecret();
         const cookieStore = await cookies();
         const token = cookieStore.get(BACKEND_CONFIG.AUTH.COOKIE_NAME)?.value;
 
