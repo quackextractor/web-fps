@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 
+
 ## [0.5.16] - 2026-03-01
 ### Fixed
 - **[Author: Dominik Hoch] Stable Vercel Build Pipeline**: Replaced the Vercel `postinstall` hook with an explicit `"build": "prisma generate && next build"` script in `package.json`, securely ensuring that the serverless cloud environment correctly synthesizes database clients before compiling the frontend.

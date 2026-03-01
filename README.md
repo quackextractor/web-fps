@@ -33,6 +33,13 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
     npm run dev
     ```
 
+### New APIs (v0.5.4+)
+The game now supports a public Tycoon/Factory saving system powered by Prisma and JWTs:
+- `POST /api/save` - Save player progress (JSON, requires hash on first attempt, JWT on updates)
+- `GET /api/save` - Load protected player progress (JSON, requires JWT cookie)
+- `GET /api/leaderboard` - Fetch the top 10 players based on Net Worth and Kills
+- `GET /api/profile/[username]/factory` - Fetch a public view of a player's factory layout
+
 3.  **Venture Forth**:
     Open [http://localhost:3000](http://localhost:3000) with your browser.
 
