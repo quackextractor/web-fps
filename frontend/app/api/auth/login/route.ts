@@ -1,0 +1,76 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { SignJWT } from 'jose';
+import { cookies } from 'next/headers';
+import { BACKEND_CONFIG } from '@/config/backend/server.config';
+
+const JWT_SECRET_STR = process.env.JWT_SECRET;
+if (!JWT_SECRET_STR && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+}
+const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'dev-secret-fallback-only-for-local');
+
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+        const { username, password } = body;
+
+        if (!username || !password) {
+            return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
+        }
+
+        let user = await prisma.user.findUnique({
+            where: { username }
+        });
+
+        if (user) {
+            // Existing user: verify password
+            const isValid = await bcrypt.compare(password, user.passwordHash);
+            if (!isValid) {
+                return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+            }
+        } else {
+            // New user: create account
+            const salt = await bcrypt.genSalt(BACKEND_CONFIG.AUTH.SALT_ROUNDS);
+            const passwordHash = await bcrypt.hash(password, salt);
+
+            user = await prisma.user.create({
+                data: {
+                    username,
+                    passwordHash,
+                    saveData: JSON.stringify(BACKEND_CONFIG.PLAYER_DEFAULTS),
+                    netWorth: BACKEND_CONFIG.PLAYER_DEFAULTS.NET_WORTH,
+                    kills: BACKEND_CONFIG.PLAYER_DEFAULTS.KILLS,
+                }
+            });
+        }
+
+        // Set JWT Cookie
+        const token = await new SignJWT({ id: user.id, username: user.username })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime(BACKEND_CONFIG.AUTH.JWT_EXPIRATION)
+            .sign(JWT_SECRET);
+
+        const cookieStore = await cookies();
+        cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: BACKEND_CONFIG.AUTH.COOKIE_MAX_AGE,
+            path: '/',
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Logged in successfully',
+            saveData: JSON.parse(user.saveData),
+            netWorth: user.netWorth,
+            kills: user.kills,
+            username: user.username
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.24] - 2026-03-01 [Author: Dominik Hoch]
+### Fixed
+- ** Security Refactor (API Save Flow) **: Addressed critical security vulnerabilities reported by the team.
+    - Split `/api/save` into `/api/auth/login` and a protected `/api/save` endpoint.
+    - Eliminated plaintext password transmission during auto-saves.
+    - Implemented server-side validation for `netWorth` and `kills` to prevent progression cheating and data inflation.
+    - Secured `JWT_SECRET` by enforcing environment variable presence in production and removing hardcoded fallbacks.
+    - Refactored `EconomyContext` to minimize client-side attack surface by removing stored passwords.
+
+
 ## [0.5.23] - 2026-03-01 [Author: Dominik Hoch]
 ### Added
 - Migrated database from local SQLite to Supabase (PostgreSQL).

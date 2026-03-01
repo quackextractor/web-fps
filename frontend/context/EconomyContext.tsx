@@ -58,7 +58,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
     const [kills, setKills] = useState(0);
     const [cloudStatus, setCloudStatus] = useState<"idle" | "syncing" | "synced" | "error">("idle");
     const [cloudError, setCloudError] = useState("");
-    const credentialsRef = useRef<{ username: string; password: string }>({ username: "", password: "" });
+    const credentialsRef = useRef<{ username: string }>({ username: "" });
 
     const isAuthenticated = useMemo(() => {
         if (username.length === 0) {
@@ -96,7 +96,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const forceCloudSave = useCallback(async (netWorth?: number, kills?: number) => {
-        if (credentialsRef.current.username.length === 0 || credentialsRef.current.password.length === 0) {
+        if (credentialsRef.current.username.length === 0) {
             setCloudStatus("error");
             setCloudError("You must log in before syncing");
             return false;
@@ -107,8 +107,6 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
 
         try {
             const payload: Record<string, unknown> = {
-                username: credentialsRef.current.username,
-                password: credentialsRef.current.password,
                 credits: saveData.credits,
                 inventory: saveData.inventory,
                 machines: saveData.machines,
@@ -130,9 +128,9 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             });
 
             if (!response.ok) {
-                const message = await response.text();
+                const data = await response.json().catch(() => ({}));
                 setCloudStatus("error");
-                setCloudError(message || "Failed to save");
+                setCloudError(data.error || "Failed to save");
                 return false;
             }
 
@@ -160,9 +158,9 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await fetch("/api/save", { method: "GET" });
             if (!response.ok) {
-                const message = await response.text();
+                const data = await response.json().catch(() => ({}));
                 setCloudStatus("error");
-                setCloudError(message || "Failed to load");
+                setCloudError(data.error || "Failed to load");
                 return false;
             }
 
@@ -191,33 +189,28 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         setCloudError("");
 
         try {
-            const response = await fetch("/api/save", {
+            const response = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     username: nextUsername,
                     password: nextPassword,
-                    credits: saveData.credits,
-                    inventory: saveData.inventory,
-                    machines: saveData.machines,
-                    unlockedWeapons: saveData.unlockedWeapons,
-                    highestLevelCompleted: saveData.highestLevelCompleted,
                 }),
             });
 
             if (!response.ok) {
-                const message = await response.text();
+                const data = await response.json().catch(() => ({}));
                 setCloudStatus("error");
-                setCloudError(message || "Invalid credentials");
+                setCloudError(data.error || "Invalid credentials");
                 return false;
             }
 
             const data = await response.json();
-            credentialsRef.current = { username: nextUsername, password: nextPassword };
+            credentialsRef.current = { username: nextUsername };
             setUsername(nextUsername);
             applySaveData(data.saveData);
-            if (typeof data.net_worth === "number") {
-                setNetWorth(data.net_worth);
+            if (typeof data.netWorth === "number") {
+                setNetWorth(data.netWorth);
             }
             if (typeof data.kills === "number") {
                 setKills(data.kills);
@@ -229,7 +222,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             setCloudError("Network error during login");
             return false;
         }
-    }, [applySaveData, saveData]);
+    }, [applySaveData]);
 
     useEffect(() => {
         if (!isAuthenticated) {

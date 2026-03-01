@@ -6,76 +6,88 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'super-secret-key-for-dev');
+const JWT_SECRET_STR = process.env.JWT_SECRET;
+if (!JWT_SECRET_STR && process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+}
+const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'dev-secret-fallback-only-for-local');
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { username, password, credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
-
-        if (!username || !password) {
-            return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
-        }
-
-        let user = await prisma.user.findUnique({
-            where: { username }
-        });
-
-        const saveDataJSON = JSON.stringify({
-            credits: credits || BACKEND_CONFIG.PLAYER_DEFAULTS.CREDITS,
-            inventory: inventory || BACKEND_CONFIG.PLAYER_DEFAULTS.INVENTORY,
-            machines: machines || BACKEND_CONFIG.PLAYER_DEFAULTS.MACHINES,
-            unlockedWeapons: unlockedWeapons || BACKEND_CONFIG.PLAYER_DEFAULTS.UNLOCKED_WEAPONS,
-            highestLevelCompleted: highestLevelCompleted || BACKEND_CONFIG.PLAYER_DEFAULTS.HIGHEST_LEVEL_COMPLETED
-        });
-
-        if (user) {
-            // Existing user: verify password
-            const isValid = await bcrypt.compare(password, user.passwordHash);
-            if (!isValid) {
-                return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
-            }
-
-            // Update save data
-            user = await prisma.user.update({
-                where: { id: user.id },
-                data: {
-                    saveData: saveDataJSON,
-                    netWorth: net_worth !== undefined ? net_worth : user.netWorth,
-                    kills: kills !== undefined ? kills : user.kills,
-                }
-            });
-        } else {
-            // New user: create account
-            const salt = await bcrypt.genSalt(BACKEND_CONFIG.AUTH.SALT_ROUNDS);
-            const passwordHash = await bcrypt.hash(password, salt);
-
-            user = await prisma.user.create({
-                data: {
-                    username,
-                    passwordHash,
-                    saveData: saveDataJSON,
-                    netWorth: net_worth || BACKEND_CONFIG.PLAYER_DEFAULTS.NET_WORTH,
-                    kills: kills || BACKEND_CONFIG.PLAYER_DEFAULTS.KILLS,
-                }
-            });
-        }
-
-        // Set JWT Cookie
-        const token = await new SignJWT({ id: user.id, username: user.username })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime(BACKEND_CONFIG.AUTH.JWT_EXPIRATION)
-            .sign(JWT_SECRET);
-
         const cookieStore = await cookies();
-        cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: BACKEND_CONFIG.AUTH.COOKIE_MAX_AGE
+        const token = cookieStore.get(BACKEND_CONFIG.AUTH.COOKIE_NAME)?.value;
+
+        if (!token) {
+            return NextResponse.json({ error: 'Unauthorized: No session found' }, { status: 401 });
+        }
+
+        let payload;
+        try {
+            const verified = await jwtVerify(token, JWT_SECRET);
+            payload = verified.payload;
+        } catch (e) {
+            return NextResponse.json({ error: 'Unauthorized: Invalid session' }, { status: 401 });
+        }
+
+        const body = await req.json();
+        const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
+
+        const userId = payload.id as string;
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
         });
 
-        return NextResponse.json({ success: true, message: 'Saved successfully', saveData: JSON.parse(user.saveData) });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // SERVER-SIDE VALIDATION
+        // 1. Prevent score/kills from decreasing
+        if (net_worth !== undefined && net_worth < user.netWorth) {
+            return NextResponse.json({ error: 'Invalid netWorth update' }, { status: 400 });
+        }
+        if (kills !== undefined && kills < user.kills) {
+            return NextResponse.json({ error: 'Invalid kills update' }, { status: 400 });
+        }
+
+        // 2. Prevent massive suspicious jumps (e.g., > 50,000 per save)
+        // Adjust these thresholds based on true game balance
+        const MAX_NET_WORTH_JUMP = 50000;
+        const MAX_KILLS_JUMP = 1000;
+
+        if (net_worth !== undefined && (net_worth - user.netWorth) > MAX_NET_WORTH_JUMP) {
+            return NextResponse.json({ error: 'Suspicious netWorth jump detected' }, { status: 403 });
+        }
+        if (kills !== undefined && (kills - user.kills) > MAX_KILLS_JUMP) {
+            return NextResponse.json({ error: 'Suspicious kills jump detected' }, { status: 403 });
+        }
+
+        const currentSaveData = JSON.parse(user.saveData);
+        const nextSaveDataJSON = JSON.stringify({
+            credits: credits !== undefined ? credits : currentSaveData.credits,
+            inventory: inventory || currentSaveData.inventory,
+            machines: machines || currentSaveData.machines,
+            unlockedWeapons: unlockedWeapons || currentSaveData.unlockedWeapons,
+            highestLevelCompleted: highestLevelCompleted !== undefined ? highestLevelCompleted : currentSaveData.highestLevelCompleted
+        });
+
+        // Update user
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                saveData: nextSaveDataJSON,
+                netWorth: net_worth !== undefined ? net_worth : user.netWorth,
+                kills: kills !== undefined ? kills : user.kills,
+            }
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Saved successfully',
+            saveData: JSON.parse(updatedUser.saveData),
+            net_worth: updatedUser.netWorth,
+            kills: updatedUser.kills
+        });
     } catch (error) {
         console.error('Save error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
