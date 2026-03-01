@@ -18,11 +18,17 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
 1.  **Clone and Install**:
     ```bash
     git clone https://github.com/quackextractor/web-fps.git
-    cd web-fps
+    cd web-fps/frontend
     npm install
     ```
 
-2.  **Launch Developer Server**:
+2.  **Database Setup (New in 0.5.4)**:
+    Since the application now features an online Tycoon progression system, you must initialize the local SQLite database via Prisma before starting the game:
+    ```bash
+    npx prisma db push
+    ```
+
+3.  **Launch Developer Server**:
     ```bash
     npm run dev
     ```

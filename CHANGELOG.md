@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.5.12] - 2026-03-01
+### Fixed
+- **[Author: Dominik Hoch] JWT Expiration Bug**: Fixed a mistake where I accidentally set the JWT cookie expiration to 30 seconds instead of 30 days. Players were getting randomly logged out in the middle of a raid.
+- **[Author: Dominik Hoch] Leaderboard Infinite Loop**: Resolved an issue in the `/api/leaderboard` route where calling the endpoint without awaiting the Prisma query caused the server to hang and crash locally.
+
+## [0.5.11] - 2026-03-01
+### Changed
+- **[Author: Dominik Hoch] Database Default Values**: Updated the Prisma schema. Realized that new users were crashing upon login because their `saveData` was defaulting to `null` instead of an empty JSON string `"{}"`.
+
+## [0.5.10] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Backend Testing Infrastructure**: Added `vitest` configuring it specifically for Next.js App Router. Created comprehensive mock testing for Prisma and Jose across all critical API routes to ensure stability prior to production deployment.
+
+## [0.5.9] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Public Factory Profiles API**: Implemented the `GET /api/profile/[username]/factory` endpoint. This allows users from the leaderboard to visit and view other tycoons' factory layouts safely without exposing private data or passwords.
+
+## [0.5.8] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Leaderboard API Core**: Implemented the `GET /api/leaderboard` endpoint which performs complex database queries to retrieve the top 10 richest and most lethal players, sorting globally by `netWorth` and `kills`.
+
+## [0.5.7] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] JWT Security Layer**: Integrated the `jose` package to generate and verify JSON Web Tokens. Players now receive an `HttpOnly` secure cookie upon login to persist their sessions safely.
+### Fixed
+- **[Author: Dominik Hoch] API Save Vulnerability**: Secured the save endpoints so unauthorized players cannot overwrite other people's factory layouts via raw API calls.
+
+## [0.5.6] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Save System Endpoints**: Implemented the primary payload handler `POST /api/save`. This endpoint accepts massive JSON structures representing player inventory, credits, and machine states, saving them securely to the database.
+- **[Author: Dominik Hoch] Load System Endpoints**: Added the corresponding `GET /api/save` endpoint so the React frontend can hydrate the user's progress immediately upon booting the game.
+
+## [0.5.5] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] User Authentication Logic**: Built the core logic for new player registration and logging in, utilizing `bcryptjs` for heavy salt-and-hash encryption of player passwords.
+
+## [0.5.4] - 2026-03-01
+### Added
+- **[Author: Dominik Hoch] Online Database MVP**: Initialized Prisma ORM with SQLite for local development. This marks the beginning of transitioning the game from a local experience to a persistent online MMO Tycoon.
+### Changed
+- **[Author: Dominik Hoch] Database Schema Refactor**: Architected the `User` table to efficiently store game settings as raw JSON blobs (`saveData`), creating a highly scalable solution for future weapon and machine additions without needing constant database migrations.
+### Fixed
+- **[Author: Dominik Hoch] Prisma Configurations**: Resolved legacy schema generation errors by properly setting up Prisma environment configurations to v7 standards.
+
 ## [0.5.3] - 2026-03-01
 ### Changed
 - **Enemy Balance**: Nerfed elite enemies' health to improve gameplay balance.
