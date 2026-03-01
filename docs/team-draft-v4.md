@@ -76,7 +76,7 @@ This document outlines the roles, responsibilities, and implementation plan for 
 ---
 
 
-### **Person 3: Frontend Developer (Factory & Armory UI)**
+### **Tobiáš Mrázek: Frontend Developer (Factory & Armory UI)**
 
 **Focus:** Building the React UI components for the Tycoon dashboard, Login overlays, and progression screens. 
 
@@ -107,7 +107,7 @@ This document outlines the roles, responsibilities, and implementation plan for 
 ---
 
 
-### **Person 4: Network & Backend Systems (Next.js APIs)**
+### **Dominik Hoch: Network & Backend Systems (Next.js APIs)**
 
 **Focus:** Database infrastructure, CRUD API endpoints, and Deployment. 
 
