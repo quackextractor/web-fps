@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 
 
+## [0.5.14] - 2026-03-01
+### Fixed
+- **[Author: Dominik Hoch] Vercel Deployment Crash**: Fixed a critical Next.js App Router bug where `GET /api/leaderboard` and `GET /api/profile/[username]/factory` were being statically evaluated (SSG) during the Vercel build step, causing Prisma to look for a non-existent database. Added `export const dynamic = 'force-dynamic';` to opt out of SSG for database routes.
+
 ## [0.5.13] - 2026-03-01
 ### Fixed
 - **[Author: Dominik Hoch] Github Actions CI Pipeline**: Resolved a breaking bug where the Next.js production server choked on Prisma's experimental V7 branch. Successfully reverted and stabilized database connections on Prisma V5.
