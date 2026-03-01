@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.20] - 2026-03-01
+### Added
+- **[Author: Tobias Mrazek] login ui**: Added the forgery and factory ui pages and menu buttons leading there.
+
+## [0.5.19] - 2026-03-01
+### Fixed
+- **[Author: Tobias Mrazek] login ui**: Fixes to login ui.
+
+## [0.5.18] - 2026-03-01
+### Added
+- **[Author: Tobias Mrazek] leaderboard ui**: Added the leaderboard UI page and menu button leading there.
+
+## [0.5.17] - 2026-03-01
+### Added
+- **[Author: Tobias Mrazek] login ui**: Added the login UI page and menu button leading there.
+
 ## [0.5.17] - 2026-03-01 [Author: Dominik Hoch]
 ### Added
 - ** Centralized Backend Configuration**: Created `frontend/config/backend/server.config.ts` to manage API limits, JWT security settings, and player default values, improving maintainability and security.
