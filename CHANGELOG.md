@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.27] - 2026-03-01 [Author: Tobias Mrazek]
+### Added
+- ** ui **: Small fixes and changes to the level select ui.
+
 ## [0.5.26] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
 - ** Vercel Deployment **: Fixed a critical build-time crash caused by module-level environment variable enforcement.

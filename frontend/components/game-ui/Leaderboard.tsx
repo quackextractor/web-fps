@@ -103,7 +103,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
                             <div key={`${entry.username}-${idx}`} className="grid grid-cols-11 px-3 py-2 border-b border-gray-900 retro-text text-xs text-white">
                                 <div className="col-span-2">#{idx + 1}</div>
                                 <div className="col-span-5 truncate">{entry.username}</div>
-                                <div className="col-span-3 text-right">${entry.kills}</div>
+                                <div className="col-span-3 text-right">{entry.kills}</div>
                             </div>
                         ))}
 

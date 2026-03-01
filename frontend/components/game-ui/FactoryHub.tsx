@@ -123,7 +123,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">
 
-                {/* Step A: top resource bar */}
+                {/** stats */}
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 mb-4 px-1">
                     <p className="retro-text text-xs text-gray-400 tracking-widest">
                         EMP: <span className="text-white">{operatorName}</span>
@@ -147,7 +147,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                     CLOUD {cloudStatusText}
                 </p>
 
-                {/* Step B: plot grid */}
+                {/** grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <SiloCard oreTotal={oreTotal} capacity={siloCapacity} level={siloLevel} />
 
@@ -169,7 +169,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                     ))}
                 </div>
 
-                {/* Action bar */}
+                {/** Action bar */}
                 <div className="flex gap-3 mb-4">
                     <MenuButton onClick={async () => { await forceCloudSave(); }} variant="secondary">
                         SAVE

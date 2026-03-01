@@ -65,7 +65,7 @@ export default function FPSGame() {
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
   const { registerClearRagdolls } = useGameActions();
-  const { isAuthenticated, forceCloudSave } = useEconomy();
+  const { isAuthenticated, forceCloudSave, addResource } = useEconomy();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -100,7 +100,7 @@ export default function FPSGame() {
   const frameCountRef = useRef(0);
   const lastFPSTimeRef = useRef(0);
   const ragdollManagerRef = useRef(new RagdollManager());
-  const runLootRef = useRef<{ [key: string]: number }>({ ore_red: 0, ore_green: 0 });
+  const runLootRef = useRef<{ ore_red: number; ore_green: number }>({ ore_red: 0, ore_green: 0 });
 
   const [, forceUpdate] = useState(0);
   const keysRef = useRef<Set<string>>(new Set());
@@ -603,15 +603,10 @@ export default function FPSGame() {
       const exitDist = getDistance(level.exitX, level.exitY, newX, newY);
       const aliveEnemies = enemiesRef.current.filter((e) => e.state !== "dead").length;
       if (exitDist < 1 && aliveEnemies === 0) {
-        // Cloud Handoff: Add resources and save to cloud
+        // Cloud Handoff: Add collected ore to global inventory
         const { ore_red, ore_green } = runLootRef.current;
         if (ore_red > 0) addResource("ore_red", ore_red);
         if (ore_green > 0) addResource("ore_green", ore_green);
-        
-        // Sync with cloud immediately
-        if (isAuthenticated) {
-          void forceCloudSave();
-        }
 
         setGameState("levelComplete");
         return;
@@ -1176,10 +1171,13 @@ export default function FPSGame() {
                   health={player.health}
                   isLastLevel={currentLevel >= LEVELS.length - 1}
                   onNextLevel={async () => {
-                    await forceCloudSave(player.health, totalKillsRef.current + killsRef.current);
+                    await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
                     nextLevel();
                   }}
-                  onMainMenu={() => setGameState("mainMenu")}
+                  onMainMenu={async () => {
+                    await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
+                    setGameState("mainMenu");
+                  }}
                 />
               )}
 
