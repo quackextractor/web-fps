@@ -49,7 +49,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
                     className="retro-text text-2xl md:text-4xl text-red-600 mb-4 text-center tracking-tighter"
                     style={{ textShadow: "4px 4px 0px #300000" }}
                 >
-                    <p>INFERNO CORP.</p>
+                    <p>INDUSTRIALIST CORP.</p>
                     <p className="text-xs text-gray-400" style={{ fontSize: "0.75rem", marginTop: "0.25rem" }}>AUTHORIZED ACCESS TERMINAL</p>
                 </h2>
 

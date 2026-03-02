@@ -32,7 +32,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">
                 <h1 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 text-center animate-pulse leading-snug tracking-tighter"
                     style={{ textShadow: "4px 4px 0px #300000" }}>
-                    INFERNO
+                    INDUSTRIALIST
                 </h1>
                 <p className="retro-text text-red-400 text-xs md:text-sm mb-12 tracking-widest text-center opacity-80">
                     DESCENT INTO DARKNESS
@@ -48,7 +48,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     <MenuButton onClick={onLeaderboard} variant="secondary">
                         GLOBAL LEADERBOARD
                     </MenuButton>
-                    <div className="flex gap-3"> 
+                    <div className="flex gap-3">
                         <MenuButton onClick={onFactory} variant="secondary">
                             FACTORY HUB
                         </MenuButton>

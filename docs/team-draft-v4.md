@@ -1,9 +1,9 @@
-# INFERNO: Online Tycoon Expansion - Team Implementation Plan
+# INDUSTRIALIST: Online Tycoon Expansion - Team Implementation Plan
 
 
 ## Project Overview
 
-This document outlines the roles, responsibilities, and implementation plan for transforming the existing INFERNO retro FPS into a persistent online game featuring a "Mining Loop" (FPS gameplay) and a "Factory Loop" (Tycoon mechanics). The team will collaborate via a shared Git repository, ensuring all tasks are tracked and authorship is recorded in the `CHANGELOG.md`.
+This document outlines the roles, responsibilities, and implementation plan for transforming the existing INDUSTRIALIST retro FPS into a persistent online game featuring a "Mining Loop" (FPS gameplay) and a "Factory Loop" (Tycoon mechanics). The team will collaborate via a shared Git repository, ensuring all tasks are tracked and authorship is recorded in the `CHANGELOG.md`.
 > Note: This document may be subject to changes in the future and information documented here may not be 100% accurate.
 
 

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.30] - 2026-03-02 [Author: Miro Slezák]
+### Changed
+- ** Game Rebranding **: Renamed the game from INFERNO to INDUSTRIALIST across all occurrences (README, layout, main menu, etc.).
+
 ## [0.5.29] - 2026-03-02 [Author: Miro Slezák]
 ### Added
 - ** Analytics Integration **: Confirmed and verified Vercel Analytics integration in the root layout.

@@ -26,7 +26,7 @@ export const OrientationLock: React.FC = () => {
 
             <h2 className="text-2xl font-bold mb-4 retro-text text-red-600">PLEASE ROTATE DEVICE</h2>
             <p className="text-gray-400 max-w-xs">
-                INFERNO is best played in LANDSCAPE mode.
+                INDUSTRIALIST is best played in LANDSCAPE mode.
                 Please turn your phone/tablet to continue.
             </p>
 

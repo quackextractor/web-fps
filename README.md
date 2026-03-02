@@ -1,4 +1,4 @@
-# INFERNO - Descent Into Darkness
+# INDUSTRIALIST - Descent Into Darkness
 
 A high-performance retro raycasting 3D FPS built with React, Next.js, and a custom Canvas engine.
 

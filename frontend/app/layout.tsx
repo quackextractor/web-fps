@@ -17,7 +17,7 @@ const pressStart2P = Press_Start_2P({
 // Remove unused Geist fonts
 
 export const metadata: Metadata = {
-  title: 'INFERNO - Descent Into Darkness',
+  title: 'INDUSTRIALIST - Descent Into Darkness',
   description: 'A fully functional raycasting 3D FPS game with 8 enemy types across 3 levels',
   icons: {
     icon: [

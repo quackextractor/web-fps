@@ -1,7 +1,7 @@
-# INFERNO Technical Documentation
+# INDUSTRIALIST Technical Documentation
 
 ## Overview
-INFERNO is a 2.5D retro FPS engine built with React and Next.js, utilizing a custom raycasting implementation for rendering and a decoupled architecture for game logic and UI.
+INDUSTRIALIST is a 2.5D retro FPS engine built with React and Next.js, utilizing a custom raycasting implementation for rendering and a decoupled architecture for game logic and UI.
 
 ## Architecture
 

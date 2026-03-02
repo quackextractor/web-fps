@@ -1,6 +1,6 @@
 {
-  "name": "INFERNO: Descent Into Darkness",
-  "short_name": "INFERNO",
+  "name": "INDUSTRIALIST: Descent Into Darkness",
+  "short_name": "INDUSTRIALIST",
   "description": "A retro 3D raycasting FPS game.",
   "start_url": "/",
   "display": "standalone",

@@ -32,5 +32,5 @@
 
 ### **Slezák: Team Leader & Core Engine Dev**
 **Pending Tasks:**
-- [ ] **Game Rebranding:** Rename the game from *INFERNO*, *Inferno* to *INDUSTRIALIST*, *Industrialist* in all occurrences (README, layout, main menu, etc.).
-- [ ] **Analytics Integration:** Add Vercel analytics based on `https://vercel.com/quackextractors-projects/web-fps/analytics?source=prod-checklist&environment=all`.
+- [x] **Game Rebranding:** Rename the game from *INFERNO*, *Inferno* to *INDUSTRIALIST*, *Industrialist* in all occurrences (README, layout, main menu, etc.).
+- [x] **Analytics Integration:** Add Vercel analytics based on `https://vercel.com/quackextractors-projects/web-fps/analytics?source=prod-checklist&environment=all`.
