@@ -16,6 +16,9 @@
       "prisma",
       "esbuild",
       "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "unrs-resolver"
     ]
   },
   "dependencies": {

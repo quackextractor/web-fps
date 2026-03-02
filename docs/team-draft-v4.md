@@ -169,7 +169,7 @@ This document outlines the roles, responsibilities, and implementation plan for 
 
 *   **Performance Optimization:** Profile the React re-renders when the new `EconomyContext` updates during active gameplay to ensure the 60Hz tick rate and frame rendering do not drop.
 
-*   **Code Review:** Enforce TypeScript strictness and ensure ESLint rules (`npm run lint`) are passing across all new UI and API additions before merging.
+*   **Code Review:** Enforce TypeScript strictness and ensure ESLint rules (`pnpm run lint`) are passing across all new UI and API additions before merging.
 
 
 #### Nice to Have

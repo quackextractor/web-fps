@@ -20,7 +20,7 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
     ```bash
     git clone https://github.com/quackextractor/web-fps.git
     cd web-fps/frontend
-    npm install
+    pnpm install
     ```
 
 2.  **Database Setup (Supabase)**:
@@ -29,13 +29,13 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
     - Ensure you have `DATABASE_URL` (pooled) and `DIRECT_URL` (direct) configured.
     - Initialize the database schema:
     ```bash
-    npx prisma generate
-    npx prisma db push
+    pnpm exec prisma generate
+    pnpm exec prisma db push
     ```
 
 3.  **Launch Developer Server**:
     ```bash
-    npm run dev
+    pnpm run dev
     ```
 
 ### New APIs (v0.5.4+)

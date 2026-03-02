@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.29] - 2026-03-02 [Author: Miro Slezák]
+### Added
+- ** Analytics Integration **: Confirmed and verified Vercel Analytics integration in the root layout.
+### Changed
+- ** Package Manager Migration **: Transitioned the project from `npm` to `pnpm` to resolve lockfile conflicts and improve build efficiency.
+- ** Documentation **: Updated `README.md` with new `pnpm` installation and development instructions.
+- ** Versioning **: Synchronized `version.md` with the latest changelog state.
+
 ## [0.5.28] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
 - ** explicit loggout ui **: Add explicit logout option.
