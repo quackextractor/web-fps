@@ -130,10 +130,11 @@ export default function FPSGame() {
 
   useEffect(() => {
     if (isLoaded) {
-      soundManager.setEnabled(settings.soundEnabled);
-      soundManager.setVolume(settings.volume);
+      const sfxEnabled = settings.soundEnabled && settings.sfxVolume > 0;
+      soundManager.setEnabled(sfxEnabled);
+      soundManager.setVolume(settings.volume * settings.sfxVolume);
     }
-  }, [settings.soundEnabled, settings.volume, isLoaded]);
+  }, [settings.soundEnabled, settings.sfxVolume, settings.volume, isLoaded]);
 
   useEffect(() => {
     offscreenCanvasRef.current = document.createElement('canvas');

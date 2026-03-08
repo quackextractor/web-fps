@@ -5,7 +5,9 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 export interface GameSettings {
     mouseSensitivity: number;
     soundEnabled: boolean;
+    sfxVolume: number;
     musicEnabled: boolean;
+    musicVolume: number;
     volume: number;
     showFPS: boolean;
     crosshairStyle: "cross" | "dot" | "circle";
@@ -50,7 +52,9 @@ export interface ControlScheme {
 export const DEFAULT_SETTINGS: GameSettings = {
     mouseSensitivity: 1,
     soundEnabled: true,
+    sfxVolume: 1,
     musicEnabled: true,
+    musicVolume: 1,
     volume: 0.5,
     showFPS: false,
     crosshairStyle: "cross",

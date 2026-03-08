@@ -42,6 +42,41 @@ export function SettingsMenu({
         setHasChanges(true);
     }, []);
 
+    const updateLocalSettings = useCallback((partial: Partial<GameSettings>) => {
+        setLocalSettings((prev) => ({ ...prev, ...partial }));
+        setHasChanges(true);
+    }, []);
+
+    const handleSfxVolumeChange = useCallback((value: number) => {
+        const isEnabled = value > 0;
+        updateLocalSettings({ sfxVolume: value, soundEnabled: isEnabled });
+    }, [updateLocalSettings]);
+
+    const handleMusicVolumeChange = useCallback((value: number) => {
+        const isEnabled = value > 0;
+        updateLocalSettings({ musicVolume: value, musicEnabled: isEnabled });
+    }, [updateLocalSettings]);
+
+    const handleMusicToggle = useCallback((enabled: boolean) => {
+        if (enabled) {
+            const restoredVolume = localSettings.musicVolume > 0 ? localSettings.musicVolume : 0.5;
+            updateLocalSettings({ musicEnabled: true, musicVolume: restoredVolume });
+            return;
+        }
+
+        updateLocalSettings({ musicEnabled: false, musicVolume: 0 });
+    }, [localSettings.musicVolume, updateLocalSettings]);
+
+    const handleSfxToggle = useCallback((enabled: boolean) => {
+        if (enabled) {
+            const restoredVolume = localSettings.sfxVolume > 0 ? localSettings.sfxVolume : 0.5;
+            updateLocalSettings({ soundEnabled: true, sfxVolume: restoredVolume });
+            return;
+        }
+
+        updateLocalSettings({ soundEnabled: false, sfxVolume: 0 });
+    }, [localSettings.sfxVolume, updateLocalSettings]);
+
     const applySettings = useCallback(() => {
         setSettings(localSettings);
         setHasChanges(false);
@@ -153,15 +188,33 @@ export function SettingsMenu({
                             onChange={(v) => updateLocalSetting("volume", v)}
                             format={(v) => `${Math.round(v * 100)}%`}
                         />
+                        <Slider
+                            label="SFX VOLUME"
+                            value={localSettings.sfxVolume}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            onChange={handleSfxVolumeChange}
+                            format={(v) => `${Math.round(v * 100)}%`}
+                        />
                         <Toggle
                             label="SOUND EFFECTS"
                             value={localSettings.soundEnabled}
-                            onChange={(v) => updateLocalSetting("soundEnabled", v)}
+                            onChange={handleSfxToggle}
+                        />
+                        <Slider
+                            label="MUSIC VOLUME"
+                            value={localSettings.musicVolume}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            onChange={handleMusicVolumeChange}
+                            format={(v) => `${Math.round(v * 100)}%`}
                         />
                         <Toggle
-                            label="MUSIC (SOON)"
+                            label="MUSIC"
                             value={localSettings.musicEnabled}
-                            onChange={(v) => updateLocalSetting("musicEnabled", v)}
+                            onChange={handleMusicToggle}
                         />
                     </div>
 
