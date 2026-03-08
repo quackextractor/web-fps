@@ -93,57 +93,57 @@ export default async function ChangelogPage() {
   return (
     <main className="relative min-h-screen overflow-y-auto bg-black px-4 py-8 md:px-8 md:py-10">
       <div
-        className="pointer-events-none absolute inset-0 opacity-35"
+        className="pointer-events-none absolute inset-0 opacity-50"
         style={{
-          backgroundImage: "linear-gradient(to bottom, rgba(10, 10, 10, 0) 50%, rgba(0, 0, 0, 0.28) 50%)",
+          backgroundImage: "linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5) 50%)",
           backgroundSize: "100% 4px",
         }}
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl">
-        <header className="mb-8 border-4 border-gray-800 bg-black p-4 md:p-6">
+      <div className="relative z-10 mx-auto w-full max-w-3xl">
+        <header className="mb-8 border-2 border-gray-900 bg-black p-4 md:p-6 shadow-inner">
           <h1
-            className="retro-text text-2xl text-red-600 md:text-4xl"
-            style={{ textShadow: "4px 4px 0px #300000" }}
+            className="retro-text text-2xl text-gray-600 md:text-4xl"
+            style={{ textShadow: "2px 2px 0px #000000" }}
           >
-            CORPORATE CHANGELOG ARCHIVE
+            CORPORATE OPERATION ARCHIVES
           </h1>
-          <p className="retro-text mt-4 text-[10px] leading-relaxed text-gray-300 md:text-xs">
-            INTERNAL REPORT STREAM. EACH CARD DOCUMENTS APPROVED CHANGES TO INDUSTRIALIST SYSTEMS.
+          <p className="retro-text mt-4 text-[10px] leading-relaxed text-gray-700 md:text-xs">
+            INTERNAL CHANGE REPORT SYSTEM.
           </p>
           <Link
             href="/"
-            className="retro-text mt-5 inline-flex border-4 border-black bg-gray-800 px-4 py-3 text-[10px] text-white transition-colors hover:bg-white hover:text-black md:text-xs"
+            className="retro-text mt-5 inline-flex border-2 border-gray-900 bg-gray-950 px-4 py-3 text-[10px] text-gray-600 transition-colors hover:bg-gray-900 hover:text-gray-400 md:text-xs"
           >
             BACK TO MENU
           </Link>
         </header>
 
-        <section className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-2 md:gap-6">
+        <section className="grid grid-cols-1 gap-6 pb-8">
           {entries.map((entry) => (
             <article
               key={`${entry.version}-${entry.date}`}
-              className="border-4 border-gray-800 bg-gray-950 p-4 shadow-[0_0_0_2px_#000] md:p-5"
+              className="border border-gray-900 bg-black p-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.9)] md:p-5"
             >
-              <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b-4 border-gray-800 pb-3">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-gray-900 pb-3">
                 <div>
-                  <h2 className="retro-text text-sm text-yellow-500 md:text-base">REPORT {entry.version}</h2>
-                  <p className="retro-text mt-2 text-[10px] text-gray-300 md:text-xs">DATE: {entry.date}</p>
+                  <h2 className="retro-text text-sm text-gray-600 md:text-base">REPORT {entry.version}</h2>
+                  <p className="retro-text mt-2 text-[10px] text-gray-700 md:text-xs">DATE: {entry.date}</p>
                 </div>
-                <p className="retro-text border-2 border-red-900 bg-black px-2 py-1 text-[9px] text-red-400 md:text-[10px]">
+                <p className="retro-text border border-gray-900 bg-black px-2 py-1 text-[9px] text-gray-700 md:text-[10px]">
                   AUTHOR: {entry.author.toUpperCase()}
                 </p>
               </div>
 
               <div className="space-y-4">
                 {entry.sections.map((section) => (
-                  <div key={`${entry.version}-${section.title}`} className="bg-black p-3 border-2 border-gray-800">
-                    <h3 className="retro-text mb-2 text-[10px] text-red-500 md:text-xs">{section.title.toUpperCase()}</h3>
+                  <div key={`${entry.version}-${section.title}`} className="bg-gray-950 p-3 border border-gray-900">
+                    <h3 className="retro-text mb-2 text-[10px] text-gray-700 md:text-xs">{section.title.toUpperCase()}</h3>
                     <ul className="space-y-2">
                       {section.items.map((item) => (
                         <li
                           key={`${entry.version}-${section.title}-${item.slice(0, 30)}`}
-                          className="retro-text text-[9px] leading-relaxed text-gray-200 md:text-[10px]"
+                          className="retro-text text-[9px] leading-relaxed text-gray-600 md:text-[10px]"
                         >
                           {item}
                         </li>
