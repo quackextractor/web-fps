@@ -7,6 +7,8 @@ interface MainMenuProps {
     onSelectLevel: () => void;
     onOptions: () => void;
     onChangelog: () => void;
+    onCredits: () => void;
+    onSource: () => void;
     onLogin: () => void;
     onLogout: () => void;
     isAuthenticated: boolean;
@@ -20,6 +22,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onSelectLevel,
     onOptions,
     onChangelog,
+    onCredits,
+    onSource,
     onLogin,
     onLogout,
     isAuthenticated,
@@ -83,8 +87,24 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     CHANGELOG
                 </button>
 
-                <div className="absolute bottom-4 right-4 text-[10px] text-gray-800 font-mono">
-                    v{process.env.NEXT_PUBLIC_GAME_VERSION || "0.0.0"}
+                <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+                    <button
+                        type="button"
+                        onClick={onCredits}
+                        className="text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                    >
+                        CREDITS
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onSource}
+                        className="text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                    >
+                        SOURCE
+                    </button>
+                    <div className="text-[10px] text-gray-800 font-mono">
+                        v{process.env.NEXT_PUBLIC_GAME_VERSION || "0.0.0"}
+                    </div>
                 </div>
             </div>
         </div>

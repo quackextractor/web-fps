@@ -1082,6 +1082,12 @@ export default function FPSGame() {
                   onChangelog={() => {
                     window.location.href = "/changelog";
                   }}
+                  onCredits={() => {
+                    window.location.href = "/credits";
+                  }}
+                  onSource={() => {
+                    window.open("https://github.com/quackextractor/web-fps", "_blank");
+                  }}
                   onLogin={() => setGameState("login")}
                   onLogout={logout}
                   isAuthenticated={isAuthenticated}

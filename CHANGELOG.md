@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.33] - 2026-03-02 [Author: Tobias Mrazek]
+### Added
+- Added credits page.
+
 ## [0.5.32] - 2026-03-02 [Author: Tobias Mrazek]
 ### Added
 - Added channelog page.

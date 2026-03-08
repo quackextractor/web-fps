@@ -26,4 +26,5 @@
 # typescript
 /**/*.tsbuildinfo
 /**/next-env.d.ts
+frontent/package-lock.json
 /.idea
