@@ -1079,6 +1079,9 @@ export default function FPSGame() {
                 <MainMenu
                   onStartGame={startGame}
                   onSelectLevel={() => setGameState("levelSelect")}
+                  onChangelog={() => {
+                    window.location.href = "/changelog";
+                  }}
                   onLogin={() => setGameState("login")}
                   onLogout={logout}
                   isAuthenticated={isAuthenticated}

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.32] - 2026-03-02 [Author: Tobias Mrazek]
+### Added
+- Added channelog page.
+
+## [0.5.31] - 2026-03-02 [Author: Tobias Mrazek]
+### Added
+- Added volume control for SFX and music.
+
 ## [0.5.30] - 2026-03-02 [Author: Miro Slezák]
 ### Changed
 - ** Game Rebranding **: Renamed the game from INFERNO to INDUSTRIALIST across all occurrences (README, layout, main menu, etc.).

@@ -6,6 +6,7 @@ interface MainMenuProps {
     onStartGame: (levelIndex: number) => void;
     onSelectLevel: () => void;
     onOptions: () => void;
+    onChangelog: () => void;
     onLogin: () => void;
     onLogout: () => void;
     isAuthenticated: boolean;
@@ -18,6 +19,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onStartGame,
     onSelectLevel,
     onOptions,
+    onChangelog,
     onLogin,
     onLogout,
     isAuthenticated,
@@ -72,6 +74,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                         <p>SPACE: CONFIRM •  CTRL: CANCEL</p>
                     </div>
                 </div>
+
+                <button
+                    type="button"
+                    onClick={onChangelog}
+                    className="absolute bottom-4 left-4 text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                >
+                    CHANGELOG
+                </button>
 
                 <div className="absolute bottom-4 right-4 text-[10px] text-gray-800 font-mono">
                     v{process.env.NEXT_PUBLIC_GAME_VERSION || "0.0.0"}
