@@ -83,6 +83,30 @@ export default async function CreditsPage() {
           </section>
         )}
 
+          <section className="space-y-3 pb-8">
+              <article
+                key="Kitsune"
+                className="border-4 border-gray-800 bg-gray-950 p-4 flex items-center gap-4 shadow-[0_0_0_2px_#000]"
+              >
+                <div
+                  className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 flex items-center justify-center border-4 border-gray-700 bg-black"
+                >
+                  <div className="retro-text text-2xl md:text-3xl text-gray-500">
+                    👤
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h2 className="retro-text text-sm md:text-base text-gray-300 truncate">
+                    KITSUNE
+                  </h2>
+                  <p className="retro-text mt-1 text-[9px] md:text-[10px] text-gray-500">
+                    Music composition and production
+                  </p>
+                </div>
+              </article>
+          </section>
+
         <footer className="mt-10 border-4 border-gray-800 bg-gray-950 p-4">
           <p className="retro-text text-gray-500 text-[10px] mb-2">SOURCE</p>
           <Link
