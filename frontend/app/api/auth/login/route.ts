@@ -75,6 +75,17 @@ export async function POST(req: Request) {
         });
     } catch (error) {
         console.error('Login error:', error);
+        // Fallback for local testing without DB
+        if (process.env.NODE_ENV !== 'production') {
+            return NextResponse.json({
+                success: true,
+                message: 'Offline mode login',
+                saveData: BACKEND_CONFIG.PLAYER_DEFAULTS,
+                netWorth: 0,
+                kills: 0,
+                username: 'offline_user'
+            });
+        }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

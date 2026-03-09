@@ -18,6 +18,7 @@ export interface EconomySaveData {
     machines: EconomyMachine[];
     unlockedWeapons: string[];
     highestLevelCompleted: number;
+    last_saved_at?: number;
 }
 
 interface EconomyContextType {
@@ -39,15 +40,20 @@ interface EconomyContextType {
 }
 
 const initialSaveData: EconomySaveData = {
-    credits: 0,
+    credits: 500,
     inventory: {
         ore_red: 0,
         ore_green: 0,
         iron_bar: 0,
+        plasmoid_bar: 0,
     },
-    machines: [],
+    machines: [
+        { id: "smelter_1", type: "smelter_red", active: true },
+        { id: "smelter_2", type: "smelter_green", active: true },
+    ],
     unlockedWeapons: ["fist", "pistol"],
     highestLevelCompleted: 0,
+    last_saved_at: Date.now(),
 };
 
 const EconomyContext = createContext<EconomyContextType | null>(null);
@@ -79,12 +85,14 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 nextInventory.ore_red = incoming.inventory.ore_red ?? nextInventory.ore_red ?? 0;
                 nextInventory.ore_green = incoming.inventory.ore_green ?? nextInventory.ore_green ?? 0;
                 nextInventory.iron_bar = incoming.inventory.iron_bar ?? nextInventory.iron_bar ?? 0;
+                nextInventory.plasmoid_bar = incoming.inventory.plasmoid_bar ?? nextInventory.plasmoid_bar ?? 0;
             }
 
             const nextMachines = incoming.machines ?? previous.machines;
             const nextWeapons = incoming.unlockedWeapons ?? previous.unlockedWeapons;
             const nextHighest = incoming.highestLevelCompleted ?? previous.highestLevelCompleted;
             const nextCredits = incoming.credits ?? previous.credits;
+            const nextLast = incoming.last_saved_at ?? previous.last_saved_at;
 
             return {
                 credits: nextCredits,
@@ -92,7 +100,75 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 machines: nextMachines,
                 unlockedWeapons: nextWeapons,
                 highestLevelCompleted: nextHighest,
+                last_saved_at: nextLast,
             };
+        });
+    }, []);
+
+    const processSmeltersTick = useCallback(() => {
+        setSaveData((prev) => {
+            if (!prev.machines || prev.machines.length === 0) {
+                return prev;
+            }
+            const next = { ...prev, inventory: { ...prev.inventory } };
+            for (const m of prev.machines) {
+                if (!m.active) {
+                    continue;
+                }
+                if (m.type === "smelter_red") {
+                    const ore = next.inventory.ore_red ?? 0;
+                    if (ore >= 2) {
+                        next.inventory.ore_red = ore - 2;
+                        next.inventory.iron_bar = (next.inventory.iron_bar ?? 0) + 1;
+                    }
+                } else if (m.type === "smelter_green") {
+                    const ore = next.inventory.ore_green ?? 0;
+                    if (ore >= 2) {
+                        next.inventory.ore_green = ore - 2;
+                        next.inventory.plasmoid_bar = (next.inventory.plasmoid_bar ?? 0) + 1;
+                    }
+                }
+            }
+            return next;
+        });
+    }, []);
+
+    const awardOfflineProgress = useCallback((lastSavedAt?: number) => {
+        const now = Date.now();
+        const last = typeof lastSavedAt === "number" ? lastSavedAt : undefined;
+        if (!last || last >= now) {
+            setSaveData((p) => ({ ...p, last_saved_at: now }));
+            return;
+        }
+        const dt = Math.floor((now - last) / 5000);
+        if (dt <= 0) {
+            setSaveData((p) => ({ ...p, last_saved_at: now }));
+            return;
+        }
+        setSaveData((prev) => {
+            const redSmelters = prev.machines.filter((m) => m.active && m.type === "smelter_red").length;
+            const greenSmelters = prev.machines.filter((m) => m.active && m.type === "smelter_green").length;
+            if (redSmelters === 0 && greenSmelters === 0) {
+                return { ...prev, last_saved_at: now };
+            }
+            const next = { ...prev, inventory: { ...prev.inventory }, last_saved_at: now };
+            if (redSmelters > 0) {
+                const maxCycles = dt * redSmelters;
+                const possible = Math.min(maxCycles, Math.floor((next.inventory.ore_red ?? 0) / 2));
+                if (possible > 0) {
+                    next.inventory.ore_red = (next.inventory.ore_red ?? 0) - possible * 2;
+                    next.inventory.iron_bar = (next.inventory.iron_bar ?? 0) + possible;
+                }
+            }
+            if (greenSmelters > 0) {
+                const maxCycles = dt * greenSmelters;
+                const possible = Math.min(maxCycles, Math.floor((next.inventory.ore_green ?? 0) / 2));
+                if (possible > 0) {
+                    next.inventory.ore_green = (next.inventory.ore_green ?? 0) - possible * 2;
+                    next.inventory.plasmoid_bar = (next.inventory.plasmoid_bar ?? 0) + possible;
+                }
+            }
+            return next;
         });
     }, []);
 
@@ -113,6 +189,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 machines: saveData.machines,
                 unlockedWeapons: saveData.unlockedWeapons,
                 highestLevelCompleted: saveData.highestLevelCompleted,
+                last_saved_at: Date.now(),
             };
 
             if (netWorth !== undefined) {
@@ -140,8 +217,22 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             setCloudStatus("synced");
             return true;
         } catch {
+            try {
+                const offlinePayload = {
+                    credits: saveData.credits,
+                    inventory: saveData.inventory,
+                    machines: saveData.machines,
+                    unlockedWeapons: saveData.unlockedWeapons,
+                    highestLevelCompleted: saveData.highestLevelCompleted,
+                    last_saved_at: Date.now(),
+                };
+                const key = `industrialist_save_${credentialsRef.current.username || "guest"}`;
+                if (typeof window !== "undefined" && window?.localStorage) {
+                    window.localStorage.setItem(key, JSON.stringify(offlinePayload));
+                }
+            } catch { void 0; }
             setCloudStatus("error");
-            setCloudError("Network error while saving");
+            setCloudError("Sync Error - saved locally");
             return false;
         }
     }, [applySaveData, saveData]);
@@ -167,6 +258,11 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
 
             const data = await response.json();
             applySaveData(data.saveData);
+            if (data?.saveData?.last_saved_at !== undefined) {
+                awardOfflineProgress(data.saveData.last_saved_at);
+            } else {
+                awardOfflineProgress(undefined);
+            }
             if (typeof data.username === "string") {
                 setUsername(data.username);
             }
@@ -210,6 +306,11 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             credentialsRef.current = { username: nextUsername };
             setUsername(nextUsername);
             applySaveData(data.saveData);
+            if (data?.saveData?.last_saved_at !== undefined) {
+                awardOfflineProgress(data.saveData.last_saved_at);
+            } else {
+                awardOfflineProgress(undefined);
+            }
             if (typeof data.netWorth === "number") {
                 setNetWorth(data.netWorth);
             }
@@ -219,9 +320,26 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             setCloudStatus("synced");
             return true;
         } catch {
+            console.log("Network error, falling back to offline mode for testing");
+            credentialsRef.current = { username: nextUsername };
+            setUsername(nextUsername);
             setCloudStatus("error");
-            setCloudError("Network error during login");
-            return false;
+            setCloudError("Offline Mode");
+            // Try to load from local storage if available
+            if (typeof window !== "undefined" && window.localStorage) {
+                const key = `industrialist_save_${nextUsername}`;
+                const stored = window.localStorage.getItem(key);
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        applySaveData(parsed);
+                        if (parsed.last_saved_at) {
+                            awardOfflineProgress(parsed.last_saved_at);
+                        }
+                    } catch { void 0; }
+                }
+            }
+            return true;
         }
     }, [applySaveData]);
 
@@ -248,6 +366,16 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             clearInterval(interval);
         };
     }, [forceCloudSave, isAuthenticated]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            return;
+        }
+        const interval = setInterval(() => {
+            processSmeltersTick();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [isAuthenticated, processSmeltersTick]);
 
     const addResource = useCallback((resource: string, amount: number) => {
         if (amount <= 0) {

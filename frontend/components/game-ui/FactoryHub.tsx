@@ -156,7 +156,13 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                             key={machine.id}
                             machine={machine}
                             index={idx}
-                            onCollect={() => { convertOreToBar("ore_red", "iron_bar", 2, 1); }}
+                            onCollect={() => {
+                                if (machine.type === "smelter_green") {
+                                    convertOreToBar("ore_green", "plasmoid_bar", 2, 1);
+                                } else {
+                                    convertOreToBar("ore_red", "iron_bar", 2, 1);
+                                }
+                            }}
                         />
                     ))}
 
