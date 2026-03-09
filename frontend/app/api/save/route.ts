@@ -57,6 +57,7 @@ export async function POST(req: Request) {
         // Adjust these thresholds based on true game balance
         const MAX_NET_WORTH_JUMP = 50000;
         const MAX_KILLS_JUMP = 1000;
+        const MAX_CREDITS_JUMP = 100000; // Allow significant progress but prevent millions
 
         if (net_worth !== undefined && (net_worth - user.netWorth) > MAX_NET_WORTH_JUMP) {
             return NextResponse.json({ error: 'Suspicious netWorth jump detected' }, { status: 403 });
@@ -66,6 +67,15 @@ export async function POST(req: Request) {
         }
 
         const currentSaveData = JSON.parse(user.saveData);
+        
+        // Validate Credits Jump
+        if (credits !== undefined) {
+            const currentCredits = currentSaveData.credits || 0;
+            if (credits > currentCredits + MAX_CREDITS_JUMP) {
+                 return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
+            }
+        }
+
         const nextSaveDataJSON = JSON.stringify({
             credits: credits !== undefined ? credits : currentSaveData.credits,
             inventory: inventory || currentSaveData.inventory,

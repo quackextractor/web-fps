@@ -65,7 +65,7 @@ export default function FPSGame() {
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
   const { registerClearRagdolls } = useGameActions();
-  const { isAuthenticated, logout, forceCloudSave, addResource } = useEconomy();
+  const { isAuthenticated, logout, forceCloudSave, addResource, saveData, incrementKills } = useEconomy();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -275,6 +275,7 @@ export default function FPSGame() {
         unlockedWeapons: new Set([...prev.unlockedWeapons, ...weaponsUnlockedRef.current]),
         highestLevel: Math.max(prev.highestLevel, next),
       }));
+      forceCloudSave();
       setCurrentLevel(next);
       totalKillsRef.current += killsRef.current;
       loadLevel(next, true);
@@ -282,8 +283,9 @@ export default function FPSGame() {
       lock(true);
     } else {
       setGameState("victory");
+      forceCloudSave();
     }
-  }, [loadLevel]);
+  }, [loadLevel, forceCloudSave]);
 
   const openFactory = useCallback(() => {
     if (!isAuthenticated) {
@@ -382,9 +384,11 @@ export default function FPSGame() {
             if (enemy.health <= 0) {
               enemy.state = "dead";
               enemy.animFrame = 0;
-              killsRef.current += 1;
-              soundManager.playEnemyDeath(enemy.type);
-              if (settings.ragdollEnabled) {
+            killsRef.current += 1;
+            addResource("credits", ENEMY_CONFIG[enemy.type].reward);
+            incrementKills(1);
+            soundManager.playEnemyDeath(enemy.type);
+            if (settings.ragdollEnabled) {
                 ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y, settings.ragdollMultiplier);
               }
             }
@@ -427,6 +431,8 @@ export default function FPSGame() {
             enemy.state = "dead";
             enemy.animFrame = 0;
             killsRef.current += 1;
+            addResource("credits", ENEMY_CONFIG[enemy.type].reward);
+            incrementKills(1);
             soundManager.playEnemyDeath(enemy.type);
             if (settings.ragdollEnabled) {
               ragdollManagerRef.current.spawnRagdoll(enemy, player.x, player.y, settings.ragdollMultiplier);
@@ -1056,6 +1062,7 @@ export default function FPSGame() {
                 levelName={LEVELS[currentLevel]?.name || "Unknown"}
                 weaponsUnlocked={weaponsUnlockedRef.current}
                 runLoot={runLootRef.current}
+                credits={saveData.credits}
               />
               <Crosshair style={settings.crosshairStyle} />
               {isTouchDeviceRef.current && (

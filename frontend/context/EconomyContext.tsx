@@ -37,6 +37,7 @@ interface EconomyContextType {
     spendResource: (resource: string, amount: number) => boolean;
     convertOreToBar: (oreType: string, barType: string, oreAmount: number, barAmount: number) => boolean;
     unlockWeapon: (weapon: string, barCost: number, creditCost: number) => boolean;
+    incrementKills: (amount: number) => void;
 }
 
 const initialSaveData: EconomySaveData = {
@@ -133,6 +134,10 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         });
     }, []);
 
+    const incrementKills = useCallback((amount: number) => {
+        setKills(prev => prev + amount);
+    }, []);
+
     const awardOfflineProgress = useCallback((lastSavedAt?: number) => {
         const now = Date.now();
         const last = typeof lastSavedAt === "number" ? lastSavedAt : undefined;
@@ -172,18 +177,14 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         });
     }, []);
 
-    const forceCloudSave = useCallback(async (netWorth?: number, kills?: number) => {
-        if (credentialsRef.current.username.length === 0) {
-            setCloudStatus("error");
-            setCloudError("You must log in before syncing");
-            return false;
-        }
-
-        setCloudStatus("syncing");
-        setCloudError("");
-
+    const forceCloudSave = useCallback(async (netWorthOverride?: number, killsOverride?: number) => {
+        if (!isAuthenticated) return false;
+        
         try {
-            const payload: Record<string, unknown> = {
+            setCloudStatus("syncing");
+            setCloudError("");
+            
+            const payload: any = {
                 credits: saveData.credits,
                 inventory: saveData.inventory,
                 machines: saveData.machines,
@@ -192,10 +193,15 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 last_saved_at: Date.now(),
             };
 
-            if (netWorth !== undefined) {
+            if (netWorthOverride !== undefined) {
+                payload.net_worth = netWorthOverride;
+            } else {
                 payload.net_worth = netWorth;
             }
-            if (kills !== undefined) {
+
+            if (killsOverride !== undefined) {
+                payload.kills = killsOverride;
+            } else {
                 payload.kills = kills;
             }
 
@@ -235,7 +241,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             setCloudError("Sync Error - saved locally");
             return false;
         }
-    }, [applySaveData, saveData]);
+    }, [applySaveData, saveData, netWorth, kills, isAuthenticated]);
 
     const refreshFromCloud = useCallback(async () => {
         if (credentialsRef.current.username.length === 0) {
@@ -504,6 +510,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             spendResource,
             convertOreToBar,
             unlockWeapon,
+            incrementKills,
         };
     }, [
         addResource,
@@ -521,6 +528,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         spendResource,
         unlockWeapon,
         username,
+        incrementKills,
     ]);
 
     return <EconomyContext.Provider value={value}>{children}</EconomyContext.Provider>;

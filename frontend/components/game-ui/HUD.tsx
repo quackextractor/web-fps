@@ -12,6 +12,7 @@ interface HUDProps {
     weaponsUnlocked: Set<WeaponType>;
     isMobile?: boolean;
     runLoot?: { ore_red: number; ore_green: number };
+    credits: number;
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -25,6 +26,7 @@ export const HUD: React.FC<HUDProps> = ({
     weaponsUnlocked,
     isMobile = false,
     runLoot = { ore_red: 0, ore_green: 0 },
+    credits,
 }) => {
     const currentWeapon = WEAPON_CONFIG[weapon];
     const currentAmmo = currentWeapon.ammoType !== null ? ammo[currentWeapon.ammoType] : null;
@@ -65,7 +67,10 @@ export const HUD: React.FC<HUDProps> = ({
                     {/* Level & Kills (Center) */}
                     <div className="flex flex-col items-center opacity-70 flex-1">
                         <span className="text-[clamp(8px,1.2vw,10px)] bg-black/40 px-1 rounded truncate max-w-full">{levelName}</span>
-                        <span className="text-[clamp(8px,1.2vw,10px)] text-red-400 font-bold">KILLS: {kills}</span>
+                        <div className="flex gap-2">
+                            <span className="text-[clamp(8px,1.2vw,10px)] text-yellow-400 font-bold">${credits}</span>
+                            <span className="text-[clamp(8px,1.2vw,10px)] text-red-400 font-bold">KILLS: {kills}</span>
+                        </div>
                     </div>
 
                     {/* Weapon & Ammo */}
@@ -100,6 +105,9 @@ export const HUD: React.FC<HUDProps> = ({
                     </span>
                 </div>
                     <div className="flex flex-col items-end gap-1">
+                        <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20 text-yellow-400">
+                            ${credits}
+                        </span>
                         <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20 text-red-400">
                             KILLS: {kills}
                         </span>

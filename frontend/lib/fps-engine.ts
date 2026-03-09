@@ -162,6 +162,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
   isMelee: boolean;
   color: string;
   size: number;
+  reward: number;
 }> = {
   [EnemyType.IMP]: {
     name: 'Imp',
@@ -175,6 +176,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#8B4513',
     size: 0.5,
+    reward: 15,
   },
   [EnemyType.DEMON]: {
     name: 'Demon',
@@ -188,6 +190,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: true,
     color: '#FF1493',
     size: 0.7,
+    reward: 35,
   },
   [EnemyType.SOLDIER]: {
     name: 'Soldier',
@@ -201,6 +204,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#556B2F',
     size: 0.5,
+    reward: 10,
   },
   [EnemyType.CACODEMON]: {
     name: 'Cacodemon',
@@ -214,6 +218,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#DC143C',
     size: 0.8,
+    reward: 50,
   },
   [EnemyType.BARON]: {
     name: 'Baron of Hell',
@@ -227,6 +232,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#228B22',
     size: 1.0,
+    reward: 150,
   },
   [EnemyType.ZOMBIE]: {
     name: 'Zombie',
@@ -240,6 +246,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: true,
     color: '#4a4a2a',
     size: 0.45,
+    reward: 5,
   },
   [EnemyType.HELLKNIGHT]: {
     name: 'Hell Knight',
@@ -253,6 +260,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#8B4513',
     size: 0.85,
+    reward: 100,
   },
   [EnemyType.CYBERDEMON]: {
     name: 'Cyberdemon',
@@ -266,6 +274,7 @@ export const ENEMY_CONFIG: Record<EnemyType, {
     isMelee: false,
     color: '#8B0000',
     size: 1.4,
+    reward: 1000,
   },
 };
 

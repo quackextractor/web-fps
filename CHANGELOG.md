@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.34] - 2026-03-09 [Author: Pavlo Kosov]
+### Added
+- ** Revenue System **: Implemented a critical revenue generation system where players earn credits for defeating enemies.
+- ** Configurable Rewards **: Added reward values to `ENEMY_CONFIG` for all enemy types (e.g., Imp: 15, Cyberdemon: 1000).
+- ** Real-time UI **: Updated HUD to display current credit balance and kill count.
+- ** Cloud Sync **: Implemented `incrementKills` and `forceCloudSave` to sync progress (credits and kills) to the server on level completion.
+- ** Server Validation **: Enhanced `/api/save` to validate credit jumps and prevent exploitation.
+- ** Testing **: Added unit tests for `ENEMY_CONFIG` reward values.
+
 ## [0.5.33] - 2026-03-02 [Author: Tobias Mrazek]
 ### Added
 - Added credits page.
