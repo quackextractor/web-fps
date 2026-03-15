@@ -1,5 +1,6 @@
-import React from "react";
-import { WeaponType, AmmoType, WEAPON_CONFIG, type Pickup, type Level } from "@/lib/fps-engine";
+import React, { useEffect, useRef } from "react";
+import { WeaponType, AmmoType, WEAPON_CONFIG, type Level, type Player, type Enemy } from "@/lib/fps-engine";
+import { drawDebugMinimap } from "@/engine/graphics/GameRenderer";
 
 interface HUDProps {
     health: number;
@@ -13,6 +14,9 @@ interface HUDProps {
     isMobile?: boolean;
     runLoot?: { ore_red: number; ore_green: number };
     credits: number;
+    level: Level;
+    player: Player;
+    enemies: Enemy[];
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -27,15 +31,42 @@ export const HUD: React.FC<HUDProps> = ({
     isMobile = false,
     runLoot = { ore_red: 0, ore_green: 0 },
     credits,
+    level,
+    player,
+    enemies,
 }) => {
     const currentWeapon = WEAPON_CONFIG[weapon];
     const currentAmmo = currentWeapon.ammoType !== null ? ammo[currentWeapon.ammoType] : null;
+    const minimapCanvasRef = useRef<HTMLCanvasElement>(null);
 
     const getHealthColor = (h: number) => {
         if (h > 50) return "text-green-500";
         if (h > 25) return "text-yellow-500";
         return "text-red-500 animate-pulse";
     };
+
+    useEffect(() => {
+        const canvas = minimapCanvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const cssWidth = Math.max(1, rect.width);
+        const cssHeight = Math.max(1, rect.height);
+        const dpr = window.devicePixelRatio || 1;
+        const pixelWidth = Math.max(1, Math.floor(cssWidth * dpr));
+        const pixelHeight = Math.max(1, Math.floor(cssHeight * dpr));
+
+        if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+            canvas.width = pixelWidth;
+            canvas.height = pixelHeight;
+        }
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawDebugMinimap(ctx, level, player, enemies, cssWidth, cssHeight);
+    });
 
     if (isMobile) {
         return (
@@ -71,6 +102,9 @@ export const HUD: React.FC<HUDProps> = ({
                             <span className="text-[clamp(8px,1.2vw,10px)] text-yellow-400 font-bold">${credits}</span>
                             <span className="text-[clamp(8px,1.2vw,10px)] text-red-400 font-bold">KILLS: {kills}</span>
                         </div>
+                        <div className="w-[clamp(72px,20vw,120px)] aspect-square mt-1">
+                            <canvas ref={minimapCanvasRef} className="w-full h-full block" />
+                        </div>
                     </div>
 
                     {/* Weapon & Ammo */}
@@ -103,6 +137,9 @@ export const HUD: React.FC<HUDProps> = ({
                     <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20">
                         {levelName}
                     </span>
+                    <div className="w-[clamp(110px,18vw,220px)] aspect-square">
+                        <canvas ref={minimapCanvasRef} className="w-full h-full block" />
+                    </div>
                 </div>
                     <div className="flex flex-col items-end gap-1">
                         <span className="text-[clamp(12px,2vw,20px)] bg-black/50 px-2 py-1 rounded border-2 border-white/20 text-yellow-400">

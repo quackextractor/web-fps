@@ -1063,6 +1063,9 @@ export default function FPSGame() {
                 weaponsUnlocked={weaponsUnlockedRef.current}
                 runLoot={runLootRef.current}
                 credits={saveData.credits}
+                level={LEVELS[currentLevel] ?? LEVELS[0]}
+                player={playerRef.current}
+                enemies={enemiesRef.current}
               />
               <Crosshair style={settings.crosshairStyle} />
               {isTouchDeviceRef.current && (

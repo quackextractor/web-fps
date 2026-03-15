@@ -43,6 +43,82 @@ export interface RenderState {
     fps: number;
 }
 
+export function drawDebugMinimap(
+    ctx: CanvasRenderingContext2D,
+    level: Level,
+    player: Player,
+    enemies: Enemy[],
+    screenWidth: number,
+    screenHeight: number
+) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(0, 0, screenWidth, screenHeight);
+
+    const scale = Math.min(screenWidth, screenHeight) / Math.max(level.map.length, level.map[0].length) * 0.8;
+    const offsetX = screenWidth / 2 - (level.map[0].length * scale) / 2;
+    const offsetY = screenHeight / 2 - (level.map.length * scale) / 2;
+
+    for (let y = 0; y < level.map.length; y++) {
+        for (let x = 0; x < level.map[y].length; x++) {
+            const cell = level.map[y][x];
+            if (cell > 0) {
+                ctx.fillStyle = cell === 9 ? "#0f0" : "#888";
+                ctx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
+            }
+            ctx.strokeStyle = "#333";
+            ctx.strokeRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
+        }
+    }
+
+    ctx.fillStyle = "#0af";
+    ctx.beginPath();
+    ctx.arc(offsetX + player.x * scale, offsetY + player.y * scale, 0.3 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#fff";
+    ctx.beginPath();
+    ctx.moveTo(offsetX + player.x * scale, offsetY + player.y * scale);
+    ctx.lineTo(
+        offsetX + (player.x + Math.cos(player.angle) * 2) * scale,
+        offsetY + (player.y + Math.sin(player.angle) * 2) * scale
+    );
+    ctx.stroke();
+
+    for (const enemy of enemies) {
+        if (enemy.state === "dead") continue;
+
+        ctx.fillStyle = enemy.state === "chasing" ? "#f00" : "#ff0";
+        ctx.beginPath();
+        ctx.arc(offsetX + enemy.x * scale, offsetY + enemy.y * scale, 0.3 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.stroke();
+
+        if (enemy.stuckFrameCount > 30) {
+            ctx.fillStyle = "#fff";
+            ctx.font = "12px monospace";
+            ctx.fillText("STUCK", offsetX + enemy.x * scale - 10, offsetY + enemy.y * scale - 10);
+        }
+
+        if (enemy.path && enemy.path.length > 0) {
+            ctx.strokeStyle = "#0f0";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(offsetX + enemy.x * scale, offsetY + enemy.y * scale);
+            for (const pt of enemy.path) {
+                ctx.lineTo(offsetX + pt.x * scale, offsetY + pt.y * scale);
+            }
+            ctx.stroke();
+            ctx.lineWidth = 1;
+
+            ctx.fillStyle = "#0f0";
+            for (const pt of enemy.path) {
+                ctx.fillRect(offsetX + pt.x * scale - 2, offsetY + pt.y * scale - 2, 4, 4);
+            }
+        }
+    }
+}
+
 export class GameRenderer {
     constructor(
         private screenWidth: number,
@@ -653,82 +729,6 @@ export class GameRenderer {
         player: Player,
         enemies: Enemy[]
     ) {
-        const SCREEN_WIDTH = this.screenWidth;
-        const SCREEN_HEIGHT = this.screenHeight;
-
-        // Semi-transparent background
-        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        const scale = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) / Math.max(level.map.length, level.map[0].length) * 0.8;
-        const offsetX = SCREEN_WIDTH / 2 - (level.map[0].length * scale) / 2;
-        const offsetY = SCREEN_HEIGHT / 2 - (level.map.length * scale) / 2;
-
-        // Draw Map
-        for (let y = 0; y < level.map.length; y++) {
-            for (let x = 0; x < level.map[y].length; x++) {
-                const cell = level.map[y][x];
-                if (cell > 0) {
-                    ctx.fillStyle = cell === 9 ? "#0f0" : "#888";
-                    ctx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
-                }
-                ctx.strokeStyle = "#333";
-                ctx.strokeRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
-            }
-        }
-
-        // Draw Player
-        ctx.fillStyle = "#0af";
-        ctx.beginPath();
-        ctx.arc(offsetX + player.x * scale, offsetY + player.y * scale, 0.3 * scale, 0, Math.PI * 2);
-        ctx.fill();
-        // Direction
-        ctx.strokeStyle = "#fff";
-        ctx.beginPath();
-        ctx.moveTo(offsetX + player.x * scale, offsetY + player.y * scale);
-        ctx.lineTo(
-            offsetX + (player.x + Math.cos(player.angle) * 2) * scale,
-            offsetY + (player.y + Math.sin(player.angle) * 2) * scale
-        );
-        ctx.stroke();
-
-        // Draw Enemies
-        for (const enemy of enemies) {
-            if (enemy.state === "dead") continue;
-
-            ctx.fillStyle = enemy.state === "chasing" ? "#f00" : "#ff0";
-            // Actual collision radius (0.3)
-            ctx.beginPath();
-            ctx.arc(offsetX + enemy.x * scale, offsetY + enemy.y * scale, 0.3 * scale, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "#fff";
-            ctx.stroke();
-
-            // Stuck indicator
-            if (enemy.stuckFrameCount > 30) {
-                ctx.fillStyle = "#fff";
-                ctx.font = "12px monospace";
-                ctx.fillText("STUCK", offsetX + enemy.x * scale - 10, offsetY + enemy.y * scale - 10);
-            }
-
-            // Draw Path
-            if (enemy.path && enemy.path.length > 0) {
-                ctx.strokeStyle = "#0f0";
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(offsetX + enemy.x * scale, offsetY + enemy.y * scale);
-                for (const pt of enemy.path) {
-                    ctx.lineTo(offsetX + pt.x * scale, offsetY + pt.y * scale);
-                }
-                ctx.stroke();
-                ctx.lineWidth = 1;
-
-                // Draw Nodes
-                ctx.fillStyle = "#0f0";
-                for (const pt of enemy.path) {
-                    ctx.fillRect(offsetX + pt.x * scale - 2, offsetY + pt.y * scale - 2, 4, 4);
-                }
-            }
-        }
+        drawDebugMinimap(ctx, level, player, enemies, this.screenWidth, this.screenHeight);
     }
 }

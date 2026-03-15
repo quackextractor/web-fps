@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.35] - 2026-03-15 [Author: Pavlo Kosov]
+### Fixed
+- ** Enemy Kill Credit Rewards **: Fixed economy resource handling so `addResource("credits", reward)` correctly increments `saveData.credits` instead of writing to inventory fields.
+- ** Credit Spending Path **: Updated `spendResource("credits", amount)` to correctly deduct from `saveData.credits` with insufficient-funds protection.
+
+### Added
+- ** Economy Context Tests **: Added `__tests__/economy-context.test.tsx` to verify credit rewards increase UI-visible balance, inventory resources still update independently, and credit spending updates balance correctly.
+
 ## [0.5.34] - 2026-03-09 [Author: Pavlo Kosov]
 ### Added
 - ** Revenue System **: Implemented a critical revenue generation system where players earn credits for defeating enemies.

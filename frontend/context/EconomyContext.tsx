@@ -389,6 +389,12 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         }
 
         setSaveData((previous) => {
+            if (resource === "credits") {
+                return {
+                    ...previous,
+                    credits: previous.credits + amount,
+                };
+            }
             const currentAmount = previous.inventory[resource] ?? 0;
             return {
                 ...previous,
@@ -407,6 +413,17 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
 
         let spent = false;
         setSaveData((previous) => {
+            if (resource === "credits") {
+                if (previous.credits < amount) {
+                    spent = false;
+                    return previous;
+                }
+                spent = true;
+                return {
+                    ...previous,
+                    credits: previous.credits - amount,
+                };
+            }
             const currentAmount = previous.inventory[resource] ?? 0;
             if (currentAmount < amount) {
                 spent = false;
