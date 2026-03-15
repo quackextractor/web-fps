@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.36] - 2026-03-15 [Author: Tobias Mrazek]
+### Fixed
+- Make main menu more mobile friendly.
+
 ## [0.5.35] - 2026-03-15 [Author: Pavlo Kosov]
 ### Fixed
 - ** Enemy Kill Credit Rewards **: Fixed economy resource handling so `addResource("credits", reward)` correctly increments `saveData.credits` instead of writing to inventory fields.
