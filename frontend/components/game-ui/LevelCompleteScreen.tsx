@@ -6,6 +6,9 @@ interface LevelCompleteScreenProps {
     levelName: string;
     kills: number;
     health: number;
+    oreRed?: number;
+    oreGreen?: number;
+    creditBonus?: number;
     isLastLevel: boolean;
     onNextLevel: () => void;
     onMainMenu: () => void;
@@ -15,6 +18,9 @@ export const LevelCompleteScreen: React.FC<LevelCompleteScreenProps> = ({
     levelName,
     kills,
     health,
+    oreRed = 0,
+    oreGreen = 0,
+    creditBonus = 0,
     isLastLevel,
     onNextLevel,
     onMainMenu
@@ -32,6 +38,21 @@ export const LevelCompleteScreen: React.FC<LevelCompleteScreenProps> = ({
                     <p>KILLS: <span className="text-red-500">{kills}</span></p>
                     <p>HEALTH: <span className="text-green-500">{Math.ceil(health)}%</span></p>
                 </div>
+
+                {(oreRed > 0 || oreGreen > 0 || creditBonus > 0) && (
+                    <div className="retro-border bg-gray-950 p-3 sm:p-4 mb-4 sm:mb-8">
+                        <p className="retro-text text-[10px] sm:text-xs text-gray-400 mb-2 tracking-widest">LOOT SECURED (100%)</p>
+                        {oreRed > 0 && (
+                            <p className="retro-text text-[10px] sm:text-sm text-red-400">RED ORE: +{oreRed}</p>
+                        )}
+                        {oreGreen > 0 && (
+                            <p className="retro-text text-[10px] sm:text-sm text-emerald-400">GREEN ORE: +{oreGreen}</p>
+                        )}
+                        {creditBonus > 0 && (
+                            <p className="retro-text text-[10px] sm:text-sm text-yellow-400 mt-1">CLEAR BONUS: +${creditBonus}</p>
+                        )}
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-2 sm:gap-4">
                     <MenuButton onClick={onNextLevel}>

@@ -291,6 +291,7 @@ export default function FPSGame() {
 
   const openFactory = useCallback(() => {
     if (!isAuthenticated) {
+      setPreviousGameState("factory");
       setGameState("login");
       return;
     }
@@ -299,6 +300,7 @@ export default function FPSGame() {
 
   const openArmory = useCallback(() => {
     if (!isAuthenticated) {
+      setPreviousGameState("armory");
       setGameState("login");
       return;
     }
@@ -1096,7 +1098,10 @@ export default function FPSGame() {
                   onSource={() => {
                     window.open("https://github.com/quackextractor/web-fps", "_blank");
                   }}
-                  onLogin={() => setGameState("login")}
+                  onLogin={() => {
+                    setPreviousGameState("mainMenu");
+                    setGameState("login");
+                  }}
                   onLogout={logout}
                   isAuthenticated={isAuthenticated}
                   onFactory={openFactory}
@@ -1111,8 +1116,8 @@ export default function FPSGame() {
 
               {gameState === "login" && (
                 <LoginScreen
-                  onBack={() => setGameState("mainMenu")}
-                  onSuccess={() => setGameState("factory")}
+                  onBack={() => setGameState(previousGameState)}
+                  onSuccess={() => setGameState(previousGameState)}
                 />
               )}
 
@@ -1201,6 +1206,8 @@ export default function FPSGame() {
                   levelName={LEVELS[currentLevel].name}
                   kills={killsRef.current}
                   health={player.health}
+                  oreRed={runLootRef.current.ore_red}
+                  oreGreen={runLootRef.current.ore_green}
                   isLastLevel={currentLevel >= LEVELS.length - 1}
                   onNextLevel={async () => {
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
