@@ -66,8 +66,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     const canGoPrev = currentPage > 0;
 
     return (
-        <div className="inset-0 flex flex-col items-center justify-center bg-black overflow-y-auto overflow-x-hidden select-none pointer-events-auto"
-            style={{ width: "100vw", height: "100vh", margin: 0, padding: 0 }}>
+        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black overflow-y-auto overflow-x-hidden select-none pointer-events-auto p-0 md:p-4"
+            style={{ margin: 0 }}>
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-2 sm:px-4 py-4">

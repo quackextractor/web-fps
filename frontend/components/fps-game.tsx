@@ -39,6 +39,8 @@ import { LoginScreen } from "./game-ui/LoginScreen";
 import { FactoryHub } from "./game-ui/FactoryHub";
 import { Armory } from "./game-ui/Armory";
 import { Leaderboard } from "./game-ui/Leaderboard";
+import { CreditsScreen } from "./game-ui/CreditsScreen";
+import { ChangelogScreen } from "./game-ui/ChangelogScreen";
 import { HUD } from "./game-ui/HUD";
 import { EffectsLayer } from "./game-ui/EffectsLayer";
 import { Crosshair } from "./game-ui/Crosshair";
@@ -52,7 +54,7 @@ const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
 const TICK_RATE = 1000 / 60;
 
-type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard";
+type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard" | "credits" | "changelog";
 
 export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1089,12 +1091,8 @@ export default function FPSGame() {
                 <MainMenu
                   onStartGame={startGame}
                   onSelectLevel={() => setGameState("levelSelect")}
-                  onChangelog={() => {
-                    window.location.href = "/changelog";
-                  }}
-                  onCredits={() => {
-                    window.location.href = "/credits";
-                  }}
+                  onChangelog={() => setGameState("changelog")}
+                  onCredits={() => setGameState("credits")}
                   onSource={() => {
                     window.open("https://github.com/quackextractor/web-fps", "_blank");
                   }}
@@ -1135,6 +1133,18 @@ export default function FPSGame() {
 
               {gameState === "leaderboard" && (
                 <Leaderboard
+                  onBack={() => setGameState("mainMenu")}
+                />
+              )}
+
+              {gameState === "credits" && (
+                <CreditsScreen
+                  onBack={() => setGameState("mainMenu")}
+                />
+              )}
+
+              {gameState === "changelog" && (
+                <ChangelogScreen
                   onBack={() => setGameState("mainMenu")}
                 />
               )}

@@ -118,7 +118,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
     const lockedSlots = TOTAL_PLOTS - usedSlots - emptySlots;
 
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none pointer-events-auto">
+        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black p-0 md:p-4 select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">

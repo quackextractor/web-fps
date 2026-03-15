@@ -16,7 +16,7 @@ export const PauseMenu: React.FC<PauseMenuProps> = ({
     onExit
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 select-none pointer-events-auto">
+        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black/90 select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center">

@@ -16,7 +16,7 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
     onMainMenu
 }) => {
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950 overflow-y-auto overflow-x-hidden p-2 sm:p-4 select-none pointer-events-auto">
+        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-red-950 overflow-y-auto overflow-x-hidden p-0 md:p-4 select-none pointer-events-auto">
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-md my-4 text-center">
