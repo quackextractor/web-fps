@@ -2,13 +2,43 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
+export const FACTORY_LEVELS = [
+    { output: "ore_red", amount: 1, intervalMs: 20 * 60 * 1000, upgradeCost: 0 },
+    { output: "ore_red", amount: 1, intervalMs: 15 * 60 * 1000, upgradeCost: 500 },
+    { output: "ore_red", amount: 1, intervalMs: 5 * 60 * 1000, upgradeCost: 1500 },
+    { output: "ore_red", amount: 1, intervalMs: 15 * 60 * 1000, upgradeCost: 2500 },
+    { output: "ore_green", amount: 1, intervalMs: 10 * 60 * 1000, upgradeCost: 4500 },
+    { output: "ore_green", amount: 2, intervalMs: 5 * 60 * 1000, upgradeCost: 10000 },
+] as const;
+
+export const SMELTER_CATEGORIES = [
+    { id: "red_to_green", input: "ore_red", output: "ore_green", baseCost: 100 },
+    { id: "green_to_iron", input: "ore_green", output: "iron_bar", baseCost: 200 },
+    { id: "iron_to_plasmoid", input: "iron_bar", output: "plasmoid_bar", baseCost: 300 },
+] as const;
+
+export const SMELTER_LEVEL_INTERVALS = [
+    20 * 60 * 1000,
+    15 * 60 * 1000,
+    10 * 60 * 1000,
+    5 * 60 * 1000,
+] as const;
+
+export const SMELTER_UPGRADE_FACTORS = [1, 2, 4] as const;
+
+export const FACTORY_COST = 200;
+export const NUM_SLOTS = 3;
+
 export interface EconomyInventory {
     [resource: string]: number;
 }
 
 export interface EconomyMachine {
     id: string;
-    type: string;
+    type: "factory" | "smelter";
+    level: number;
+    category?: string;
+    lastProducedAt?: number;
     active: boolean;
 }
 
@@ -36,6 +66,9 @@ interface EconomyContextType {
     addResource: (resource: string, amount: number) => void;
     spendResource: (resource: string, amount: number) => boolean;
     convertOreToBar: (oreType: string, barType: string, oreAmount: number, barAmount: number) => boolean;
+    buySlotMachine: (slotIndex: number, machineType: "factory" | "smelter", category?: string) => boolean;
+    upgradeMachine: (machineId: string) => boolean;
+    collectMachine: (machineId: string) => boolean;
     unlockWeapon: (weapon: string, barCost: number, creditCost: number) => boolean;
     incrementKills: (amount: number) => void;
 }
@@ -49,8 +82,7 @@ const initialSaveData: EconomySaveData = {
         plasmoid_bar: 0,
     },
     machines: [
-        { id: "smelter_1", type: "smelter_red", active: true },
-        { id: "smelter_2", type: "smelter_green", active: true },
+        { id: "factory_slot0", type: "factory", level: 1, lastProducedAt: Date.now(), active: true },
     ],
     unlockedWeapons: ["fist", "pistol"],
     highestLevelCompleted: 0,
@@ -106,27 +138,48 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         });
     }, []);
 
-    const processSmeltersTick = useCallback(() => {
+    const processProductionTick = useCallback(() => {
+        const now = Date.now();
         setSaveData((prev) => {
             if (!prev.machines || prev.machines.length === 0) {
                 return prev;
             }
-            const next = { ...prev, inventory: { ...prev.inventory } };
-            for (const m of prev.machines) {
+            const next = { ...prev, inventory: { ...prev.inventory }, machines: prev.machines.map((m) => ({ ...m })) };
+            for (const m of next.machines) {
                 if (!m.active) {
                     continue;
                 }
-                if (m.type === "smelter_red") {
-                    const ore = next.inventory.ore_red ?? 0;
-                    if (ore >= 2) {
-                        next.inventory.ore_red = ore - 2;
-                        next.inventory.iron_bar = (next.inventory.iron_bar ?? 0) + 1;
+                const lastProduced = m.lastProducedAt ?? now;
+                if (m.type === "factory") {
+                    const lvl = FACTORY_LEVELS[m.level - 1];
+                    if (!lvl) {
+                        continue;
                     }
-                } else if (m.type === "smelter_green") {
-                    const ore = next.inventory.ore_green ?? 0;
-                    if (ore >= 2) {
-                        next.inventory.ore_green = ore - 2;
-                        next.inventory.plasmoid_bar = (next.inventory.plasmoid_bar ?? 0) + 1;
+                    const elapsed = now - lastProduced;
+                    const cycles = Math.floor(elapsed / lvl.intervalMs);
+                    if (cycles > 0) {
+                        next.inventory[lvl.output] = (next.inventory[lvl.output] ?? 0) + (lvl.amount * cycles);
+                        m.lastProducedAt = lastProduced + (cycles * lvl.intervalMs);
+                    }
+                } else if (m.type === "smelter") {
+                    const cat = SMELTER_CATEGORIES.find((c) => c.id === m.category);
+                    if (!cat) {
+                        continue;
+                    }
+                    const interval = SMELTER_LEVEL_INTERVALS[m.level - 1];
+                    if (!interval) {
+                        continue;
+                    }
+                    const elapsed = now - lastProduced;
+                    const cycles = Math.floor(elapsed / interval);
+                    if (cycles > 0) {
+                        const inputAvailable = next.inventory[cat.input] ?? 0;
+                        const actualCycles = Math.min(cycles, inputAvailable);
+                        if (actualCycles > 0) {
+                            next.inventory[cat.input] = inputAvailable - actualCycles;
+                            next.inventory[cat.output] = (next.inventory[cat.output] ?? 0) + actualCycles;
+                        }
+                        m.lastProducedAt = lastProduced + (cycles * interval);
                     }
                 }
             }
@@ -141,36 +194,48 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
     const awardOfflineProgress = useCallback((lastSavedAt?: number) => {
         const now = Date.now();
         const last = typeof lastSavedAt === "number" ? lastSavedAt : undefined;
-        if (!last || last >= now) {
-            setSaveData((p) => ({ ...p, last_saved_at: now }));
-            return;
-        }
-        const dt = Math.floor((now - last) / 5000);
-        if (dt <= 0) {
+        if (!last || (last >= now)) {
             setSaveData((p) => ({ ...p, last_saved_at: now }));
             return;
         }
         setSaveData((prev) => {
-            const redSmelters = prev.machines.filter((m) => m.active && m.type === "smelter_red").length;
-            const greenSmelters = prev.machines.filter((m) => m.active && m.type === "smelter_green").length;
-            if (redSmelters === 0 && greenSmelters === 0) {
-                return { ...prev, last_saved_at: now };
-            }
-            const next = { ...prev, inventory: { ...prev.inventory }, last_saved_at: now };
-            if (redSmelters > 0) {
-                const maxCycles = dt * redSmelters;
-                const possible = Math.min(maxCycles, Math.floor((next.inventory.ore_red ?? 0) / 2));
-                if (possible > 0) {
-                    next.inventory.ore_red = (next.inventory.ore_red ?? 0) - possible * 2;
-                    next.inventory.iron_bar = (next.inventory.iron_bar ?? 0) + possible;
+            const next = { ...prev, inventory: { ...prev.inventory }, machines: prev.machines.map((m) => ({ ...m })), last_saved_at: now };
+            for (const m of next.machines) {
+                if (!m.active) {
+                    continue;
                 }
-            }
-            if (greenSmelters > 0) {
-                const maxCycles = dt * greenSmelters;
-                const possible = Math.min(maxCycles, Math.floor((next.inventory.ore_green ?? 0) / 2));
-                if (possible > 0) {
-                    next.inventory.ore_green = (next.inventory.ore_green ?? 0) - possible * 2;
-                    next.inventory.plasmoid_bar = (next.inventory.plasmoid_bar ?? 0) + possible;
+                const machineLastProduced = m.lastProducedAt ?? last;
+                if (m.type === "factory") {
+                    const lvl = FACTORY_LEVELS[m.level - 1];
+                    if (!lvl) {
+                        continue;
+                    }
+                    const elapsed = now - machineLastProduced;
+                    const cycles = Math.floor(elapsed / lvl.intervalMs);
+                    if (cycles > 0) {
+                        next.inventory[lvl.output] = (next.inventory[lvl.output] ?? 0) + (lvl.amount * cycles);
+                        m.lastProducedAt = machineLastProduced + (cycles * lvl.intervalMs);
+                    }
+                } else if (m.type === "smelter") {
+                    const cat = SMELTER_CATEGORIES.find((c) => c.id === m.category);
+                    if (!cat) {
+                        continue;
+                    }
+                    const interval = SMELTER_LEVEL_INTERVALS[m.level - 1];
+                    if (!interval) {
+                        continue;
+                    }
+                    const elapsed = now - machineLastProduced;
+                    const cycles = Math.floor(elapsed / interval);
+                    if (cycles > 0) {
+                        const inputAvailable = next.inventory[cat.input] ?? 0;
+                        const actualCycles = Math.min(cycles, inputAvailable);
+                        if (actualCycles > 0) {
+                            next.inventory[cat.input] = inputAvailable - actualCycles;
+                            next.inventory[cat.output] = (next.inventory[cat.output] ?? 0) + actualCycles;
+                        }
+                        m.lastProducedAt = machineLastProduced + (cycles * interval);
+                    }
                 }
             }
             return next;
@@ -378,10 +443,10 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             return;
         }
         const interval = setInterval(() => {
-            processSmeltersTick();
+            processProductionTick();
         }, 5000);
         return () => clearInterval(interval);
-    }, [isAuthenticated, processSmeltersTick]);
+    }, [isAuthenticated, processProductionTick]);
 
     const addResource = useCallback((resource: string, amount: number) => {
         if (amount <= 0) {
@@ -395,6 +460,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                     credits: previous.credits + amount,
                 };
             }
+
             const currentAmount = previous.inventory[resource] ?? 0;
             return {
                 ...previous,
@@ -471,6 +537,166 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         return converted;
     }, []);
 
+    const buySlotMachine = useCallback((slotIndex: number, machineType: "factory" | "smelter", category?: string): boolean => {
+        let bought = false;
+        setSaveData((prev) => {
+            if (slotIndex < 0 || slotIndex >= NUM_SLOTS) {
+                return prev;
+            }
+            if (slotIndex > prev.highestLevelCompleted) {
+                return prev;
+            }
+            const existingInSlot = prev.machines.find((m) => m.id === `slot_${slotIndex}`);
+            if (existingInSlot) {
+                return prev;
+            }
+
+            let cost = 0;
+            if (machineType === "factory") {
+                cost = FACTORY_COST;
+            } else if ((machineType === "smelter") && category) {
+                const cat = SMELTER_CATEGORIES.find((c) => c.id === category);
+                if (!cat) {
+                    return prev;
+                }
+                const factorIdx = SMELTER_CATEGORIES.indexOf(cat);
+                cost = cat.baseCost * SMELTER_UPGRADE_FACTORS[factorIdx];
+            } else {
+                return prev;
+            }
+
+            if (prev.credits < cost) {
+                return prev;
+            }
+
+            bought = true;
+            const newMachine: EconomyMachine = {
+                id: `slot_${slotIndex}`,
+                type: machineType,
+                level: 1,
+                category: machineType === "smelter" ? category : undefined,
+                lastProducedAt: Date.now(),
+                active: true,
+            };
+            return {
+                ...prev,
+                credits: prev.credits - cost,
+                machines: [...prev.machines, newMachine],
+            };
+        });
+        return bought;
+    }, []);
+
+    const upgradeMachine = useCallback((machineId: string): boolean => {
+        let upgraded = false;
+        setSaveData((prev) => {
+            const machine = prev.machines.find((m) => m.id === machineId);
+            if (!machine || !machine.active) {
+                return prev;
+            }
+
+            let cost = 0;
+            let maxLevel = 0;
+            if (machine.type === "factory") {
+                maxLevel = FACTORY_LEVELS.length;
+                if (machine.level >= maxLevel) {
+                    return prev;
+                }
+                cost = FACTORY_LEVELS[machine.level].upgradeCost;
+            } else if (machine.type === "smelter") {
+                maxLevel = SMELTER_LEVEL_INTERVALS.length;
+                if (machine.level >= maxLevel) {
+                    return prev;
+                }
+                const cat = SMELTER_CATEGORIES.find((c) => c.id === machine.category);
+                if (!cat) {
+                    return prev;
+                }
+                const factorIdx = SMELTER_CATEGORIES.indexOf(cat);
+                const baseCost = cat.baseCost * (machine.level + 1);
+                cost = baseCost * SMELTER_UPGRADE_FACTORS[factorIdx];
+            } else {
+                return prev;
+            }
+
+            if (prev.credits < cost) {
+                return prev;
+            }
+
+            upgraded = true;
+            return {
+                ...prev,
+                credits: prev.credits - cost,
+                machines: prev.machines.map((m) => {
+                    if (m.id === machineId) {
+                        return { ...m, level: m.level + 1 };
+                    }
+                    return m;
+                }),
+            };
+        });
+        return upgraded;
+    }, []);
+
+    const collectMachine = useCallback((machineId: string): boolean => {
+        const now = Date.now();
+        let collected = false;
+        setSaveData((prev) => {
+            const machine = prev.machines.find((m) => m.id === machineId);
+            if (!machine || !machine.active) {
+                return prev;
+            }
+
+            const next = { ...prev, inventory: { ...prev.inventory }, machines: prev.machines.map((m) => ({ ...m })) };
+            const mRef = next.machines.find((m) => m.id === machineId);
+            if (!mRef) {
+                return prev;
+            }
+            const lastProduced = mRef.lastProducedAt ?? now;
+
+            if (mRef.type === "factory") {
+                const lvl = FACTORY_LEVELS[mRef.level - 1];
+                if (!lvl) {
+                    return prev;
+                }
+                const elapsed = now - lastProduced;
+                const cycles = Math.floor(elapsed / lvl.intervalMs);
+                if (cycles <= 0) {
+                    return prev;
+                }
+                collected = true;
+                next.inventory[lvl.output] = (next.inventory[lvl.output] ?? 0) + (lvl.amount * cycles);
+                mRef.lastProducedAt = lastProduced + (cycles * lvl.intervalMs);
+            } else if (mRef.type === "smelter") {
+                const cat = SMELTER_CATEGORIES.find((c) => c.id === mRef.category);
+                if (!cat) {
+                    return prev;
+                }
+                const interval = SMELTER_LEVEL_INTERVALS[mRef.level - 1];
+                if (!interval) {
+                    return prev;
+                }
+                const elapsed = now - lastProduced;
+                const cycles = Math.floor(elapsed / interval);
+                if (cycles <= 0) {
+                    return prev;
+                }
+                const inputAvailable = next.inventory[cat.input] ?? 0;
+                const actualCycles = Math.min(cycles, inputAvailable);
+                if (actualCycles <= 0) {
+                    mRef.lastProducedAt = now;
+                    return next;
+                }
+                collected = true;
+                next.inventory[cat.input] = inputAvailable - actualCycles;
+                next.inventory[cat.output] = (next.inventory[cat.output] ?? 0) + actualCycles;
+                mRef.lastProducedAt = lastProduced + (cycles * interval);
+            }
+            return next;
+        });
+        return collected;
+    }, []);
+
     const unlockWeapon = useCallback((weapon: string, barCost: number, creditCost: number) => {
         if (barCost < 0 || creditCost < 0) {
             return false;
@@ -526,13 +752,18 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             addResource,
             spendResource,
             convertOreToBar,
+            buySlotMachine,
+            upgradeMachine,
+            collectMachine,
             unlockWeapon,
             incrementKills,
         };
     }, [
         addResource,
+        buySlotMachine,
         cloudError,
         cloudStatus,
+        collectMachine,
         convertOreToBar,
         forceCloudSave,
         isAuthenticated,
@@ -544,6 +775,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         saveData,
         spendResource,
         unlockWeapon,
+        upgradeMachine,
         username,
         incrementKills,
     ]);

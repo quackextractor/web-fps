@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MenuButton } from "./MenuButton";
 import { ScanlinesOverlay } from "./ScanlinesOverlay";
 
@@ -31,20 +31,118 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onArmory,
     onLeaderboard,
 }) => {
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const buttonPages = [
+        [
+            { label: "PLAY", onClick: () => onStartGame(0), variant: "primary" as const },
+            { label: "SELECT LEVEL", onClick: onSelectLevel, variant: "secondary" as const },
+        ],
+        [
+            { label: "GLOBAL LEADERBOARD", onClick: onLeaderboard, variant: "secondary" as const },
+            {
+                label: null,
+                onClick: null,
+                variant: "secondary" as const,
+                isRow: true,
+                children: [
+                    { label: "FACTORY HUB", mobileLabel: "FACTORY", onClick: onFactory, variant: "secondary" as const },
+                    { label: "ARMORY", onClick: onArmory, variant: "secondary" as const },
+                ]
+            },
+        ],
+        [
+            { label: isAuthenticated ? "LOGOUT" : "LOGIN TERMINAL", onClick: isAuthenticated ? onLogout : onLogin, variant: "secondary" as const },
+            { label: "OPTIONS", onClick: onOptions, variant: "secondary" as const },
+        ],
+        [
+            { label: "CREDITS", onClick: onCredits, variant: "secondary" as const },
+            { label: "CHANGELOG", onClick: onChangelog, variant: "secondary" as const },
+        ],
+    ];
+
+    const totalPages = buttonPages.length;
+    const canGoNext = currentPage < totalPages - 1;
+    const canGoPrev = currentPage > 0;
+
     return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black overflow-hidden select-none pointer-events-auto">
+        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black overflow-y-auto overflow-x-hidden select-none pointer-events-auto p-0 md:p-4"
+            style={{ margin: 0 }}>
             <ScanlinesOverlay />
 
-            <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">
-                <h1 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 text-center animate-pulse leading-snug tracking-tighter"
-                    style={{ textShadow: "4px 4px 0px #300000" }}>
+            <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-2 sm:px-4 py-4">
+                <h1 className="retro-text text-2xl sm:text-4xl md:text-6xl text-red-600 mb-2 sm:mb-4 text-center animate-pulse leading-snug tracking-tighter"
+                    style={{ textShadow: "2px 2px 0px #300000" }}>
                     INDUSTRIALIST
                 </h1>
-                <p className="retro-text text-red-400 text-xs md:text-sm mb-12 tracking-widest text-center opacity-80">
+                <p className="retro-text text-red-400 text-[10px] sm:text-xs md:text-sm mb-4 sm:mb-6 md:mb-12 tracking-widest text-center opacity-80">
                     DESCENT INTO DARKNESS
                 </p>
 
-                <div className="flex flex-col gap-6 w-full max-w-sm">
+                {/* Mobile carousel view */}
+                <div className="md:hidden flex flex-col gap-2 sm:gap-4 w-full max-w-sm">
+                    {buttonPages[currentPage].map((button, idx) => {
+                        if (button.isRow && "children" in button) {
+                            return (
+                                <div key={idx} className="flex gap-3">
+                                    {button.children?.map((childBtn, childIdx) => (
+                                        <MenuButton
+                                            key={childIdx}
+                                            onClick={childBtn.onClick}
+                                            variant={childBtn.variant}
+                                        >
+                                            {childBtn.mobileLabel && (
+                                                <>
+                                                    <span className="md:hidden">{childBtn.mobileLabel}</span>
+                                                    <span className="hidden md:inline">{childBtn.label}</span>
+                                                </>
+                                            )}
+                                            {!childBtn.mobileLabel && childBtn.label}
+                                        </MenuButton>
+                                    ))}
+                                </div>
+                            );
+                        }
+                        if (!button.onClick) {
+                            return <div key={idx} />;
+                        }
+                        return (
+                            <MenuButton
+                                key={idx}
+                                onClick={button.onClick}
+                                variant={button.variant}
+                            >
+                                {button.label}
+                            </MenuButton>
+                        );
+                    })}
+
+                    <div className="flex justify-center items-center gap-2 sm:gap-4 mt-4 sm:mt-6 w-full px-2"
+                    style={{ margin: 0, padding: 0 }}>
+                        <button
+                            type="button"
+                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                            disabled={!canGoPrev}
+                            className="flex-1 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-bold transition-all duration-75 transform active:translate-y-1 retro-text retro-border uppercase tracking-widest bg-gray-800 hover:bg-white hover:text-black text-white border-black disabled:bg-gray-900 disabled:text-gray-700 disabled:opacity-50"
+                        >
+                            &lt;
+                        </button>
+                        <div className="text-[8px] sm:text-[10px] text-gray-600 font-mono whitespace-nowrap">
+                            {currentPage + 1} / {totalPages}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                            disabled={!canGoNext}
+                            className="flex-1 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-bold transition-all duration-75 transform active:translate-y-1 retro-text retro-border uppercase tracking-widest bg-gray-800 hover:bg-white hover:text-black text-white border-black disabled:bg-gray-900 disabled:text-gray-700 disabled:opacity-50"
+                        >
+                            &gt;
+                        </button>
+                    </div>
+                </div>
+
+                {/* Desktop full view */}
+                <div className="hidden md:flex flex-col gap-6 w-full max-w-sm">
                     <MenuButton onClick={() => onStartGame(0)}>
                         PLAY
                     </MenuButton>
@@ -70,7 +168,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     </MenuButton>
                 </div>
 
-                <div className="mt-16 text-gray-500 text-center text-[10px] md:text-xs font-mono retro-text opacity-50">
+                <div className="hidden md:block mt-4 sm:mt-8 md:mt-16 text-gray-500 text-center text-[8px] sm:text-[10px] md:text-xs font-mono retro-text opacity-50">
                     <p className="text-yellow-600 mb-2">DEFAULT CONTROLS</p>
                     <div className="flex flex-col gap-1">
                         <p>WASD: MOVE  •  MOUSE: LOOK</p>
@@ -82,27 +180,27 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 <button
                     type="button"
                     onClick={onChangelog}
-                    className="absolute bottom-4 left-4 text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                    className="hidden md:block absolute bottom-4 left-4 text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
                 >
                     CHANGELOG
                 </button>
 
-                <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+                <div className="hidden md:flex absolute bottom-4 right-4 flex-col items-end gap-2">
                     <button
                         type="button"
                         onClick={onCredits}
-                        className="text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                        className="text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
                     >
                         CREDITS
                     </button>
                     <button
                         type="button"
                         onClick={onSource}
-                        className="text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                        className="text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
                     >
                         SOURCE
                     </button>
-                    <div className="text-[10px] text-gray-800 font-mono">
+                    <div className="text-[8px] sm:text-[10px] text-gray-800 font-mono">
                         v{process.env.NEXT_PUBLIC_GAME_VERSION || "0.0.0"}
                     </div>
                 </div>

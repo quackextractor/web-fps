@@ -38,6 +38,8 @@ import { LoginScreen } from "./game-ui/LoginScreen";
 import { FactoryHub } from "./game-ui/FactoryHub";
 import { Armory } from "./game-ui/Armory";
 import { Leaderboard } from "./game-ui/Leaderboard";
+import { CreditsScreen } from "./game-ui/CreditsScreen";
+import { ChangelogScreen } from "./game-ui/ChangelogScreen";
 import { HUD } from "./game-ui/HUD";
 import { EffectsLayer } from "./game-ui/EffectsLayer";
 import { Crosshair } from "./game-ui/Crosshair";
@@ -52,7 +54,7 @@ const ROTATION_SPEED = 0.003;
 const TICK_RATE = 1000 / 60;
 const RUN_METERS_PER_WORLD_UNIT = 25;
 
-type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard";
+type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard" | "credits" | "changelog";
 
 export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -317,6 +319,7 @@ export default function FPSGame() {
 
   const openFactory = useCallback(() => {
     if (!isAuthenticated) {
+      setPreviousGameState("factory");
       setGameState("login");
       return;
     }
@@ -325,6 +328,7 @@ export default function FPSGame() {
 
   const openArmory = useCallback(() => {
     if (!isAuthenticated) {
+      setPreviousGameState("armory");
       setGameState("login");
       return;
     }
@@ -1123,16 +1127,15 @@ export default function FPSGame() {
                 <MainMenu
                   onStartGame={startGame}
                   onSelectLevel={() => setGameState("levelSelect")}
-                  onChangelog={() => {
-                    window.location.href = "/changelog";
-                  }}
-                  onCredits={() => {
-                    window.location.href = "/credits";
-                  }}
+                  onChangelog={() => setGameState("changelog")}
+                  onCredits={() => setGameState("credits")}
                   onSource={() => {
                     window.open("https://github.com/quackextractor/web-fps", "_blank");
                   }}
-                  onLogin={() => setGameState("login")}
+                  onLogin={() => {
+                    setPreviousGameState("mainMenu");
+                    setGameState("login");
+                  }}
                   onLogout={logout}
                   isAuthenticated={isAuthenticated}
                   onFactory={openFactory}
@@ -1147,8 +1150,8 @@ export default function FPSGame() {
 
               {gameState === "login" && (
                 <LoginScreen
-                  onBack={() => setGameState("mainMenu")}
-                  onSuccess={() => setGameState("factory")}
+                  onBack={() => setGameState(previousGameState)}
+                  onSuccess={() => setGameState(previousGameState)}
                 />
               )}
 
@@ -1169,6 +1172,18 @@ export default function FPSGame() {
 
               {gameState === "leaderboard" && (
                 <Leaderboard
+                  onBack={() => setGameState("mainMenu")}
+                />
+              )}
+
+              {gameState === "credits" && (
+                <CreditsScreen
+                  onBack={() => setGameState("mainMenu")}
+                />
+              )}
+
+              {gameState === "changelog" && (
+                <ChangelogScreen
                   onBack={() => setGameState("mainMenu")}
                 />
               )}
@@ -1221,6 +1236,7 @@ export default function FPSGame() {
 
               {/* Level Complete */}
               {gameState === "levelComplete" && (
+<<<<<<< HEAD
                 <PostRunSummary
                   title="RUN SUMMARY"
                   metrics={{
@@ -1229,6 +1245,16 @@ export default function FPSGame() {
                   }}
                   primaryActionLabel={currentLevel >= LEVELS.length - 1 ? "FINAL VICTORY" : "NEXT LEVEL"}
                   onPrimaryAction={async () => {
+=======
+                <LevelCompleteScreen
+                  levelName={LEVELS[currentLevel].name}
+                  kills={killsRef.current}
+                  health={player.health}
+                  oreRed={runLootRef.current.ore_red}
+                  oreGreen={runLootRef.current.ore_green}
+                  isLastLevel={currentLevel >= LEVELS.length - 1}
+                  onNextLevel={async () => {
+>>>>>>> eca5658ec9e74f07068ee886e56514fa7ed8abe9
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
                     nextLevel();
                   }}
