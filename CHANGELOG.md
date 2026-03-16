@@ -1,6 +1,17 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.5.37] - 2026-03-15 [Author: Pavlo Kosov]
+
+### Added
+feat(game-ui): add post-run summary screen with metrics and audio enhancements
+
+- Replace LevelCompleteScreen and VictoryScreen with unified PostRunSummary component
+- Add run distance and duration tracking during gameplay
+- Implement calorie estimation and monetary value calculation
+- Add music system with start/loop/end sequences and fallback handling
+- Include hitmark sound effects for weapon impacts
+- Add comprehensive test coverage for calculations and component behavior
 
 ## [0.5.36] - 2026-03-15 [Author: Tobias Mrazek]
 ### Fixed
