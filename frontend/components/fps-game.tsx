@@ -33,8 +33,7 @@ import { MainMenu } from "./game-ui/MainMenu";
 import { LevelSelect, type SavedProgress } from "./game-ui/LevelSelect";
 import { PauseMenu } from "./game-ui/PauseMenu";
 import { DeathScreen } from "./game-ui/DeathScreen";
-import { LevelCompleteScreen } from "./game-ui/LevelCompleteScreen";
-import { VictoryScreen } from "./game-ui/VictoryScreen";
+import { PostRunSummary } from "./game-ui/PostRunSummary";
 import { LoginScreen } from "./game-ui/LoginScreen";
 import { FactoryHub } from "./game-ui/FactoryHub";
 import { Armory } from "./game-ui/Armory";
@@ -51,6 +50,7 @@ import { MobileControls } from "./game-ui/MobileControls";
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
 const TICK_RATE = 1000 / 60;
+const RUN_METERS_PER_WORLD_UNIT = 25;
 
 type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard";
 
@@ -101,6 +101,8 @@ export default function FPSGame() {
   const lastFPSTimeRef = useRef(0);
   const ragdollManagerRef = useRef(new RagdollManager());
   const runLootRef = useRef<{ ore_red: number; ore_green: number }>({ ore_red: 0, ore_green: 0 });
+  const runDistanceMetersRef = useRef(0);
+  const runDurationSecondsRef = useRef(0);
 
   const [, forceUpdate] = useState(0);
   const keysRef = useRef<Set<string>>(new Set());
@@ -129,12 +131,32 @@ export default function FPSGame() {
   }, [isLoaded, settings.forceMobileControls]);
 
   useEffect(() => {
-    if (isLoaded) {
-      const sfxEnabled = settings.soundEnabled && settings.sfxVolume > 0;
-      soundManager.setEnabled(sfxEnabled);
-      soundManager.setVolume(settings.volume * settings.sfxVolume);
+    if (!isLoaded) {
+      return;
     }
-  }, [settings.soundEnabled, settings.sfxVolume, settings.volume, isLoaded]);
+    soundManager.setMasterVolume(settings.volume);
+    soundManager.setSfxEnabled(settings.soundEnabled);
+    soundManager.setSfxVolume(settings.sfxVolume);
+    soundManager.setMusicEnabled(settings.musicEnabled);
+    soundManager.setMusicVolume(settings.musicVolume);
+  }, [settings.soundEnabled, settings.sfxVolume, settings.musicEnabled, settings.musicVolume, settings.volume, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+    if (gameState === "playing" && settings.musicEnabled) {
+      void soundManager.startMusic();
+      return;
+    }
+    soundManager.stopMusic(true);
+  }, [gameState, settings.musicEnabled, isLoaded]);
+
+  useEffect(() => {
+    return () => {
+      soundManager.stopMusic(false);
+    };
+  }, []);
 
   useEffect(() => {
     offscreenCanvasRef.current = document.createElement('canvas');
@@ -193,6 +215,11 @@ export default function FPSGame() {
     }
   }, [settings.difficulty]);
 
+  const resetRunMetrics = useCallback(() => {
+    runDistanceMetersRef.current = 0;
+    runDurationSecondsRef.current = 0;
+  }, []);
+
   const loadLevel = useCallback((levelIndex: number, preservePlayer = false) => {
     const level = LEVELS[levelIndex];
     if (!level) return;
@@ -234,11 +261,12 @@ export default function FPSGame() {
     projectilesRef.current = [];
     killsRef.current = 0;
     shootFlashRef.current = 0;
+    resetRunMetrics();
 
     if (rendererRef.current) {
       rendererRef.current.loadLevelTextures(level);
     }
-  }, [savedProgress.unlockedWeapons, getDifficultyMultiplier]);
+  }, [savedProgress.unlockedWeapons, getDifficultyMultiplier, resetRunMetrics]);
 
   const restartCurrentLevel = useCallback(() => {
     // Restore weapons and ammo from before current level started
@@ -380,6 +408,7 @@ export default function FPSGame() {
             const damage = weapon.damage * (0.8 + Math.random() * 0.4);
             enemy.health -= damage;
             enemy.state = "hurt";
+            soundManager.playHitmark();
 
             if (enemy.health <= 0) {
               enemy.state = "dead";
@@ -426,6 +455,7 @@ export default function FPSGame() {
           const damage = weapon.damage * (0.8 + Math.random() * 0.4);
           const enemy = enemiesRef.current[closestHitIndex];
           enemy.health -= damage;
+          soundManager.playHitmark();
 
           if (enemy.health <= 0) {
             enemy.state = "dead";
@@ -552,6 +582,12 @@ export default function FPSGame() {
         bobPhase: isMoving ? player.bobPhase + dt * 0.012 : 0,
         isMoving,
       };
+
+      const movedDistanceWorldUnits = Math.hypot(newX - player.x, newY - player.y);
+      if (movedDistanceWorldUnits > 0) {
+        runDistanceMetersRef.current += movedDistanceWorldUnits * RUN_METERS_PER_WORLD_UNIT;
+      }
+      runDurationSecondsRef.current += dt / 1000;
 
       if (shootFlashRef.current > 0) shootFlashRef.current--;
       if (hurtFlashRef.current > 0) hurtFlashRef.current -= 0.5;
@@ -995,8 +1031,6 @@ export default function FPSGame() {
     localStorage.setItem("fps-savegame", JSON.stringify(toSave));
   }, [savedProgress]);
 
-
-  const player = playerRef.current;
   const [resW, resH] = settings.resolution.split("x").map(Number);
   const aspectRatio = resW / resH;
 
@@ -1187,16 +1221,19 @@ export default function FPSGame() {
 
               {/* Level Complete */}
               {gameState === "levelComplete" && (
-                <LevelCompleteScreen
-                  levelName={LEVELS[currentLevel].name}
-                  kills={killsRef.current}
-                  health={player.health}
-                  isLastLevel={currentLevel >= LEVELS.length - 1}
-                  onNextLevel={async () => {
+                <PostRunSummary
+                  title="RUN SUMMARY"
+                  metrics={{
+                    totalDistanceMeters: runDistanceMetersRef.current,
+                    totalDurationSeconds: runDurationSecondsRef.current,
+                  }}
+                  primaryActionLabel={currentLevel >= LEVELS.length - 1 ? "FINAL VICTORY" : "NEXT LEVEL"}
+                  onPrimaryAction={async () => {
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
                     nextLevel();
                   }}
-                  onMainMenu={async () => {
+                  secondaryActionLabel="MAIN MENU"
+                  onSecondaryAction={async () => {
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
                     setGameState("mainMenu");
                   }}
@@ -1205,11 +1242,16 @@ export default function FPSGame() {
 
               {/* Victory */}
               {gameState === "victory" && (
-                <VictoryScreen
-                  totalKills={totalKillsRef.current + killsRef.current}
-                  health={player.health}
-                  onPlayAgain={() => startGame(0)}
-                  onMainMenu={() => setGameState("mainMenu")}
+                <PostRunSummary
+                  title="VICTORY SUMMARY"
+                  metrics={{
+                    totalDistanceMeters: runDistanceMetersRef.current,
+                    totalDurationSeconds: runDurationSecondsRef.current,
+                  }}
+                  primaryActionLabel="PLAY AGAIN"
+                  onPrimaryAction={() => startGame(0)}
+                  secondaryActionLabel="RETURN TO MENU"
+                  onSecondaryAction={() => setGameState("mainMenu")}
                 />
               )}
             </div>
