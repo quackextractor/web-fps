@@ -1236,7 +1236,6 @@ export default function FPSGame() {
 
               {/* Level Complete */}
               {gameState === "levelComplete" && (
-<<<<<<< HEAD
                 <PostRunSummary
                   title="RUN SUMMARY"
                   metrics={{
@@ -1245,16 +1244,6 @@ export default function FPSGame() {
                   }}
                   primaryActionLabel={currentLevel >= LEVELS.length - 1 ? "FINAL VICTORY" : "NEXT LEVEL"}
                   onPrimaryAction={async () => {
-=======
-                <LevelCompleteScreen
-                  levelName={LEVELS[currentLevel].name}
-                  kills={killsRef.current}
-                  health={player.health}
-                  oreRed={runLootRef.current.ore_red}
-                  oreGreen={runLootRef.current.ore_green}
-                  isLastLevel={currentLevel >= LEVELS.length - 1}
-                  onNextLevel={async () => {
->>>>>>> eca5658ec9e74f07068ee886e56514fa7ed8abe9
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
                     nextLevel();
                   }}
