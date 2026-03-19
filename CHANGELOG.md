@@ -1,8 +1,16 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [0.5.37] - 2026-03-15 [Author: Pavlo Kosov]
 
+## [0.6.0] - 2026-03-19 [Author: Miro Slezák]
+### Added
+- add dev checklists
+- dev guides
+- dev taskboard.md linked with implementation-plans-full.md
+### Changed
+- moved analysis docs to docs/legacy/ dir
+
+## [0.5.37] - 2026-03-15 [Author: Pavlo Kosov]
 ### Added
 feat(game-ui): add post-run summary screen with metrics and audio enhancements
 
