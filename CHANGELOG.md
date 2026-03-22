@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Added robust try-catch JSON validation to explicitly reject malformed requests with `400 Bad Request` instead of crashing with `500 Internal Server Error` (Fixes #34).
 
+## [0.6.2] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Fixed API routes to return explicit HTTP 200 status codes for all successful `NextResponse.json()` server replies (Fixes #33).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.

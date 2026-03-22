@@ -110,7 +110,7 @@ export async function POST(req: Request) {
             saveData: JSON.parse(updatedUser.saveData),
             net_worth: updatedUser.netWorth,
             kills: updatedUser.kills
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('Save error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -142,7 +142,7 @@ export async function GET(req: Request) {
             net_worth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('Load error:', error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });

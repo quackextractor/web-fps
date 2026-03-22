@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             netWorth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('Login error:', error);
         // Fallback for local testing without DB
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
                 netWorth: 0,
                 kills: 0,
                 username: 'offline_user'
-            });
+            }, { status: 200 });
         }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
