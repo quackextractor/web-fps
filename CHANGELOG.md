@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Masked internal server errors in all API responses to prevent stack trace leaks, and improved server-side `console.error` logging (Fixes #35).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.

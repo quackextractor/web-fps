@@ -20,7 +20,7 @@ export async function GET() {
 
         return NextResponse.json({ success: true, leaderboard: users });
     } catch (error) {
-        console.error('Leaderboard fetch error:', error);
-        return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
+        console.error('[Internal Error] Leaderboard fetch:', error instanceof Error ? error.stack : error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

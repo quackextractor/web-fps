@@ -67,12 +67,12 @@ export async function POST(req: Request) {
         }
 
         const currentSaveData = JSON.parse(user.saveData);
-        
+
         // Validate Credits Jump
         if (credits !== undefined) {
             const currentCredits = currentSaveData.credits || 0;
             if (credits > currentCredits + MAX_CREDITS_JUMP) {
-                 return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
+                return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
             }
         }
 
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
             kills: updatedUser.kills
         });
     } catch (error) {
-        console.error('Save error:', error);
+        console.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -134,7 +134,7 @@ export async function GET(req: Request) {
             username: user.username
         });
     } catch (error) {
-        console.error('Load error:', error);
+        console.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });
     }
 }
