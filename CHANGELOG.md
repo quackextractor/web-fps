@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.7] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Introduced global Next.js middleware CSRF protection (`frontend/middleware.ts`) enforcing strict `Origin` and `Referer` validation against the host domain for all POST requests to the API (Fixes #56).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.
