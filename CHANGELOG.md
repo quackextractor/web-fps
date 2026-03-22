@@ -549,7 +549,7 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 ## [0.2.20] - 2026-01-29 [Author: Miro Slezák]
 
 ### Fixed
--   **Critical Bug**: Fixed a runtime error where settings were undefined due to a missing hook call (regression in 0.2.19). This was a "small change" that broke multiple parts of the application (Fixes #75.5 / 12.5).
+-   **Critical Bug**: Fixed a runtime error where settings were undefined. This was a "small change" that broke multiple parts of the application (regression in 0.2.19, Fixes #75.5 / 12.5).
 
 ## [0.2.19] - 2026-01-29 [Author: Miro Slezák]
 
