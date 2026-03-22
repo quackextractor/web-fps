@@ -84,7 +84,7 @@ export async function POST(req: Request) {
             username: user.username
         }, { status: 200 });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('[Internal Error] Login:', error instanceof Error ? error.stack : error);
         // Fallback for local testing without DB
         if (process.env.NODE_ENV !== 'production') {
             return NextResponse.json({

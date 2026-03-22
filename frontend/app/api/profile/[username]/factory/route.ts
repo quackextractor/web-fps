@@ -31,7 +31,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
             machines: parsedSave.machines || []
         }, { status: 200 });
     } catch (error) {
-        console.error('Factory profile error:', error);
-        return NextResponse.json({ error: 'Failed to fetch user factory' }, { status: 500 });
+        console.error('[Internal Error] Factory profile:', error instanceof Error ? error.stack : error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

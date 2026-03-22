@@ -112,7 +112,7 @@ export async function POST(req: Request) {
             kills: updatedUser.kills
         }, { status: 200 });
     } catch (error) {
-        console.error('Save error:', error);
+        console.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -144,7 +144,7 @@ export async function GET(req: Request) {
             username: user.username
         }, { status: 200 });
     } catch (error) {
-        console.error('Load error:', error);
+        console.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });
     }
 }
