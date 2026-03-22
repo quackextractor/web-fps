@@ -830,6 +830,17 @@ export default function FPSGame() {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      const isTextInputFocused =
+        (activeElement instanceof HTMLInputElement) ||
+        (activeElement instanceof HTMLTextAreaElement) ||
+        (activeElement instanceof HTMLSelectElement) ||
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable);
+
+      if (gameStateRef.current === "login" || isTextInputFocused) {
+        return;
+      }
+
       const key = e.key.toLowerCase();
       keysRef.current.add(key);
       const { controls } = settings;
@@ -901,7 +912,7 @@ export default function FPSGame() {
       if (controls.prevWeapon.some(k => k === key)) switchWeapon(-1);
       if (controls.nextWeapon.some(k => k === key)) switchWeapon(1);
 
-      if (key === "t") {
+      if (key === "t" && gameStateRef.current === "playing" && settings.debugMode) {
         const testLevelIndex = LEVELS.length - 1;
         startGame(testLevelIndex);
       }
