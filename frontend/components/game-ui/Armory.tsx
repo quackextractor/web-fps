@@ -52,20 +52,21 @@ export const Armory: React.FC<ArmoryProps> = ({ onBack }) => {
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">
-                <h2 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                <h1 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     ARMORY FABRICATION
-                </h2>
+                </h1>
 
                 <p className="retro-text text-xs text-center text-gray-400 mb-8 tracking-widest">
                     IRON BARS {saveData.inventory.iron_bar ?? 0} | CREDITS ${saveData.credits}
                 </p>
 
+                <h2 className="retro-text text-xs text-gray-500 tracking-widest mb-3 text-center">FABRICATION TARGETS</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     {recipes.map((recipe) => {
                         const unlocked = saveData.unlockedWeapons.includes(recipe.weapon);
                         return (
                             <div key={recipe.weapon} className="retro-border bg-gray-950 p-4 flex flex-col gap-3">
-                                <p className="retro-text text-lg text-white">{recipe.title}</p>
+                                <h3 className="retro-text text-lg text-white">{recipe.title}</h3>
                                 <p className="retro-text text-[10px] text-gray-400">{recipe.description}</p>
                                 <p className="retro-text text-[10px] text-red-400">
                                     COST {recipe.barCost} IRON BARS + ${recipe.creditCost}

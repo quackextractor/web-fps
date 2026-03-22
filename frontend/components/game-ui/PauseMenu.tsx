@@ -20,9 +20,9 @@ export const PauseMenu: React.FC<PauseMenuProps> = ({
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center">
-                <h2 className="retro-text text-3xl md:text-5xl text-yellow-500 mb-8 text-center tracking-tighter animate-pulse" style={{ textShadow: "4px 4px 0px #303000" }}>
+                <h1 className="retro-text text-3xl md:text-5xl text-yellow-500 mb-8 text-center tracking-tighter animate-pulse" style={{ textShadow: "4px 4px 0px #303000" }}>
                     PAUSED
-                </h2>
+                </h1>
                 <div className="flex flex-col gap-4 w-64">
                     <MenuButton onClick={onResume}>
                         RESUME

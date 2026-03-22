@@ -46,9 +46,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">
-                <h2 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                <h1 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     GLOBAL LEADERBOARD
-                </h2>
+                </h1>
 
                 {status === "loading" && (
                     <p className="retro-text text-xs text-center text-gray-400 mb-8">LOADING SCORES</p>
@@ -58,9 +58,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
                     <p className="retro-text text-xs text-center text-yellow-500 mb-8">FAILED TO LOAD LEADERBOARD</p>
                 )}
 
-                <h4 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                <h2 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     TOP NET WORTH
-                </h4>
+                </h2>
                 {status === "ready" && (
                     <div className="retro-border bg-gray-950 mb-8 overflow-hidden">
                         <div className="grid grid-cols-11 border-b border-gray-800 px-3 py-2 retro-text text-[10px] text-red-400">
@@ -84,9 +84,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
 
                     </div>
                 )}
-                <h4 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                <h2 className="retro-text text-2xl md:text-2xl text-red-600 mb-3 tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     MOST KILLS
-                </h4>
+                </h2>
                 {status === "ready" && (
                     <div className="retro-border bg-gray-950 mb-8 overflow-hidden">
                         <div className="grid grid-cols-11 border-b border-gray-800 px-3 py-2 retro-text text-[10px] text-red-400">

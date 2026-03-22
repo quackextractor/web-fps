@@ -20,9 +20,9 @@ export const DeathScreen: React.FC<DeathScreenProps> = ({
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-md text-center">
-                <h2 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 animate-pulse tracking-tighter" style={{ textShadow: "4px 4px 0px #000" }}>
+                <h1 className="retro-text text-4xl md:text-6xl text-red-600 mb-4 animate-pulse tracking-tighter" style={{ textShadow: "4px 4px 0px #000" }}>
                     YOU DIED
-                </h2>
+                </h1>
                 <p className="retro-text text-red-400 text-xs md:text-sm mb-12 tracking-widest opacity-80">
                     PRESS 'R' TO RESTART
                 </p>

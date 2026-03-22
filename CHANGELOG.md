@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 - Configured multi-browser support for Chromium, Firefox, and WebKit.
 - Created E2E test suite (`frontend/__tests__/e2e/browser.test.ts`) to validate application launch, navigation, component loading, core rendering, and responsive design.
 - Added test scripts `test:e2e` and `test:e2e:ui` to `package.json`.
+## [0.7.4] - 2026-03-22 [Author: Tobias Mrazek]
+### Fixed
+- Removed unused Geist font CSS variables `--font-sans` and `--font-mono` from `frontend/app/globals.css` to eliminate dead declarations.
+- Performed explicit cleanup verification by scanning for residual Geist variable declarations and running a purge analysis command:
+    - `npx --yes purgecss --css frontend/app/globals.css --content "frontend/**/*.{ts,tsx,js,jsx,html}" --output frontend/.purgecss-report`
+    - `rg -e "--font-sans|--font-mono|Geist" frontend/app/globals.css` returned no matches.
+    - Purge output generated at `frontend/.purgecss-report/globals.css`.
 
 ## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
