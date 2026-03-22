@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.
