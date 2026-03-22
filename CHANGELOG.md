@@ -6,9 +6,30 @@ All notable changes to this project will be documented in this file.
 ### Security
 - Standardized the Zod schema validation rejection response payload structure to strictly return `{ error: 'Invalid or incomplete data' }` with a 400 Bad Request, explicitly stripping detailed parse error formatting to prevent potential schema leaks against malicious payloads (Fixes #57).
 
+## [0.6.7] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Introduced global Next.js middleware CSRF protection (`frontend/middleware.ts`) enforcing strict `Origin` and `Referer` validation against the host domain for all POST requests to the API (Fixes #56).
+
 ## [0.6.6] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
+
 - Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
+## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+
+### Added
+- Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
+
+## [0.6.4] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Masked internal server errors in all API responses to prevent stack trace leaks, and improved server-side `console.error` logging (Fixes #35).
+
+## [0.6.3] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Added robust try-catch JSON validation to explicitly reject malformed requests with `400 Bad Request` instead of crashing with `500 Internal Server Error` (Fixes #34).
+
+## [0.6.2] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Fixed API routes to return explicit HTTP 200 status codes for all successful `NextResponse.json()` server replies (Fixes #33).
 
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
