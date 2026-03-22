@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.4] - 2026-03-22 [Author: GitHub Copilot]
+### Fixed
+- Removed unused Geist font CSS variables `--font-sans` and `--font-mono` from `frontend/app/globals.css` to eliminate dead declarations.
+- Performed explicit cleanup verification by scanning for residual Geist variable declarations and running a purge analysis command:
+    - `npx --yes purgecss --css frontend/app/globals.css --content "frontend/**/*.{ts,tsx,js,jsx,html}" --output frontend/.purgecss-report`
+    - `rg -e "--font-sans|--font-mono|Geist" frontend/app/globals.css` returned no matches.
+    - Purge output generated at `frontend/.purgecss-report/globals.css`.
+
 ## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Implemented administrative monitoring API at `/api/admin/metrics` using Prisma aggregations (Fixes #94).
