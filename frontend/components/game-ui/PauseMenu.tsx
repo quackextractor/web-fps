@@ -16,11 +16,11 @@ export const PauseMenu: React.FC<PauseMenuProps> = ({
     onExit
 }) => {
     return (
-        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black/90 select-none pointer-events-auto">
+        <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-start xl:justify-center bg-black/90 select-none pointer-events-auto overflow-y-auto overflow-x-hidden p-2 xl:p-0">
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center">
-                <h1 className="retro-text text-3xl md:text-5xl text-yellow-500 mb-8 text-center tracking-tighter animate-pulse" style={{ textShadow: "4px 4px 0px #303000" }}>
+                <h1 className="retro-text text-3xl xl:text-5xl text-yellow-500 mb-8 text-center tracking-tighter animate-pulse" style={{ textShadow: "4px 4px 0px #303000" }}>
                     PAUSED
                 </h1>
                 <div className="flex flex-col gap-4 w-64">

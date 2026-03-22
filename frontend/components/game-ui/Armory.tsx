@@ -48,11 +48,11 @@ export const Armory: React.FC<ArmoryProps> = ({ onBack }) => {
     };
 
     return (
-        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black p-0 md:p-4 select-none pointer-events-auto">
+        <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-start xl:justify-center bg-black p-2 xl:p-4 select-none pointer-events-auto overflow-y-auto overflow-x-hidden">
             <ScanlinesOverlay />
 
-            <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">
-                <h1 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+            <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 xl:p-8 overflow-y-auto max-h-[calc(100dvh-1rem)] xl:max-h-[calc(100dvh-2rem)]">
+                <h1 className="retro-text text-3xl xl:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     ARMORY FABRICATION
                 </h1>
 
@@ -61,7 +61,7 @@ export const Armory: React.FC<ArmoryProps> = ({ onBack }) => {
                 </p>
 
                 <h2 className="retro-text text-xs text-gray-500 tracking-widest mb-3 text-center">FABRICATION TARGETS</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-8">
                     {recipes.map((recipe) => {
                         const unlocked = saveData.unlockedWeapons.includes(recipe.weapon);
                         return (
@@ -91,7 +91,7 @@ export const Armory: React.FC<ArmoryProps> = ({ onBack }) => {
                     {message.length === 0 && <p className="retro-text text-xs text-gray-500">SELECT A FABRICATION TARGET</p>}
                 </div>
 
-                <div className="w-full md:w-1/3 mx-auto">
+                <div className="w-full xl:w-1/3 mx-auto">
                     <MenuButton onClick={onBack} variant="danger">BACK TO FACTORY</MenuButton>
                 </div>
             </div>

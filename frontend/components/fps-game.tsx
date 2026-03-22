@@ -1083,7 +1083,7 @@ export default function FPSGame() {
   const shouldShowAssetPreloader = isSceneTransitioning || preloadedLevelIndex !== currentLevel;
 
   return (
-    <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden p-0 m-0">
+    <div className="flex flex-col items-center justify-center bg-black w-full h-[100dvh] min-h-[100dvh] overflow-hidden p-0 m-0">
       {shouldShowAssetPreloader && (
         <AssetPreloader
           onComplete={() => {
@@ -1103,7 +1103,7 @@ export default function FPSGame() {
         style={{
           width: '100%',
           height: '100%',
-          maxHeight: '100vh',
+          maxHeight: '100dvh',
           maxWidth: '100vw',
           display: 'flex',
           alignItems: 'center',
@@ -1117,7 +1117,7 @@ export default function FPSGame() {
             maxWidth: '100%',
             maxHeight: '100%',
             height: 'auto',
-            width: `min(100%, calc(100vh * ${aspectRatio}))`,
+            width: `min(100%, calc(100dvh * ${aspectRatio}))`,
           }}
         >
           <canvas

@@ -109,21 +109,21 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
     const paginatedEntries = entries.slice(startIdx, startIdx + entriesPerPage);
 
     return (
-        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-start bg-black p-0 md:p-4 select-none pointer-events-auto overflow-y-auto">
+        <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-start bg-black p-0 xl:p-4 select-none pointer-events-auto overflow-y-auto">
             <ScanlinesOverlay />
 
-            <div className="relative z-10 w-full md:max-w-3xl bg-black mt-4 md:mt-0">
-                <div className="border-4 border-gray-800 bg-black p-3 md:p-6 m-4 md:m-0">
+            <div className="relative z-10 w-full xl:max-w-3xl bg-black mt-4 xl:mt-0">
+                <div className="border-4 border-gray-800 bg-black p-3 xl:p-6 m-4 xl:m-0">
                     <h1
-                        className="retro-text text-lg md:text-4xl text-red-600"
+                        className="retro-text text-lg xl:text-4xl text-red-600"
                         style={{ textShadow: "2px 2px 0px #300000" }}
                     >
                         CORPORATE OPERATION ARCHIVES
                     </h1>
-                    <p className="retro-text mt-2 md:mt-4 text-xs md:text-xs leading-relaxed text-gray-300">
+                    <p className="retro-text mt-2 xl:mt-4 text-xs xl:text-xs leading-relaxed text-gray-300">
                         INTERNAL CHANGE REPORT SYSTEM.
                     </p>
-                    <div className="mt-4 md:mt-5">
+                    <div className="mt-4 xl:mt-5">
                         <MenuButton onClick={onBack} variant="secondary">
                             BACK TO MENU
                         </MenuButton>
@@ -132,11 +132,11 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
 
 
                 {loading ? (
-                    <div className="text-center p-4 md:p-6 m-4 md:m-0">
-                        <p className="retro-text text-gray-500 text-xs md:text-xs">LOADING CHANGELOG...</p>
+                    <div className="text-center p-4 xl:p-6 m-4 xl:m-0">
+                        <p className="retro-text text-gray-500 text-xs xl:text-xs">LOADING CHANGELOG...</p>
                     </div>
                 ) : (
-                    <section className="grid grid-cols-1 gap-2 md:gap-4 pb-4 md:pb-8">
+                    <section className="grid grid-cols-1 gap-2 xl:gap-4 pb-4 xl:pb-8">
                         {paginatedEntries.map((entry) => {
                             const addedSection = entry.sections.find(s => s.title.toLowerCase() === "added");
                             const changedSection = entry.sections.find(s => s.title.toLowerCase() === "changed");
@@ -157,10 +157,10 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
                             return (
                                 <article
                                     key={`${entry.version}-${entry.date}`}
-                                    className="border-4 border-gray-900 p-3 md:p-6 shadow-[0_0_0_2px_rgba(0,0,0,0.3)] m-4 md:m-0"
+                                    className="border-4 border-gray-900 p-3 xl:p-6 shadow-[0_0_0_2px_rgba(0,0,0,0.3)] m-4 xl:m-0"
                                     style={{ background: "linear-gradient(135deg, #1a1a1a 0%, #111 100%)" }}
                                 >
-                                    <div className="space-y-2 md:space-y-3 text-xs md:text-[10px]">
+                                    <div className="space-y-2 xl:space-y-3 text-xs xl:text-[10px]">
                                         <div>
                                             <p className="retro-text text-red-700 mb-1">&gt; REPORT ID</p>
                                             <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
@@ -184,8 +184,8 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
 
                                         <div>
                                             <p className="retro-text text-red-700 mb-1">&gt; ADDED</p>
-                                            <div className="border-2 border-gray-800 p-2 md:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] md:text-[9px] ${!addedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!addedSection ? "line-through text-gray-600" : "text-white"}`}>
                                                     {addedText}
                                                 </p>
                                             </div>
@@ -193,8 +193,8 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
 
                                         <div>
                                             <p className="retro-text text-red-700 mb-1">&gt; CHANGED</p>
-                                            <div className="border-2 border-gray-800 p-2 md:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] md:text-[9px] ${!changedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!changedSection ? "line-through text-gray-600" : "text-white"}`}>
                                                     {changedText}
                                                 </p>
                                             </div>
@@ -202,8 +202,8 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
 
                                         <div>
                                             <p className="retro-text text-red-700 mb-1">&gt; FIXED</p>
-                                            <div className="border-2 border-gray-800 p-2 md:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] md:text-[9px] ${!fixedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!fixedSection ? "line-through text-gray-600" : "text-white"}`}>
                                                     {fixedText}
                                                 </p>
                                             </div>
@@ -215,22 +215,22 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
                     </section>
                 )}
 
-                <div className="mb-4 md:mb-8 flex flex-col items-center gap-2 md:gap-4 p-4 md:p-0">
-                    <p className="retro-text text-gray-300 text-xs md:text-[10px]">
+                <div className="mb-4 xl:mb-8 flex flex-col items-center gap-2 xl:gap-4 p-4 xl:p-0">
+                    <p className="retro-text text-gray-300 text-xs xl:text-[10px]">
                         PAGE {currentPage} OF {totalPages || 1}
                     </p>
-                    <div className="flex gap-2 md:gap-3 w-full md:w-auto">
+                    <div className="flex gap-2 xl:gap-3 w-full xl:w-auto">
                         <button
                             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
-                            className="flex-1 md:flex-initial retro-text border-4 border-black bg-gray-800 px-3 md:px-4 py-2 md:py-3 text-xs md:text-xs text-white transition-colors hover:enabled:bg-white hover:enabled:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 xl:flex-initial retro-text border-4 border-black bg-gray-800 px-3 xl:px-4 py-2 xl:py-3 text-xs xl:text-xs text-white transition-colors hover:enabled:bg-white hover:enabled:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             PREV
                         </button>
                         <button
                             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
-                            className="flex-1 md:flex-initial retro-text border-4 border-black bg-gray-800 px-3 md:px-4 py-2 md:py-3 text-xs md:text-xs text-white transition-colors hover:enabled:bg-white hover:enabled:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 xl:flex-initial retro-text border-4 border-black bg-gray-800 px-3 xl:px-4 py-2 xl:py-3 text-xs xl:text-xs text-white transition-colors hover:enabled:bg-white hover:enabled:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             NEXT
                         </button>

@@ -66,23 +66,23 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     const canGoPrev = currentPage > 0;
 
     return (
-        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black overflow-y-auto overflow-x-hidden select-none pointer-events-auto p-0 md:p-4"
+        <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-center bg-black overflow-y-auto overflow-x-hidden select-none pointer-events-auto p-0 xl:p-4"
             style={{ margin: 0 }}>
             <ScanlinesOverlay />
 
             <div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-2 sm:px-4 py-4">
-                <h1 className="retro-text text-2xl sm:text-4xl md:text-6xl text-red-600 mb-2 sm:mb-4 text-center animate-pulse leading-snug tracking-tighter"
+                <h1 className="retro-text text-2xl sm:text-4xl xl:text-6xl text-red-600 mb-2 sm:mb-4 text-center animate-pulse leading-snug tracking-tighter"
                     style={{ textShadow: "2px 2px 0px #300000" }}>
                     INDUSTRIALIST
                 </h1>
-                <p className="retro-text text-red-400 text-[10px] sm:text-xs md:text-sm mb-4 sm:mb-6 md:mb-12 tracking-widest text-center opacity-80">
+                <p className="retro-text text-red-400 text-[10px] sm:text-xs xl:text-sm mb-4 sm:mb-6 xl:mb-12 tracking-widest text-center opacity-80">
                     DESCENT INTO DARKNESS
                 </p>
 
                 {/* Mobile carousel view */}
-                <div className="md:hidden flex flex-col gap-2 sm:gap-4 w-full max-w-sm">
+                <div className="xl:hidden flex flex-col gap-2 sm:gap-4 w-full max-w-sm">
                     {buttonPages[currentPage].map((button, idx) => {
-                        if (button.isRow && "children" in button) {
+                        if ("children" in button && Array.isArray(button.children)) {
                             return (
                                 <div key={idx} className="flex gap-3">
                                     {button.children?.map((childBtn, childIdx) => (
@@ -93,8 +93,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                                         >
                                             {childBtn.mobileLabel && (
                                                 <>
-                                                    <span className="md:hidden">{childBtn.mobileLabel}</span>
-                                                    <span className="hidden md:inline">{childBtn.label}</span>
+                                                    <span className="xl:hidden">{childBtn.mobileLabel}</span>
+                                                    <span className="hidden xl:inline">{childBtn.label}</span>
                                                 </>
                                             )}
                                             {!childBtn.mobileLabel && childBtn.label}
@@ -142,7 +142,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 </div>
 
                 {/* Desktop full view */}
-                <div className="hidden md:flex flex-col gap-6 w-full max-w-sm">
+                <div className="hidden xl:flex flex-col gap-6 w-full max-w-sm">
                     <MenuButton onClick={() => onStartGame(0)}>
                         PLAY
                     </MenuButton>
@@ -168,7 +168,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     </MenuButton>
                 </div>
 
-                <div className="hidden md:block mt-4 sm:mt-8 md:mt-16 text-gray-500 text-center text-[8px] sm:text-[10px] md:text-xs font-mono retro-text opacity-50">
+                <div className="hidden xl:block mt-4 sm:mt-8 xl:mt-16 text-gray-500 text-center text-[8px] sm:text-[10px] xl:text-xs font-mono retro-text opacity-50">
                     <p className="text-yellow-600 mb-2">DEFAULT CONTROLS</p>
                     <div className="flex flex-col gap-1">
                         <p>WASD: MOVE  •  MOUSE: LOOK</p>
@@ -180,12 +180,12 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 <button
                     type="button"
                     onClick={onChangelog}
-                    className="hidden md:block absolute bottom-4 left-4 text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
+                    className="hidden xl:block absolute bottom-4 left-4 text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
                 >
                     CHANGELOG
                 </button>
 
-                <div className="hidden md:flex absolute bottom-4 right-4 flex-col items-end gap-2">
+                <div className="hidden xl:flex absolute bottom-4 right-4 flex-col items-end gap-2">
                     <button
                         type="button"
                         onClick={onCredits}

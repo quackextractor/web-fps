@@ -166,16 +166,16 @@ export function SettingsMenu({
     };
 
     return (
-        <div className="fixed md:absolute inset-0 flex flex-col items-center justify-center bg-black p-0 md:p-4 z-50 overflow-y-auto select-none pointer-events-auto">
+        <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-start xl:justify-center bg-black p-2 xl:p-4 z-50 overflow-y-auto overflow-x-hidden select-none pointer-events-auto">
             <ScanlinesOverlay enabled={localSettings.scanlinesEnabled} size={localSettings.scanlineSize} />
 
-            <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-6 shadow-2xl h-full md:h-auto overflow-y-auto">
-                <h2 className="retro-text text-2xl md:text-4xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+            <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 xl:p-6 shadow-2xl max-h-[calc(100dvh-1rem)] xl:max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                <h2 className="retro-text text-2xl xl:text-4xl text-red-600 mb-8 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
                     OPTIONS
                     {hasChanges && <span className="text-yellow-500 text-sm ml-4">*</span>}
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8 text-xs">
                     {/* Audio Section */}
                     <div className="space-y-4">
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4">AUDIO</h3>
