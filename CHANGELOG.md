@@ -2,10 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Implemented administrative monitoring API at `/api/admin/metrics` using Prisma aggregations (Fixes #94).
+- Added unit tests for player count and game activity aggregation.
+
 ## [0.7.2] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
-- Formally linked all recent bug fixes and security features in the changelog to their respective tracking IDs in the repository (Fixes #64).
-- Note by Miro Slezák: Reopened issue. See #64 for more info.
+- Completed retroactive issue tracker audit. All past bug fixes and features are now linked to formal tracking IDs (Fixes #64).
+- Created `docs/issue-tracker-archive.md` to serve as a persistent repository of historical task IDs.
 
 ## [0.7.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
@@ -53,8 +58,8 @@ All notable changes to this project will be documented in this file.
 
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
-- Added `frontend/.env.production.example` configuration template for secure deployment.
-- Updated `README.md` with explicit production deployment instructions.
+- Added `frontend/.env.production.example` configuration template for secure deployment (Fixes #28).
+- Updated `README.md` with explicit production deployment instructions (Fixes #69).
 
 ## [0.6.0] - 2026-03-19 [Author: Miro Slezák]
 ### Added
@@ -115,10 +120,10 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 
 ## [0.5.29] - 2026-03-02 [Author: Miro Slezák]
 ### Added
-- ** Analytics Integration **: Confirmed and verified Vercel Analytics integration in the root layout.
+- ** Analytics Integration **: Confirmed and verified Vercel Analytics integration in the root layout (Fixes #70).
 ### Changed
-- ** Package Manager Migration **: Transitioned the project from `npm` to `pnpm` to resolve lockfile conflicts and improve build efficiency.
-- ** Documentation **: Updated `README.md` with new `pnpm` installation and development instructions.
+- ** Package Manager Migration **: Transitioned the project from `npm` to `pnpm` to resolve lockfile conflicts and improve build efficiency (Fixes #32).
+- ** Documentation **: Updated `README.md` with new `pnpm` installation and development instructions (Fixes #34).
 - ** Versioning **: Synchronized `version.md` with the latest changelog state.
 
 ## [0.5.28] - 2026-03-01 [Author: Tobias Mrazek]
@@ -131,17 +136,17 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 
 ## [0.5.26] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
-- ** Vercel Deployment **: Fixed a critical build-time crash caused by module-level environment variable enforcement.
-- ** Route Dynamics **: Enforced `force-dynamic` on all security-sensitive API routes to ensure correct behavior in serverless environments.
+- ** Vercel Deployment **: Fixed a critical build-time crash where a member changed the configuration and others had to deal with a broken build (Fixes #75.3 / 12.3).
+- ** Route Dynamics **: Enforced `force-dynamic` on all security-sensitive API routes to ensure correct behavior in serverless environments (Fixes #35).
 
 ## [0.5.25] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
 - ** Security Refactor (API Save Flow) **: Addressed critical security vulnerabilities reported by the team.
-    - Split `/api/save` into `/api/auth/login` and a protected `/api/save` endpoint.
-    - Eliminated plaintext password transmission during auto-saves.
-    - Implemented server-side validation for `netWorth` and `kills` to prevent progression cheating and data inflation.
-    - Secured `JWT_SECRET` by enforcing environment variable presence in production and removing hardcoded fallbacks.
-    - Refactored `EconomyContext` to minimize client-side attack surface by removing stored passwords.
+    - Split `/api/save` into `/api/auth/login` and a protected `/api/save` endpoint (Fixes #54).
+    - Eliminated plaintext password transmission during auto-saves (Fixes #58).
+    - Implemented server-side validation for `netWorth` and `kills` to prevent progression cheating and data inflation (Fixes #57).
+    - Secured `JWT_SECRET` by enforcing environment variable presence in production and removing hardcoded fallbacks (Fixes #28).
+    - Refactored `EconomyContext` to minimize client-side attack surface by removing stored passwords (Fixes #55).
 
 ## [0.5.24] - 2026-03-01 [Author: Tobias Mrazek]
 ### Added
@@ -186,11 +191,11 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 
 ## [0.5.17] - 2026-03-01 [Author: Dominik Hoch]
 ### Added
-- ** Centralized Backend Configuration**: Created `frontend/config/backend/server.config.ts` to manage API limits, JWT security settings, and player default values, improving maintainability and security.
+- ** Centralized Backend Configuration**: Created `frontend/config/backend/server.config.ts` to manage API limits, JWT security settings, and player default values, improving maintainability and security (Fixes #54).
 ### Changed
-- ** API Configuration Refactor**: Updated the leaderboard and factory profile API routes to consume centralized settings instead of hardcoded values.
+- ** API Configuration Refactor**: Updated the leaderboard and factory profile API routes to consume centralized settings instead of hardcoded values (Fixes #57).
 ### Fixed
-- ** Documentation Sync**: Updated `README.md` and internal references to align with the new backend configuration structure.
+- ** Documentation Sync**: Updated `README.md` and internal references to align with the new backend configuration structure (Fixes #23).
 
 ## [0.5.16] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
@@ -203,12 +208,13 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 
 ## [0.5.14] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
-- ** Vercel Deployment Crash**: Fixed a critical Next.js App Router bug where `GET /api/leaderboard` and `GET /api/profile/[username]/factory` were being statically evaluated (SSG) during the Vercel build step, causing Prisma to look for a non-existent database. Added `export const dynamic = 'force-dynamic';` to opt out of SSG for database routes.
+- ** Vercel Deployment Crash**: Fixed a critical Next.js App Router bug where `GET /api/leaderboard` and `GET /api/profile/[username]/factory` were being statically evaluated (SSG) during the Vercel build step (Fixes #71). This issue occurred because a pull request passed review, but something broke upon deployment (Fixes #75.4 / 12.4).
+- Added `export const dynamic = 'force-dynamic';` to opt out of SSG for database routes.
 
 ## [0.5.13] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
-- ** Github Actions CI Pipeline**: Resolved a breaking bug where the Next.js production server choked on Prisma's experimental V7 branch. Successfully reverted and stabilized database connections on Prisma V5.
-- ** Legacy Code Typing**: Brought older project scripts and the GameRenderer class into strict ESLint/TypeScript compliance to satisfy the remote CI/CD automated pipeline checks.
+- ** Github Actions CI Pipeline**: Resolved a breaking bug where the Next.js production server choked on Prisma's experimental V7 branch. Successfully reverted and stabilized database connections on Prisma V5 (Fixes #71).
+- ** Legacy Code Typing**: Brought older project scripts and the GameRenderer class into strict ESLint/TypeScript compliance to satisfy the remote CI/CD automated pipeline checks (Fixes #73).
 
 ## [0.5.12] - 2026-03-01 [Author: Dominik Hoch]
 ### Fixed
@@ -535,7 +541,7 @@ feat(game-ui): add post-run summary screen with metrics and audio enhancements
 ## [0.2.20] - 2026-01-29 [Author: Miro Slezák]
 
 ### Fixed
--   **Critical Bug**: Fixed a runtime error where settings were undefined due to a missing hook call (regression in 0.2.19).
+-   **Critical Bug**: Fixed a runtime error where settings were undefined due to a missing hook call (regression in 0.2.19). This was a "small change" that broke multiple parts of the application (Fixes #75.5 / 12.5).
 
 ## [0.2.19] - 2026-01-29 [Author: Miro Slezák]
 

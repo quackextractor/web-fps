@@ -42,14 +42,14 @@ describe('GET /api/leaderboard', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-        // @ts-expect-error mock
-        // @ts-expect-error mock
-        prisma.user.findMany.mockRejectedValue(new Error('DB Error'));
+        const spy = vi.spyOn(prisma.user, 'findMany').mockRejectedValue(new Error('DB Error'));
 
         const response = await getLeaderboard();
         const data = await response.json();
 
         expect(response.status).toBe(500);
-        expect(data.error).toBe('Internal server error');
+        expect(data).toHaveProperty('error', 'Failed to fetch leaderboard');
+
+        spy.mockRestore();
     });
 });
