@@ -81,4 +81,43 @@ describe('POST /api/auth/login', () => {
         const response = await loginRoute(req);
         expect(response.status).toBe(401);
     });
+
+    it('should return 400 for missing credentials', async () => {
+        const req = new Request('http://localhost/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: 'test' }), // missing password
+        });
+
+        const response = await loginRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid or incomplete data');
+    });
+
+    it('should return 400 for too long username', async () => {
+        const req = new Request('http://localhost/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: 'a'.repeat(33),
+                password: 'password'
+            }),
+        });
+
+        const response = await loginRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid or incomplete data');
+    });
+
+    it('should return 400 for malformed JSON', async () => {
+        const req = new Request('http://localhost/api/auth/login', {
+            method: 'POST',
+            body: '{ "username": "test", "password": "pa ', // malformed
+        });
+
+        const response = await loginRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid JSON payload');
+    });
 });

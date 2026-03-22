@@ -94,4 +94,40 @@ describe('POST /api/save', () => {
         const response = await saveRoute(req);
         expect(response.status).toBe(403);
     });
+
+    it('should return 400 for invalid data types (Zod)', async () => {
+        const req = new Request('http://localhost/api/save', {
+            method: 'POST',
+            body: JSON.stringify({ net_worth: "not-a-number" }),
+        });
+
+        const response = await saveRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid data');
+    });
+
+    it('should return 400 for negative numbers (Zod)', async () => {
+        const req = new Request('http://localhost/api/save', {
+            method: 'POST',
+            body: JSON.stringify({ net_worth: -100 }),
+        });
+
+        const response = await saveRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid data');
+    });
+
+    it('should return 400 for malformed JSON', async () => {
+        const req = new Request('http://localhost/api/save', {
+            method: 'POST',
+            body: '{ "net_worth": 100 ', // malformed
+        });
+
+        const response = await saveRoute(req);
+        const data = await response.json();
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('Invalid JSON payload');
+    });
 });
