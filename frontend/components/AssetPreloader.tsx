@@ -1,22 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import type { Level } from "@/lib/fps-engine";
 
 interface AssetPreloaderProps {
     onComplete: () => void;
-    assets: {
-        images: string[];
-        sounds: string[];
-    };
+    level: Level;
+    sounds?: string[];
 }
 
-export function AssetPreloader({ onComplete, assets }: AssetPreloaderProps) {
+export function AssetPreloader({ onComplete, level, sounds = [] }: AssetPreloaderProps) {
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        let isCancelled = false;
         let loaded = 0;
-        const total = assets.images.length + assets.sounds.length;
+        const imageSet = new Set<string>();
+
+        Object.values(level.wallTextures).forEach((src) => {
+            if (!src.startsWith("generated:")) {
+                imageSet.add(src);
+            }
+        });
+
+        if (level.floorTexture && !level.floorTexture.startsWith("generated:")) {
+            imageSet.add(level.floorTexture);
+        }
+
+        if (level.ceilingTexture && !level.ceilingTexture.startsWith("generated:")) {
+            imageSet.add(level.ceilingTexture);
+        }
+
+        const images = Array.from(imageSet);
+        const total = images.length + sounds.length;
 
         if (total === 0) {
             onComplete();
@@ -24,22 +41,30 @@ export function AssetPreloader({ onComplete, assets }: AssetPreloaderProps) {
         }
 
         const updateProgress = () => {
+            if (isCancelled) {
+                return;
+            }
             loaded++;
             setProgress(Math.floor((loaded / total) * 100));
             if (loaded === total) {
                 // Small delay for visual polish
-                setTimeout(onComplete, 500);
+                setTimeout(() => {
+                    if (!isCancelled) {
+                        onComplete();
+                    }
+                }, 500);
             }
         };
 
         const handleError = (src: string) => {
             console.error(`Failed to load asset: ${src}`);
+            setError("Some assets failed to load");
             // We still continue even if one asset fails to load
             updateProgress();
         };
 
         // Preload images
-        assets.images.forEach((src) => {
+        images.forEach((src) => {
             const img = new Image();
             img.src = src;
             img.onload = updateProgress;
@@ -47,7 +72,7 @@ export function AssetPreloader({ onComplete, assets }: AssetPreloaderProps) {
         });
 
         // Preload sounds
-        assets.sounds.forEach((src) => {
+        sounds.forEach((src) => {
             const audio = new Audio();
             audio.src = src;
             audio.oncanplaythrough = updateProgress;
@@ -55,7 +80,11 @@ export function AssetPreloader({ onComplete, assets }: AssetPreloaderProps) {
             // Some browsers require explicit load for Audio
             audio.load();
         });
-    }, [assets, onComplete]);
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [level, sounds, onComplete]);
 
     return (
         <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-8">
