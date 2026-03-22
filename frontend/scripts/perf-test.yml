@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Baseline performance test"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "API Read Performance (Leaderboard)"
+    weight: 60
+    flow:
+      - get:
+          url: "/api/leaderboard"
+          expect:
+            - statusCode: 200
+
+  - name: "API Write Performance (Auth)"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "perftest_user"
+            password: "perftest_pass"
+            loginToken: "test"

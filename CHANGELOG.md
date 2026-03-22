@@ -36,6 +36,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added Artillery load testing configuration for simulating concurrent players (Fixes #62).
 - Created `docs/concurrent-users-test.md` documenting test methodology and expected metrics.
+## [0.8.7] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Added Artillery server performance benchmark script (Fixes #63).
+- Created `docs/performance-test.md` documenting methodology and key metrics.
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
