@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MenuButton } from "./MenuButton";
 import { ScanlinesOverlay } from "./ScanlinesOverlay";
+import { useEconomy } from "@/context/EconomyContext";
+
+const EASTER_EGG_CREDITS = 1000;
+const EASTER_EGG_SKIP_RECENT = 20;
 
 interface ChangelogSection {
     title: string;
@@ -89,12 +93,24 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
     const [loading, setLoading] = useState(true);
     const entriesPerPage = 1;
 
+    const { isAuthenticated, username, refreshFromCloud } = useEconomy();
+
+    const easterEggIndexRef = useRef<number | null>(null);
+    const [easterEggClaimed, setEasterEggClaimed] = useState(false);
+    const [easterEggClaiming, setEasterEggClaiming] = useState(false);
+    const [easterEggError, setEasterEggError] = useState("");
+
     useEffect(() => {
         const fetchEntries = async () => {
             try {
                 const response = await fetch("/api/changelog");
                 const data = await response.json();
                 setEntries(data);
+
+                if (Array.isArray(data) && data.length > EASTER_EGG_SKIP_RECENT) {
+                    const eligible = data.length - EASTER_EGG_SKIP_RECENT;
+                    easterEggIndexRef.current = EASTER_EGG_SKIP_RECENT + Math.floor(Math.random() * eligible);
+                }
             } catch (error) {
                 console.error("Failed to fetch changelog:", error);
             } finally {
@@ -104,9 +120,53 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
         fetchEntries();
     }, []);
 
+    useEffect(() => {
+        if (!isAuthenticated || easterEggIndexRef.current === null) {
+            return;
+        }
+        const checkClaimed = async () => {
+            try {
+                const res = await fetch("/api/changelog/easter-egg", { credentials: "include" });
+                if (res.ok) {
+                    const data = await res.json();
+                    setEasterEggClaimed(data.claimed === true);
+                }
+            } catch {
+                // silent
+            }
+        };
+        void checkClaimed();
+    }, [isAuthenticated]);
+
+    const handleClaimEasterEgg = async () => {
+        setEasterEggClaiming(true);
+        setEasterEggError("");
+        try {
+            const res = await fetch("/api/changelog/easter-egg", {
+                method: "POST",
+                credentials: "include",
+            });
+            if (res.status === 409) {
+                setEasterEggClaimed(true);
+                return;
+            }
+            if (!res.ok) {
+                setEasterEggError("TRANSMISSION FAILED");
+                return;
+            }
+            setEasterEggClaimed(true);
+            await refreshFromCloud();
+        } catch {
+            setEasterEggError("TRANSMISSION FAILED");
+        } finally {
+            setEasterEggClaiming(false);
+        }
+    };
+
     const totalPages = Math.ceil(entries.length / entriesPerPage);
     const startIdx = (currentPage - 1) * entriesPerPage;
     const paginatedEntries = entries.slice(startIdx, startIdx + entriesPerPage);
+    const isEasterEggPage = easterEggIndexRef.current !== null && currentPage - 1 === easterEggIndexRef.current;
 
     return (
         <div className="fixed xl:absolute inset-0 flex flex-col items-center justify-start bg-black p-0 xl:p-4 select-none pointer-events-auto overflow-y-auto">
@@ -137,81 +197,146 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
                     </div>
                 ) : (
                     <section className="grid grid-cols-1 gap-2 xl:gap-4 pb-4 xl:pb-8">
-                        {paginatedEntries.map((entry) => {
-                            const addedSection = entry.sections.find(s => s.title.toLowerCase() === "added");
-                            const changedSection = entry.sections.find(s => s.title.toLowerCase() === "changed");
-                            const fixedSection = entry.sections.find(s => s.title.toLowerCase() === "fixed");
-
-                            const addedText = addedSection
-                                ? addedSection.items.map(item => `• ${item}`).join("\n")
-                                : "DOES NOT APPLY";
-
-                            const changedText = changedSection
-                                ? changedSection.items.map(item => `• ${item}`).join("\n")
-                                : "DOES NOT APPLY";
-
-                            const fixedText = fixedSection
-                                ? fixedSection.items.map(item => `• ${item}`).join("\n")
-                                : "DOES NOT APPLY";
-
-                            return (
-                                <article
-                                    key={`${entry.version}-${entry.date}`}
-                                    className="border-4 border-gray-900 p-3 xl:p-6 shadow-[0_0_0_2px_rgba(0,0,0,0.3)] m-4 xl:m-0"
-                                    style={{ background: "linear-gradient(135deg, #1a1a1a 0%, #111 100%)" }}
-                                >
-                                    <div className="space-y-2 xl:space-y-3 text-xs xl:text-[10px]">
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; REPORT ID</p>
-                                            <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className="retro-text text-white font-mono">{entry.version}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; RESPONSIBLE EMPLOYEE</p>
-                                            <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className="retro-text text-white font-mono uppercase">{entry.author}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; DATE</p>
-                                            <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className="retro-text text-white font-mono">{entry.date}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; ADDED</p>
-                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!addedSection ? "line-through text-gray-600" : "text-white"}`}>
-                                                    {addedText}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; CHANGED</p>
-                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!changedSection ? "line-through text-gray-600" : "text-white"}`}>
-                                                    {changedText}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <p className="retro-text text-red-700 mb-1">&gt; FIXED</p>
-                                            <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
-                                                <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!fixedSection ? "line-through text-gray-600" : "text-white"}`}>
-                                                    {fixedText}
-                                                </p>
-                                            </div>
+                        {isEasterEggPage ? (
+                            <article
+                                className="border-4 border-yellow-900 p-3 xl:p-6 shadow-[0_0_0_2px_rgba(0,0,0,0.3)] m-4 xl:m-0"
+                                style={{ background: "linear-gradient(135deg, #1a1200 0%, #0d0900 100%)" }}
+                            >
+                                <div className="space-y-2 xl:space-y-3 text-xs xl:text-[10px]">
+                                    <div>
+                                        <p className="retro-text text-yellow-700 mb-1 animate-pulse">&gt; TRANSMISSION TYPE</p>
+                                        <div className="border-2 border-yellow-900 p-2" style={{ background: "linear-gradient(135deg, #302000 0%, #000000 100%)" }}>
+                                            <p className="retro-text text-yellow-400 font-mono tracking-widest">CLASSIFIED // LEVEL 9 CLEARANCE</p>
                                         </div>
                                     </div>
-                                </article>
-                            );
-                        })}
+
+                                    <div>
+                                        <p className="retro-text text-yellow-700 mb-1">&gt; RECIPIENT</p>
+                                        <div className="border-2 border-yellow-900 p-2" style={{ background: "linear-gradient(135deg, #302000 0%, #000000 100%)" }}>
+                                            <p className="retro-text text-yellow-300 font-mono uppercase">
+                                                {isAuthenticated ? username : "UNIDENTIFIED WORKER"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p className="retro-text text-yellow-700 mb-1">&gt; CORPORATE DIRECTIVE</p>
+                                        <div className="border-2 border-yellow-900 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #302000 0%, #000000 100%)" }}>
+                                            <p className="retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] text-yellow-200">
+                                                {`ATTENTION: EMPLOYEE LOYALTY REWARD PROGRAM\n\nYOU HAVE DEMONSTRATED EXCEPTIONAL DEDICATION\nTO THE INDUSTRIALIST CORPORATION BY REVIEWING\nOUR ARCHIVED OPERATIONAL RECORDS.\n\nAS PER INTERNAL POLICY REF. IC-7749-B, A\nONE-TIME WELFARE DISPENSATION OF ${EASTER_EGG_CREDITS} CR\nHAS BEEN AUTHORIZED FOR YOUR ACCOUNT.`}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p className="retro-text text-yellow-700 mb-1">&gt; DISPENSATION STATUS</p>
+                                        <div className="border-2 border-yellow-900 p-2" style={{ background: "linear-gradient(135deg, #302000 0%, #000000 100%)" }}>
+                                            {easterEggClaimed ? (
+                                                <p className="retro-text text-green-400 font-mono">REWARD CLAIMED // BALANCE UPDATED</p>
+                                            ) : (
+                                                <p className="retro-text text-yellow-500 font-mono animate-pulse">PENDING AUTHORIZATION</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {!easterEggClaimed && (
+                                        <div className="pt-1">
+                                            {!isAuthenticated ? (
+                                                <p className="retro-text text-gray-500 text-[9px] text-center tracking-widest">LOGIN REQUIRED TO CLAIM</p>
+                                            ) : (
+                                                <div className="flex flex-col gap-2">
+                                                    <MenuButton
+                                                        onClick={() => { void handleClaimEasterEgg(); }}
+                                                        variant="primary"
+                                                    >
+                                                        {easterEggClaiming ? "PROCESSING..." : `CLAIM ${EASTER_EGG_CREDITS} CR`}
+                                                    </MenuButton>
+                                                    {easterEggError.length > 0 && (
+                                                        <p className="retro-text text-red-500 text-[9px] text-center">{easterEggError}</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </article>
+                        ) : (
+                            paginatedEntries.map((entry) => {
+                                const addedSection = entry.sections.find(s => s.title.toLowerCase() === "added");
+                                const changedSection = entry.sections.find(s => s.title.toLowerCase() === "changed");
+                                const fixedSection = entry.sections.find(s => s.title.toLowerCase() === "fixed");
+
+                                const addedText = addedSection
+                                    ? addedSection.items.map(item => `• ${item}`).join("\n")
+                                    : "DOES NOT APPLY";
+
+                                const changedText = changedSection
+                                    ? changedSection.items.map(item => `• ${item}`).join("\n")
+                                    : "DOES NOT APPLY";
+
+                                const fixedText = fixedSection
+                                    ? fixedSection.items.map(item => `• ${item}`).join("\n")
+                                    : "DOES NOT APPLY";
+
+                                return (
+                                    <article
+                                        key={`${entry.version}-${entry.date}`}
+                                        className="border-4 border-gray-900 p-3 xl:p-6 shadow-[0_0_0_2px_rgba(0,0,0,0.3)] m-4 xl:m-0"
+                                        style={{ background: "linear-gradient(135deg, #1a1a1a 0%, #111 100%)" }}
+                                    >
+                                        <div className="space-y-2 xl:space-y-3 text-xs xl:text-[10px]">
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; REPORT ID</p>
+                                                <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className="retro-text text-white font-mono">{entry.version}</p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; RESPONSIBLE EMPLOYEE</p>
+                                                <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className="retro-text text-white font-mono uppercase">{entry.author}</p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; DATE</p>
+                                                <div className="border-2 border-gray-800 p-2" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className="retro-text text-white font-mono">{entry.date}</p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; ADDED</p>
+                                                <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!addedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                                        {addedText}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; CHANGED</p>
+                                                <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!changedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                                        {changedText}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="retro-text text-red-700 mb-1">&gt; FIXED</p>
+                                                <div className="border-2 border-gray-800 p-2 xl:p-3" style={{ background: "linear-gradient(135deg, #301010 0%, #000000 100%)" }}>
+                                                    <p className={`retro-text font-mono whitespace-pre-wrap leading-relaxed text-[9px] xl:text-[9px] ${!fixedSection ? "line-through text-gray-600" : "text-white"}`}>
+                                                        {fixedText}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                );
+                            })
+                        )}
                     </section>
                 )}
 
