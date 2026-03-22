@@ -6,10 +6,14 @@ import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
 import { z } from 'zod';
+import { createHash } from 'crypto';
+
+const LOGIN_FORM_TOKEN_COOKIE = 'industrialist_login_form_token';
 
 const loginSchema = z.object({
     username: z.string().min(1, "Username is required").max(32, "Username is too long"),
-    password: z.string().min(1, "Password is required")
+    password: z.string().min(1, "Password is required"),
+    loginToken: z.string().min(32, "Missing login token"),
 });
 
 function getJwtSecret() {
@@ -35,7 +39,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid or incomplete data' }, { status: 400 });
         }
 
-        const { username, password } = parseResult.data;
+        const { username, password, loginToken } = parseResult.data;
+
+        const cookieStore = await cookies();
+        const tokenHashFromCookie = cookieStore.get(LOGIN_FORM_TOKEN_COOKIE)?.value;
+        const tokenHashFromRequest = createHash('sha256').update(loginToken).digest('hex');
+
+        if (!tokenHashFromCookie || tokenHashFromCookie !== tokenHashFromRequest) {
+            return NextResponse.json({ error: 'Invalid or expired login token' }, { status: 403 });
+        }
+
+        // One-time token: consume immediately after successful validation.
+        cookieStore.delete(LOGIN_FORM_TOKEN_COOKIE);
 
         let user = await prisma.user.findUnique({
             where: { username }
@@ -68,8 +83,6 @@ export async function POST(req: Request) {
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime(BACKEND_CONFIG.AUTH.JWT_EXPIRATION)
             .sign(JWT_SECRET);
-
-        const cookieStore = await cookies();
 
         // CSRF & XSS Protection: Ensure cookies are explicitly HttpOnly and Secure
         cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {

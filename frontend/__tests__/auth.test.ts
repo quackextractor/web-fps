@@ -1,12 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST as loginRoute } from '@/app/api/auth/login/route';
 import bcrypt from 'bcryptjs';
+import { createHash } from 'crypto';
+
+const LOGIN_TOKEN = 'a'.repeat(64);
+const LOGIN_TOKEN_HASH = createHash('sha256').update(LOGIN_TOKEN).digest('hex');
 
 // Mock cookies
 vi.mock('next/headers', () => ({
     cookies: vi.fn(() => ({
         set: vi.fn(),
-        get: vi.fn(),
+        get: vi.fn(() => ({ value: LOGIN_TOKEN_HASH })),
+        delete: vi.fn(),
     })),
 }));
 
@@ -54,7 +59,7 @@ describe('POST /api/auth/login', () => {
 
         const req = new Request('http://localhost/api/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ username: 'newuser', password: 'password' }),
+            body: JSON.stringify({ username: 'newuser', password: 'password', loginToken: LOGIN_TOKEN }),
         });
 
         const response = await loginRoute(req);
@@ -75,7 +80,7 @@ describe('POST /api/auth/login', () => {
 
         const req = new Request('http://localhost/api/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ username: 'test', password: 'wrong' }),
+            body: JSON.stringify({ username: 'test', password: 'wrong', loginToken: LOGIN_TOKEN }),
         });
 
         const response = await loginRoute(req);
@@ -85,7 +90,7 @@ describe('POST /api/auth/login', () => {
     it('should return 400 for missing credentials', async () => {
         const req = new Request('http://localhost/api/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ username: 'test' }), // missing password
+            body: JSON.stringify({ username: 'test', loginToken: LOGIN_TOKEN }), // missing password
         });
 
         const response = await loginRoute(req);
@@ -99,7 +104,8 @@ describe('POST /api/auth/login', () => {
             method: 'POST',
             body: JSON.stringify({
                 username: 'a'.repeat(33),
-                password: 'password'
+                password: 'password',
+                loginToken: LOGIN_TOKEN,
             }),
         });
 
