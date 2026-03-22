@@ -5,6 +5,17 @@ import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
+import { z } from 'zod';
+
+const savePayloadSchema = z.object({
+    credits: z.number().min(0).optional(),
+    inventory: z.any().optional(),
+    machines: z.any().optional(),
+    unlockedWeapons: z.array(z.string()).optional(),
+    highestLevelCompleted: z.number().min(0).optional(),
+    net_worth: z.number().min(0).optional(),
+    kills: z.number().min(0).optional(),
+});
 
 function getJwtSecret() {
     const secret = process.env.JWT_SECRET;
@@ -32,8 +43,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized: Invalid session' }, { status: 401 });
         }
 
-        const body = await req.json();
-        const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+        }
+
+        const parseResult = savePayloadSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: 'Invalid data', details: parseResult.error.format() }, { status: 400 });
+        }
+
+        const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = parseResult.data;
 
         const userId = payload.id as string;
         const user = await prisma.user.findUnique({
@@ -67,12 +89,12 @@ export async function POST(req: Request) {
         }
 
         const currentSaveData = JSON.parse(user.saveData);
-        
+
         // Validate Credits Jump
         if (credits !== undefined) {
             const currentCredits = currentSaveData.credits || 0;
             if (credits > currentCredits + MAX_CREDITS_JUMP) {
-                 return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
+                return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
             }
         }
 
@@ -100,9 +122,9 @@ export async function POST(req: Request) {
             saveData: JSON.parse(updatedUser.saveData),
             net_worth: updatedUser.netWorth,
             kills: updatedUser.kills
-        });
+        }, { status: 200 });
     } catch (error) {
-        console.error('Save error:', error);
+        console.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -132,9 +154,9 @@ export async function GET(req: Request) {
             net_worth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
-        console.error('Load error:', error);
+        console.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });
     }
 }
