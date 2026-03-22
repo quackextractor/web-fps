@@ -152,7 +152,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                     onFire(false);
                 }}
             >
-                <Crosshair className="w-12 h-12 text-white" />
+                <Crosshair aria-hidden="true" className="w-12 h-12 text-white" />
             </button>
 
             {/* Top Bar (Pause & Weapons) */}
@@ -162,7 +162,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                     className="w-12 h-12 bg-white/10 rounded-full border border-white/20 flex items-center justify-center pointer-events-auto active:bg-white/30"
                     onClick={onPause}
                 >
-                    <Pause className="w-6 h-6 text-white fill-current" />
+                    <Pause aria-hidden="true" className="w-6 h-6 text-white fill-current" />
                 </button>
 
                 <div className="flex gap-4 pointer-events-auto">
@@ -171,14 +171,14 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                         className="w-12 h-12 bg-white/10 rounded border border-white/20 flex items-center justify-center active:bg-white/30"
                         onClick={onPrevWeapon}
                     >
-                        <ChevronLeft className="w-6 h-6 text-white" />
+                        <ChevronLeft aria-hidden="true" className="w-6 h-6 text-white" />
                     </button>
                     <button
                         aria-label="Next Weapon"
                         className="w-12 h-12 bg-white/10 rounded border border-white/20 flex items-center justify-center active:bg-white/30"
                         onClick={onNextWeapon}
                     >
-                        <ChevronRight className="w-6 h-6 text-white" />
+                        <ChevronRight aria-hidden="true" className="w-6 h-6 text-white" />
                     </button>
                 </div>
             </div>
