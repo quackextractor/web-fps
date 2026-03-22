@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.4] - 2026-03-22 [Author: Trae AI]
+### Added
+- Implemented comprehensive cross-browser E2E testing using Playwright.
+- Configured multi-browser support for Chromium, Firefox, and WebKit.
+- Created E2E test suite (`frontend/__tests__/e2e/browser.test.ts`) to validate application launch, navigation, component loading, core rendering, and responsive design.
+- Added test scripts `test:e2e` and `test:e2e:ui` to `package.json`.
+
 ## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Implemented administrative monitoring API at `/api/admin/metrics` using Prisma aggregations (Fixes #94).
