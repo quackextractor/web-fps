@@ -20,6 +20,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Configured Dependabot for automated weekly npm dependency updates in the frontend directory (Fixes #30).
 - Defined a team process for reviewing and merging Dependabot PRs in the technical documentation.
+## [0.8.8] - 2026-03-22 [Author: Filip Houdek]
+### Removed
+- Performed dependency audit and removed unused libraries: `@hookform/resolvers`, `date-fns`, `autoprefixer`, `tailwindcss-animate` (Fixes #32).
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
