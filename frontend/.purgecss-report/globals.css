@@ -271,20 +271,6 @@
   }
 }
 
-.crt-vignette {
-  background: radial-gradient(circle,
-      rgba(0, 0, 0, 0) 50%,
-      rgba(0, 0, 0, 0.6) 90%,
-      rgba(0, 0, 0, 1) 100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 60;
-}
-
 .retro-border {
   box-shadow:
     -4px 0 0 0 white,
@@ -296,14 +282,6 @@
     4px -4px 0 0 white,
     4px 4px 0 0 white;
   border: 4px solid black;
-}
-
-.text-glow {
-  text-shadow: 0 0 5px currentColor;
-}
-
-.damage-pulse {
-  animation: damage-pulse 0.5s ease-out;
 }
 
 @keyframes damage-pulse {
