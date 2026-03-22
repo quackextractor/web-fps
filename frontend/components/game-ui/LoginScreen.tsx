@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MenuButton } from "./MenuButton";
 import { ScanlinesOverlay } from "./ScanlinesOverlay";
 import { useEconomy } from "@/context/EconomyContext";
@@ -12,7 +12,37 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
     const { login, cloudStatus, cloudError } = useEconomy();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [loginToken, setLoginToken] = useState("");
     const [localError, setLocalError] = useState("");
+
+    const fetchLoginToken = async () => {
+        try {
+            const response = await fetch("/api/auth/login-token", {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                setLocalError("FAILED TO PREPARE LOGIN TOKEN");
+                return;
+            }
+
+            const data = await response.json();
+            if (typeof data.loginToken === "string" && data.loginToken.length > 0) {
+                setLoginToken(data.loginToken);
+                setLocalError("");
+                return;
+            }
+
+            setLocalError("FAILED TO PREPARE LOGIN TOKEN");
+        } catch {
+            setLocalError("FAILED TO PREPARE LOGIN TOKEN");
+        }
+    };
+
+    useEffect(() => {
+        void fetchLoginToken();
+    }, []);
 
     const handleLogin = async () => {
         setLocalError("");
@@ -27,7 +57,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
             return;
         }
 
-        const ok = await login(username.trim(), password);
+        if (loginToken.trim().length === 0) {
+            setLocalError("LOGIN TOKEN NOT READY");
+            return;
+        }
+
+        const ok = await login(username.trim(), password, loginToken);
+        await fetchLoginToken();
         if (!ok) {
             return;
         }

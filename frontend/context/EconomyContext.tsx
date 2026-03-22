@@ -59,7 +59,7 @@ interface EconomyContextType {
     cloudStatus: "idle" | "syncing" | "synced" | "error";
     cloudError: string;
     isAuthenticated: boolean;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (username: string, password: string, loginToken: string) => Promise<boolean>;
     logout: () => void;
     refreshFromCloud: () => Promise<boolean>;
     forceCloudSave: (netWorth?: number, kills?: number) => Promise<boolean>;
@@ -352,9 +352,15 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         }
     }, [applySaveData]);
 
-    const login = useCallback(async (nextUsername: string, nextPassword: string) => {
+    const login = useCallback(async (nextUsername: string, nextPassword: string, loginToken: string) => {
         setCloudStatus("syncing");
         setCloudError("");
+
+        if (loginToken.trim().length === 0) {
+            setCloudStatus("error");
+            setCloudError("Missing login token");
+            return false;
+        }
 
         try {
             const response = await fetch("/api/auth/login", {
@@ -363,6 +369,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 body: JSON.stringify({
                     username: nextUsername,
                     password: nextPassword,
+                    loginToken,
                 }),
             });
 
