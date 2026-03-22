@@ -29,6 +29,9 @@ All notable changes to this project will be documented in this file.
 ## [0.7.8] - 2026-03-22 [Author: Filip Houdek]
 ### Added
 - Enabled Next.js image optimization and added Cache-Control headers for static assets (JS, CSS, images) (Fixes #48).
+## [0.8.5] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Documented and verified HTTP cache functionality for static assets (Fixes #49).
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
