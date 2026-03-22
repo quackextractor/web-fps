@@ -70,6 +70,8 @@ export async function POST(req: Request) {
             .sign(JWT_SECRET);
 
         const cookieStore = await cookies();
+
+        // CSRF & XSS Protection: Ensure cookies are explicitly HttpOnly and Secure
         cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Explicitly documented and verified the `httpOnly: true` and `secure: process.env.NODE_ENV === 'production'` JWT cookie attributes within `auth/login/route.ts` to satisfy Issue 58 audit constraints (Fixes #58).
+
 ## [0.6.8] - 2026-03-22 [Author: Dominik Hoch]
 ### Security
 - Standardized the Zod schema validation rejection response payload structure to strictly return `{ error: 'Invalid or incomplete data' }` with a 400 Bad Request, explicitly stripping detailed parse error formatting to prevent potential schema leaks against malicious payloads (Fixes #57).
