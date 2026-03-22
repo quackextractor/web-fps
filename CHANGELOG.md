@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.7.4] - 2026-03-22 [Author: GitHub Copilot]
+## [0.7.4] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
 - Removed unused Geist font CSS variables `--font-sans` and `--font-mono` from `frontend/app/globals.css` to eliminate dead declarations.
 - Performed explicit cleanup verification by scanning for residual Geist variable declarations and running a purge analysis command:
