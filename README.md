@@ -60,7 +60,7 @@ The game now supports a public Tycoon/Factory saving system powered by Prisma an
 -   **1-5**: Select Weapon
 -   **R**: Restart Level
 -   **ESC**: Pause / Options
--   **P**: Toggle Debug Mode
+-   **P**: Toggle Debug Mode (Development Only)
 
 ## Issue Tracking
 

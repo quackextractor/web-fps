@@ -948,7 +948,7 @@ export default function FPSGame() {
         startGame(testLevelIndex);
       }
 
-      if (key === "p") {
+      if (key === "p" && process.env.NODE_ENV !== "production") {
         updateSetting("debugMode", !settings.debugMode);
       }
     };
