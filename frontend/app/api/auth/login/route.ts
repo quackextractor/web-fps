@@ -17,7 +17,17 @@ function getJwtSecret() {
 export async function POST(req: Request) {
     try {
         const JWT_SECRET = getJwtSecret();
-        const body = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+        }
+
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        }
+
         const { username, password } = body;
 
         if (!username || !password) {
@@ -72,9 +82,9 @@ export async function POST(req: Request) {
             netWorth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('[Internal Error] Login:', error instanceof Error ? error.stack : error);
         // Fallback for local testing without DB
         if (process.env.NODE_ENV !== 'production') {
             return NextResponse.json({
@@ -84,7 +94,7 @@ export async function POST(req: Request) {
                 netWorth: 0,
                 kills: 0,
                 username: 'offline_user'
-            });
+            }, { status: 200 });
         }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }

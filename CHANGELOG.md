@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
 
+## [0.6.4] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Masked internal server errors in all API responses to prevent stack trace leaks, and improved server-side `console.error` logging (Fixes #35).
+
+## [0.6.3] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Added robust try-catch JSON validation to explicitly reject malformed requests with `400 Bad Request` instead of crashing with `500 Internal Server Error` (Fixes #34).
+
+## [0.6.2] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Fixed API routes to return explicit HTTP 200 status codes for all successful `NextResponse.json()` server replies (Fixes #33).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.
