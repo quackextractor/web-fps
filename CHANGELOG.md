@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Performed a comprehensive security audit against the OWASP Top 10 vulnerabilities.
+- Documented findings, methodologies, and security implementations in `docs/owasp-audit.md` (Fixes #59).
+- Verified implementation of secure cookies, input validation, and error masking.
+
 ## [0.6.9] - 2026-03-22 [Author: Dominik Hoch]
 ### Security
 - Explicitly documented and verified the `httpOnly: true` and `secure: process.env.NODE_ENV === 'production'` JWT cookie attributes within `auth/login/route.ts` to satisfy Issue 58 audit constraints (Fixes #58).
