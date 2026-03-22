@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.8] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Standardized the Zod schema validation rejection response payload structure to strictly return `{ error: 'Invalid or incomplete data' }` with a 400 Bad Request, explicitly stripping detailed parse error formatting to prevent potential schema leaks against malicious payloads (Fixes #57).
+
 ## [0.6.6] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
