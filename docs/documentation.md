@@ -43,6 +43,17 @@ INDUSTRIALIST is a 2.5D retro FPS engine built with React and Next.js, utilizing
 - **Viewmodel Scaling**: Weapon sprites are automatically scaled based on vertical resolution to maintain a consistent visual weight across different screen heights.
 - **Standalone Mode**: Includes a web manifest for an app-like fullscreen experience when added to the home screen.
 
+## Dependency Update Process
+
+The project uses [Dependabot](https://docs.github.com/en/code-security/dependabot) to automatically check for outdated npm dependencies in the `frontend/` directory on a weekly basis. The configuration is defined in `.github/dependabot.yml`.
+
+### Team Process for Reviewing Dependabot PRs
+1. **Triage**: When Dependabot opens a pull request, a team member is assigned to review it within one business day.
+2. **Review**: The reviewer checks the changelog and release notes of the updated dependency for breaking changes or deprecations.
+3. **Test**: The reviewer ensures that the CI pipeline passes and manually verifies any areas of the application affected by the updated dependency.
+4. **Merge or Defer**: If all checks pass, the PR is approved and merged. If a breaking change is detected, the reviewer documents the issue and defers the update until compatibility is resolved.
+5. **Batch Updates**: Minor and patch updates may be batched and merged together. Major version bumps must be reviewed individually.
+
 ## Assets
 - **Preloading**: `AssetPreloader` ensures all required textures and sounds are cached before gameplay begins.
 - **Ragdolls**: Procedural physics system for enemy deaths, fully configurable via settings.

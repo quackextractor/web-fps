@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
 ## [0.7.9] - 2026-03-22 [Author: Filip Houdek]
 ### Fixed
 - Fixed factory plots not unlocking after completing corresponding levels by syncing `highestLevelCompleted` from game progression to EconomyContext (Fixes #24).
+## [0.7.6] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Configured Dependabot for automated weekly npm dependency updates in the frontend directory (Fixes #30).
+- Defined a team process for reviewing and merging Dependabot PRs in the technical documentation.
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
