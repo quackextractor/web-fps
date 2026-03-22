@@ -5,6 +5,12 @@ import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+    username: z.string().min(1, "Username is required").max(32, "Username is too long"),
+    password: z.string().min(1, "Password is required")
+});
 
 function getJwtSecret() {
     const secret = process.env.JWT_SECRET;
@@ -24,15 +30,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
         }
 
-        if (!body || typeof body !== 'object') {
-            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        const parseResult = loginSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: 'Invalid data', details: parseResult.error.format() }, { status: 400 });
         }
 
-        const { username, password } = body;
-
-        if (!username || !password) {
-            return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
-        }
+        const { username, password } = parseResult.data;
 
         let user = await prisma.user.findUnique({
             where: { username }

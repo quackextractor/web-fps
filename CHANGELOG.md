@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+
+- Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
 ## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+
 ### Added
 - Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
 
