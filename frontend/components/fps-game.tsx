@@ -63,6 +63,7 @@ export default function FPSGame() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
+  const [isNextLevelTransitioning, setIsNextLevelTransitioning] = useState(false);
 
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
@@ -113,6 +114,7 @@ export default function FPSGame() {
   const lastTimeRef = useRef(0);
   const accumulatorRef = useRef(0);
   const gameStateRef = useRef(gameState);
+  const nextLevelTransitionRef = useRef(false);
 
   const touchJoystickRef = useRef({ x: 0, y: 0 });
   const touchLookRef = useRef(0);
@@ -190,6 +192,13 @@ export default function FPSGame() {
 
   useEffect(() => {
     gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    if (gameState === "levelComplete") {
+      nextLevelTransitionRef.current = false;
+      setIsNextLevelTransitioning(false);
+    }
   }, [gameState]);
 
   function createInitialPlayer(): Player {
@@ -296,6 +305,17 @@ export default function FPSGame() {
   }, [loadLevel, lock]);
 
   const nextLevel = useCallback(() => {
+    if (gameStateRef.current !== "levelComplete") {
+      return;
+    }
+
+    if (nextLevelTransitionRef.current) {
+      return;
+    }
+
+    nextLevelTransitionRef.current = true;
+    setIsNextLevelTransitioning(true);
+
     const next = currentLevelRef.current + 1;
     if (next < LEVELS.length) {
       // Unlock next level in progress
@@ -305,7 +325,7 @@ export default function FPSGame() {
         unlockedWeapons: new Set([...prev.unlockedWeapons, ...weaponsUnlockedRef.current]),
         highestLevel: Math.max(prev.highestLevel, next),
       }));
-      forceCloudSave();
+      void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
       setCurrentLevel(next);
       totalKillsRef.current += killsRef.current;
       loadLevel(next, true);
@@ -313,7 +333,7 @@ export default function FPSGame() {
       lock(true);
     } else {
       setGameState("victory");
-      forceCloudSave();
+      void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
     }
   }, [loadLevel, forceCloudSave]);
 
@@ -1254,10 +1274,8 @@ export default function FPSGame() {
                     totalDurationSeconds: runDurationSecondsRef.current,
                   }}
                   primaryActionLabel={currentLevel >= LEVELS.length - 1 ? "FINAL VICTORY" : "NEXT LEVEL"}
-                  onPrimaryAction={async () => {
-                    await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
-                    nextLevel();
-                  }}
+                  primaryActionDisabled={isNextLevelTransitioning}
+                  onPrimaryAction={nextLevel}
                   secondaryActionLabel="MAIN MENU"
                   onSecondaryAction={async () => {
                     await forceCloudSave(undefined, totalKillsRef.current + killsRef.current);

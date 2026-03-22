@@ -36,6 +36,7 @@ export interface PostRunSummaryProps {
     metrics: RunSummaryMetrics | null;
     onPrimaryAction: () => void;
     primaryActionLabel: string;
+    primaryActionDisabled?: boolean;
     onSecondaryAction?: () => void;
     secondaryActionLabel?: string;
     pricing?: Partial<PricingParameters>;
@@ -147,6 +148,7 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
     metrics,
     onPrimaryAction,
     primaryActionLabel,
+    primaryActionDisabled = false,
     onSecondaryAction,
     secondaryActionLabel,
     pricing,
@@ -246,7 +248,7 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                     <div className="flex-1 max-w-xs mx-auto sm:mx-0">
-                        <MenuButton onClick={onPrimaryAction}>
+                        <MenuButton onClick={onPrimaryAction} disabled={primaryActionDisabled}>
                             {primaryActionLabel}
                         </MenuButton>
                     </div>
