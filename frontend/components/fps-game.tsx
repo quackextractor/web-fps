@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react"
+import dynamic from "next/dynamic";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -25,29 +26,31 @@ import {
 import { soundManager } from "@/lib/sound-manager";
 import { updateEnemyAI } from "@/lib/enemy-ai";
 import { RagdollManager } from "@/lib/Ragdoll";
-import { SettingsMenu } from "./settings-menu";
 import { useSettings } from "@/hooks/use-settings";
 import { usePointerLock } from "@/hooks/use-pointer-lock";
 import { GameRenderer, type RenderState } from "@/engine/graphics/GameRenderer";
-import { MainMenu } from "./game-ui/MainMenu";
-import { LevelSelect, type SavedProgress } from "./game-ui/LevelSelect";
-import { PauseMenu } from "./game-ui/PauseMenu";
-import { DeathScreen } from "./game-ui/DeathScreen";
-import { PostRunSummary } from "./game-ui/PostRunSummary";
-import { LoginScreen } from "./game-ui/LoginScreen";
-import { FactoryHub } from "./game-ui/FactoryHub";
-import { Armory } from "./game-ui/Armory";
-import { Leaderboard } from "./game-ui/Leaderboard";
-import { CreditsScreen } from "./game-ui/CreditsScreen";
-import { ChangelogScreen } from "./game-ui/ChangelogScreen";
-import { HUD } from "./game-ui/HUD";
-import { EffectsLayer } from "./game-ui/EffectsLayer";
-import { Crosshair } from "./game-ui/Crosshair";
+import type { SavedProgress } from "./game-ui/LevelSelect";
 import { useGameActions } from "@/context/GameActionContext";
 import { useEconomy } from "@/context/EconomyContext";
 import { AssetPreloader } from "./AssetPreloader";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileControls } from "./game-ui/MobileControls";
+
+const SettingsMenu = dynamic(() => import("./settings-menu").then((mod) => mod.SettingsMenu), { ssr: false });
+const MainMenu = dynamic(() => import("./game-ui/MainMenu").then((mod) => mod.MainMenu), { ssr: false });
+const LevelSelect = dynamic(() => import("./game-ui/LevelSelect").then((mod) => mod.LevelSelect), { ssr: false });
+const PauseMenu = dynamic(() => import("./game-ui/PauseMenu").then((mod) => mod.PauseMenu), { ssr: false });
+const DeathScreen = dynamic(() => import("./game-ui/DeathScreen").then((mod) => mod.DeathScreen), { ssr: false });
+const PostRunSummary = dynamic(() => import("./game-ui/PostRunSummary").then((mod) => mod.PostRunSummary), { ssr: false });
+const LoginScreen = dynamic(() => import("./game-ui/LoginScreen").then((mod) => mod.LoginScreen), { ssr: false });
+const FactoryHub = dynamic(() => import("./game-ui/FactoryHub").then((mod) => mod.FactoryHub), { ssr: false });
+const Armory = dynamic(() => import("./game-ui/Armory").then((mod) => mod.Armory), { ssr: false });
+const Leaderboard = dynamic(() => import("./game-ui/Leaderboard").then((mod) => mod.Leaderboard), { ssr: false });
+const CreditsScreen = dynamic(() => import("./game-ui/CreditsScreen").then((mod) => mod.CreditsScreen), { ssr: false });
+const ChangelogScreen = dynamic(() => import("./game-ui/ChangelogScreen").then((mod) => mod.ChangelogScreen), { ssr: false });
+const HUD = dynamic(() => import("./game-ui/HUD").then((mod) => mod.HUD), { ssr: false });
+const EffectsLayer = dynamic(() => import("./game-ui/EffectsLayer").then((mod) => mod.EffectsLayer), { ssr: false });
+const Crosshair = dynamic(() => import("./game-ui/Crosshair").then((mod) => mod.Crosshair), { ssr: false });
+const MobileControls = dynamic(() => import("./game-ui/MobileControls").then((mod) => mod.MobileControls), { ssr: false });
 
 const MOVE_SPEED = 0.08;
 const ROTATION_SPEED = 0.003;
@@ -60,7 +63,7 @@ export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [preloadedLevelIndex, setPreloadedLevelIndex] = useState<number | null>(null);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
   const [isNextLevelTransitioning, setIsNextLevelTransitioning] = useState(false);
@@ -1068,21 +1071,16 @@ export default function FPSGame() {
 
   const [resW, resH] = settings.resolution.split("x").map(Number);
   const aspectRatio = resW / resH;
+  const activeLevel = LEVELS[currentLevel] ?? LEVELS[0];
+  const shouldShowAssetPreloader = preloadedLevelIndex !== currentLevel;
 
   return (
     <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden p-0 m-0">
-      {!assetsLoaded && (
+      {shouldShowAssetPreloader && (
         <AssetPreloader
-          onComplete={() => setAssetsLoaded(true)}
-          assets={{
-            images: [
-              '/textures/wall_tech.bmp',
-              '/textures/wall_metal.bmp',
-              '/textures/wall_brick.bmp',
-              '/textures/wall_stone.bmp',
-            ],
-            sounds: [] // Sounds are currently synthesized
-          }}
+          onComplete={() => setPreloadedLevelIndex(currentLevel)}
+          level={activeLevel}
+          sounds={[]}
         />
       )}
 
