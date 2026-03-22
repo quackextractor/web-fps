@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Explicitly documented and verified the `httpOnly: true` and `secure: process.env.NODE_ENV === 'production'` JWT cookie attributes within `auth/login/route.ts` to satisfy Issue 58 audit constraints (Fixes #58).
+
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Added `frontend/.env.production.example` configuration template for secure deployment.
