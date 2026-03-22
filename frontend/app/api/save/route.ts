@@ -32,7 +32,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized: Invalid session' }, { status: 401 });
         }
 
-        const body = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+        }
+
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        }
+
         const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
 
         const userId = payload.id as string;
@@ -67,12 +77,12 @@ export async function POST(req: Request) {
         }
 
         const currentSaveData = JSON.parse(user.saveData);
-        
+
         // Validate Credits Jump
         if (credits !== undefined) {
             const currentCredits = currentSaveData.credits || 0;
             if (credits > currentCredits + MAX_CREDITS_JUMP) {
-                 return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
+                return NextResponse.json({ error: 'Suspicious credits jump detected' }, { status: 403 });
             }
         }
 
