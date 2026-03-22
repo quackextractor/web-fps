@@ -29,7 +29,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
             success: true,
             username: user.username,
             machines: parsedSave.machines || []
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('Factory profile error:', error);
         return NextResponse.json({ error: 'Failed to fetch user factory' }, { status: 500 });
