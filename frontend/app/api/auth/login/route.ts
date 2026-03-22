@@ -17,7 +17,17 @@ function getJwtSecret() {
 export async function POST(req: Request) {
     try {
         const JWT_SECRET = getJwtSecret();
-        const body = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+        }
+
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        }
+
         const { username, password } = body;
 
         if (!username || !password) {
