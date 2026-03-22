@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MenuButton } from "./MenuButton";
 import { ScanlinesOverlay } from "./ScanlinesOverlay";
 import { useEconomy } from "@/context/EconomyContext";
+import { logger } from "@/lib/logger";
 
 const EASTER_EGG_CREDITS = 1000;
 const EASTER_EGG_SKIP_RECENT = 20;
@@ -112,7 +113,7 @@ export const ChangelogScreen: React.FC<ChangelogScreenProps> = ({ onBack }) => {
                     easterEggIndexRef.current = EASTER_EGG_SKIP_RECENT + Math.floor(Math.random() * eligible);
                 }
             } catch (error) {
-                console.error("Failed to fetch changelog:", error);
+                logger.error("Failed to fetch changelog:", error);
             } finally {
                 setLoading(false);
             }

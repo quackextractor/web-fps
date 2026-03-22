@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
 import { z } from 'zod';
 import { createHash } from 'crypto';
+import { logger } from '@/lib/logger';
 
 const LOGIN_FORM_TOKEN_COOKIE = 'industrialist_login_form_token';
 
@@ -102,7 +103,7 @@ export async function POST(req: Request) {
             username: user.username
         }, { status: 200 });
     } catch (error) {
-        console.error('[Internal Error] Login:', error instanceof Error ? error.stack : error);
+        logger.error('[Internal Error] Login:', error instanceof Error ? error.stack : error);
         // Fallback for local testing without DB
         if (process.env.NODE_ENV !== 'production') {
             return NextResponse.json({

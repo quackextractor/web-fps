@@ -6,6 +6,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const savePayloadSchema = z.object({
     credits: z.number().min(0).optional(),
@@ -124,7 +125,7 @@ export async function POST(req: Request) {
             kills: updatedUser.kills
         }, { status: 200 });
     } catch (error) {
-        console.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
+        logger.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -156,7 +157,7 @@ export async function GET(req: Request) {
             username: user.username
         }, { status: 200 });
     } catch (error) {
-        console.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
+        logger.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });
     }
 }

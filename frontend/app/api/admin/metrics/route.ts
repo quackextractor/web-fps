@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/admin/metrics
@@ -53,7 +54,7 @@ export async function GET() {
 
     } catch (error) {
         // Mask internal details while logging error for the team (Point 3.4 & 9.2)
-        console.error(`[${new Date().toISOString()}] Metrics aggregation failed:`, error);
+        logger.error('Metrics aggregation failed:', error);
         return NextResponse.json(
             { error: 'Failed to aggregate metrics' },
             { status: 500 }

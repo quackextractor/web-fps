@@ -40,6 +40,12 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added Artillery server performance benchmark script (Fixes #63).
 - Created `docs/performance-test.md` documenting methodology and key metrics.
+## [0.8.3] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Created centralized logging utility at `frontend/lib/logger.ts` with timestamped, structured log output (Fixes #65).
+
+### Changed
+- Replaced all `console.error`, `console.warn`, and `console.log` calls across 14 frontend files with the new `logger` utility to ensure logs contain timestamps and error types.
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { logger } from '../lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -19,7 +20,7 @@ async function main() {
 
 main()
     .catch((e) => {
-        console.error('Cleanup error:', e);
+        logger.error('Cleanup error:', e);
         process.exit(1);
     })
     .finally(async () => {

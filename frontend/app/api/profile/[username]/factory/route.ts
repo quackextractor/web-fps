@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: Request, { params }: { params: Promise<{ username: string }> }) {
     try {
@@ -31,7 +32,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
             machines: parsedSave.machines || []
         }, { status: 200 });
     } catch (error) {
-        console.error('[Internal Error] Factory profile:', error instanceof Error ? error.stack : error);
+        logger.error('[Internal Error] Factory profile:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

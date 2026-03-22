@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { logger } from "@/lib/logger";
 
 export interface GameSettings {
     mouseSensitivity: number;
@@ -135,7 +136,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 setSettingsState(merged);
             }
         } catch (e) {
-            console.warn("Failed to load settings from localStorage", e);
+            logger.warn("Failed to load settings from localStorage", e);
         } finally {
             setIsLoaded(true);
         }
@@ -148,7 +149,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             try {
                 window.localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
             } catch (e) {
-                console.warn("Failed to save settings to localStorage", e);
+                logger.warn("Failed to save settings to localStorage", e);
             }
         }
     }, []);
@@ -160,7 +161,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 try {
                     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
                 } catch (e) {
-                    console.warn("Failed to save settings to localStorage", e);
+                    logger.warn("Failed to save settings to localStorage", e);
                 }
             }
             return next;

@@ -1,4 +1,5 @@
 import { WeaponType, PickupType, EnemyType } from "./fps-engine";
+import { logger } from "./logger";
 
 export class SoundManager {
   private ctx: AudioContext | null = null;
@@ -51,7 +52,7 @@ export class SoundManager {
       // Proactively load music assets
       void this.ensureMusicLoaded();
     } catch (e) {
-      console.warn("AudioContext not supported or failed to initialize", e);
+      logger.warn("AudioContext not supported or failed to initialize", e);
     }
   }
 
@@ -131,7 +132,7 @@ export class SoundManager {
     const playPromise = audio.play();
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch((e) => {
-        console.warn("Audio playback blocked or failed", e);
+        logger.warn("Audio playback blocked or failed", e);
       });
     }
   }
@@ -220,11 +221,11 @@ export class SoundManager {
           this.fullTemplate.preload = "auto";
         } else {
           this.musicMode = "none";
-          console.warn("No playable music assets found (start/loop/end or full)");
+          logger.warn("No playable music assets found (start/loop/end or full)");
         }
       } catch (e) {
         this.musicMode = "none";
-        console.warn("Music/SFX loading failed", e);
+        logger.warn("Music/SFX loading failed", e);
       } finally {
         this.musicLoadPromise = null;
       }

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
     try {
@@ -20,7 +21,7 @@ export async function GET() {
 
         return NextResponse.json({ success: true, leaderboard: users }, { status: 200 });
     } catch (error) {
-        console.error('[Internal Error] Leaderboard fetch:', error instanceof Error ? error.stack : error);
+        logger.error('[Internal Error] Leaderboard fetch:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
