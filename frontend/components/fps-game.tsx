@@ -34,6 +34,7 @@ import { useGameActions } from "@/context/GameActionContext";
 import { useEconomy } from "@/context/EconomyContext";
 import { AssetPreloader } from "./AssetPreloader";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { logger } from "@/lib/logger";
 
 const SettingsMenu = dynamic(() => import("./settings-menu").then((mod) => mod.SettingsMenu), { ssr: false });
 const MainMenu = dynamic(() => import("./game-ui/MainMenu").then((mod) => mod.MainMenu), { ssr: false });
@@ -1038,14 +1039,14 @@ export default function FPSGame() {
     if (settings.fullscreen) {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
-          console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+          logger.warn(`Error attempting to enable fullscreen: ${err.message}`);
           updateSetting("fullscreen", false);
         });
       }
     } else {
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(err => {
-          console.warn(`Error attempting to exit fullscreen: ${err.message}`);
+          logger.warn(`Error attempting to exit fullscreen: ${err.message}`);
         });
       }
     }
@@ -1065,7 +1066,7 @@ export default function FPSGame() {
         weaponsUnlockedRef.current = new Set(parsed.unlockedWeapons);
         updateHighestLevel(parsed.highestLevel);
       } catch (e) {
-        console.error("Failed to load savegame", e);
+        logger.error("Failed to load savegame", e);
       }
     }
   }, []);

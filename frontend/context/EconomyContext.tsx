@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
 
 export const FACTORY_LEVELS = [
     { output: "ore_red", amount: 1, intervalMs: 20 * 60 * 1000, upgradeCost: 0 },
@@ -412,7 +413,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             setCloudStatus("synced");
             return true;
         } catch {
-            console.log("Network error, falling back to offline mode for testing");
+            logger.info("Network error, falling back to offline mode for testing");
             credentialsRef.current = { username: nextUsername };
             setUsername(nextUsername);
             setCloudStatus("error");

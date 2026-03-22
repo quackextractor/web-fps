@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import type { Level } from "@/lib/fps-engine";
+import { logger } from "@/lib/logger";
 
 interface AssetPreloaderProps {
     onComplete: () => void;
@@ -57,7 +58,7 @@ export function AssetPreloader({ onComplete, level, sounds = [] }: AssetPreloade
         };
 
         const handleError = (src: string) => {
-            console.error(`Failed to load asset: ${src}`);
+            logger.error(`Failed to load asset: ${src}`);
             setError("Some assets failed to load");
             // We still continue even if one asset fails to load
             updateProgress();

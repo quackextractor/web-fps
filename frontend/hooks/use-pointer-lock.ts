@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
 
 export function usePointerLock(
     elementRef: React.RefObject<HTMLElement>,
@@ -21,7 +22,7 @@ export function usePointerLock(
         try {
             elementRef.current.requestPointerLock();
         } catch (e) {
-            console.error("Failed to request pointer lock:", e);
+            logger.error("Failed to request pointer lock:", e);
         }
     }, [elementRef]);
 
@@ -41,7 +42,7 @@ export function usePointerLock(
         };
 
         const handleError = (e: Event) => {
-            console.warn("Pointer lock error:", e);
+            logger.warn("Pointer lock error:", e);
         };
 
         document.addEventListener("pointerlockchange", handleLockChange);
