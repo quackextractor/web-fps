@@ -61,3 +61,7 @@ The game now supports a public Tycoon/Factory saving system powered by Prisma an
 -   **R**: Restart Level
 -   **ESC**: Pause / Options
 -   **P**: Toggle Debug Mode
+
+## Issue Tracking
+
+Formal bug reports and task tracking for this repository are managed via the [Industrialist Public Issue Tracker](https://github.com/quackextractor/web-fps/issues). All security fixes and feature milestones are formally logged and linked to corresponding tracking IDs.
