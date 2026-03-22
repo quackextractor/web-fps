@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
         const parseResult = loginSchema.safeParse(body);
         if (!parseResult.success) {
-            return NextResponse.json({ error: 'Invalid data', details: parseResult.error.format() }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid or incomplete data' }, { status: 400 });
         }
 
         const { username, password } = parseResult.data;
