@@ -29,7 +29,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
             success: true,
             username: user.username,
             machines: parsedSave.machines || []
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('[Internal Error] Factory profile:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

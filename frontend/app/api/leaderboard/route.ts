@@ -18,7 +18,7 @@ export async function GET() {
             take: BACKEND_CONFIG.LEADERBOARD.LIMIT,
         });
 
-        return NextResponse.json({ success: true, leaderboard: users });
+        return NextResponse.json({ success: true, leaderboard: users }, { status: 200 });
     } catch (error) {
         console.error('[Internal Error] Leaderboard fetch:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

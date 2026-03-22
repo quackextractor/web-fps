@@ -32,7 +32,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized: Invalid session' }, { status: 401 });
         }
 
-        const body = await req.json();
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+        }
+
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        }
+
         const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
 
         const userId = payload.id as string;
@@ -100,7 +110,7 @@ export async function POST(req: Request) {
             saveData: JSON.parse(updatedUser.saveData),
             net_worth: updatedUser.netWorth,
             kills: updatedUser.kills
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('[Internal Error] Save API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -132,7 +142,7 @@ export async function GET(req: Request) {
             net_worth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
         console.error('[Internal Error] Load API:', error instanceof Error ? error.stack : error);
         return NextResponse.json({ error: 'Unauthorized or token expired' }, { status: 401 });
