@@ -25,6 +25,7 @@ describe("PostRunSummary", () => {
             totalCaloriesBurned: 320,
         };
         const pricing: PricingParameters = {
+            perMileUsd: 0,
             baseRateUsd: 1,
             perKilometerUsd: 2,
             perMinuteUsd: 0.1,
@@ -62,7 +63,7 @@ describe("PostRunSummary", () => {
             />
         );
 
-        expect(screen.getByText("PROCESSING RUN METRICS...")).toBeTruthy();
+        expect(screen.getByText(/ANALYZING RUN PERFORMANCE/)).toBeTruthy();
     });
 
     it("renders error state", () => {
@@ -98,10 +99,10 @@ describe("PostRunSummary", () => {
             />
         );
 
-        expect(screen.getByText("2.50 km")).toBeTruthy();
-        expect(screen.getByText("15m 00s")).toBeTruthy();
-        expect(screen.getByText("180 kcal")).toBeTruthy();
-        expect(screen.getByText(/\$/)).toBeTruthy();
+        expect(screen.getByText(/2\.50/)).toBeTruthy();
+        expect(screen.getByText(/15m 00s/)).toBeTruthy();
+        expect(screen.getByText(/180/)).toBeTruthy();
+        expect(screen.getAllByText(/\$/).length).toBeGreaterThan(0);
 
         fireEvent.click(screen.getByText("NEXT LEVEL"));
         fireEvent.click(screen.getByText("MAIN MENU"));

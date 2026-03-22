@@ -33,6 +33,10 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
     pnpm exec prisma db push
     ```
 
+3.  **Deployment to Production**:
+    - When deploying to a live server, copy the `frontend/.env.production.example` file to create your production environment variables (or set them in your hosting provider's dashboard).
+    - Ensure `DATABASE_URL`, `DIRECT_URL`, and `JWT_SECRET` are securely set.
+
 3.  **Launch Developer Server**:
     ```bash
     pnpm run dev

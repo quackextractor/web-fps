@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Added `frontend/.env.production.example` configuration template for secure deployment.
+- Updated `README.md` with explicit production deployment instructions.
+
 ## [0.6.0] - 2026-03-19 [Author: Miro Slezák]
 ### Added
 - add dev checklists
