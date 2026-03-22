@@ -71,6 +71,7 @@ interface EconomyContextType {
     collectMachine: (machineId: string) => boolean;
     unlockWeapon: (weapon: string, barCost: number, creditCost: number) => boolean;
     incrementKills: (amount: number) => void;
+    updateHighestLevel: (level: number) => void;
 }
 
 const initialSaveData: EconomySaveData = {
@@ -189,6 +190,13 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
 
     const incrementKills = useCallback((amount: number) => {
         setKills(prev => prev + amount);
+    }, []);
+
+    const updateHighestLevel = useCallback((level: number) => {
+        setSaveData((prev) => ({
+            ...prev,
+            highestLevelCompleted: Math.max(prev.highestLevelCompleted, level),
+        }));
     }, []);
 
     const awardOfflineProgress = useCallback((lastSavedAt?: number) => {
@@ -783,6 +791,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             collectMachine,
             unlockWeapon,
             incrementKills,
+            updateHighestLevel,
         };
     }, [
         addResource,
@@ -804,6 +813,7 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         upgradeMachine,
         username,
         incrementKills,
+        updateHighestLevel,
     ]);
 
     return <EconomyContext.Provider value={value}>{children}</EconomyContext.Provider>;
