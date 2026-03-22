@@ -17,19 +17,44 @@ All notable changes to this project will be documented in this file.
 - Expanded API test coverage in `auth.test.ts` and `save.test.ts` with explicit invalid input scenarios (Fixes #61).
 - Verified 400 Bad Request rejections for malformed JSON, Zod schema violations (type mismatch, range violations), and missing required fields.
 
-<<<<<<< .merge_file_9JOhIw
-## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+## [0.7.0] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
-- Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
-=======
+- Performed a comprehensive security audit against the OWASP Top 10 vulnerabilities.
+- Documented findings, methodologies, and security implementations in `docs/owasp-audit.md` (Fixes #59).
+- Verified implementation of secure cookies, input validation, and error masking.
+
+## [0.6.9] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Explicitly documented and verified the `httpOnly: true` and `secure: process.env.NODE_ENV === 'production'` JWT cookie attributes within `auth/login/route.ts` to satisfy security audit constraints (Fixes #58).
+
 ## [0.6.8] - 2026-03-22 [Author: Dominik Hoch]
 ### Security
 - Standardized the Zod schema validation rejection response payload structure to strictly return `{ error: 'Invalid or incomplete data' }` with a 400 Bad Request, explicitly stripping detailed parse error formatting to prevent potential schema leaks against malicious payloads (Fixes #57).
 
+## [0.6.7] - 2026-03-22 [Author: Dominik Hoch]
+### Security
+- Introduced global Next.js middleware CSRF protection (`frontend/middleware.ts`) enforcing strict `Origin` and `Referer` validation against the host domain for all POST requests to the API (Fixes #56).
+
 ## [0.6.6] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
->>>>>>> .merge_file_poIv30
+
+## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Implemented strict payload validation using Zod in the `save` API route for progression metrics (`net_worth`, `kills`), ensuring data integrity and preventing non-numeric or malformed data injection (Fixes #36).
+- Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
+
+## [0.6.4] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Masked internal server errors in all API responses to prevent stack trace leaks, and improved server-side `console.error` to securely log original stack traces for internal debugging (Fixes #35).
+
+## [0.6.3] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Added robust try-catch JSON validation to explicitly reject malformed requests with `400 Bad Request` instead of crashing with `500 Internal Server Error` (Fixes #34).
+
+## [0.6.2] - 2026-03-22 [Author: Dominik Hoch]
+### Fixed
+- Fixed API routes to return explicit HTTP 200 status codes for all successful `NextResponse.json()` server replies (Fixes #33).
 
 ## [0.6.1] - 2026-03-22 [Author: Dominik Hoch]
 ### Added

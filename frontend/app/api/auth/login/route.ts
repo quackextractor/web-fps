@@ -70,6 +70,8 @@ export async function POST(req: Request) {
             .sign(JWT_SECRET);
 
         const cookieStore = await cookies();
+
+        // CSRF & XSS Protection: Ensure cookies are explicitly HttpOnly and Secure
         cookieStore.set(BACKEND_CONFIG.AUTH.COOKIE_NAME, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -85,9 +87,9 @@ export async function POST(req: Request) {
             netWorth: user.netWorth,
             kills: user.kills,
             username: user.username
-        });
+        }, { status: 200 });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('[Internal Error] Login:', error instanceof Error ? error.stack : error);
         // Fallback for local testing without DB
         if (process.env.NODE_ENV !== 'production') {
             return NextResponse.json({
@@ -97,7 +99,7 @@ export async function POST(req: Request) {
                 netWorth: 0,
                 kills: 0,
                 username: 'offline_user'
-            });
+            }, { status: 200 });
         }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
