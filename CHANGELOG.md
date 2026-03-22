@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Expanded API test coverage in `auth.test.ts` and `save.test.ts` with explicit invalid input scenarios (Fixes #61).
+- Verified 400 Bad Request rejections for malformed JSON, Zod schema violations (type mismatch, range violations), and missing required fields.
+
+## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
+
 ## [0.7.0] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Performed a comprehensive security audit against the OWASP Top 10 vulnerabilities.
@@ -22,10 +31,9 @@ All notable changes to this project will be documented in this file.
 
 ## [0.6.6] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
-
 - Expanded strict Zod schema validation to the Authentication endpoint (`auth/login`), preventing invalid usernames and passwords from bypassing data integrity checks (Fixes #54).
-## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
 
+## [0.6.5] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Implemented strict server-side schema validation using Zod for the Save API route to guarantee that numeric properties (`netWorth`, `kills`) are strictly non-negative numbers before processing (Fixes #36).
 
