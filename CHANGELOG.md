@@ -32,6 +32,10 @@ All notable changes to this project will be documented in this file.
 ## [0.8.5] - 2026-03-22 [Author: Filip Houdek]
 ### Added
 - Documented and verified HTTP cache functionality for static assets (Fixes #49).
+## [0.8.6] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Added Artillery load testing configuration for simulating concurrent players (Fixes #62).
+- Created `docs/concurrent-users-test.md` documenting test methodology and expected metrics.
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed

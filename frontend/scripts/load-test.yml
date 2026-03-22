@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm-up"
+    - duration: 60
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 30
+      arrivalRate: 50
+      name: "Peak load"
+
+scenarios:
+  - name: "Leaderboard access"
+    flow:
+      - get:
+          url: "/api/leaderboard"
+          expect:
+            - statusCode: 200
+
+  - name: "Authentication flow"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "loadtest_user"
+            password: "loadtest_pass"
+            loginToken: "test"
+          expect:
+            - statusCode:
+                - 200
+                - 401
