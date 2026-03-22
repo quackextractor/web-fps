@@ -30,15 +30,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 {/* Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-red-600 animate-pulse" />
 
-                <h2 className="retro-text text-xl md:text-2xl text-red-600 mb-4 text-center tracking-tighter">
+                <h2 className="retro-text text-xl xl:text-2xl text-red-600 mb-4 text-center tracking-tighter">
                     {title}
                 </h2>
 
-                <p className="retro-text text-xs md:text-sm text-gray-300 mb-8 text-center leading-relaxed">
+                <p className="retro-text text-xs xl:text-sm text-gray-300 mb-8 text-center leading-relaxed">
                     {message}
                 </p>
 
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col xl:flex-row gap-4">
                     <div className="flex-1">
                         <MenuButton onClick={onConfirm} variant={variant}>
                             {confirmText}

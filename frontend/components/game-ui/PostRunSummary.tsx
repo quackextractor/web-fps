@@ -180,8 +180,8 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none pointer-events-auto overflow-y-auto">
             <ScanlinesOverlay />
-            <div className="relative z-10 w-full max-w-3xl p-4 sm:p-6 md:p-8 bg-black/90 retro-border text-center shadow-[0_0_50px_rgba(0,0,0,0.8)] my-auto">
-                <h1 className="retro-text text-2xl sm:text-3xl md:text-5xl text-yellow-500 mb-6 md:mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>
+            <div className="relative z-10 w-full max-w-3xl p-4 sm:p-6 xl:p-8 bg-black/90 retro-border text-center shadow-[0_0_50px_rgba(0,0,0,0.8)] my-auto">
+                <h1 className="retro-text text-2xl sm:text-3xl xl:text-5xl text-yellow-500 mb-6 xl:mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>
                     {title}
                 </h1>
 
@@ -197,28 +197,28 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6">
-                            <div className="bg-black/70 border-2 border-gray-700 p-3 md:p-4 text-left hover:border-green-500/50 transition-colors group">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 xl:gap-4 mb-6">
+                            <div className="bg-black/70 border-2 border-gray-700 p-3 xl:p-4 text-left hover:border-green-500/50 transition-colors group">
                                 <div className="retro-text text-gray-400 text-[10px] mb-1 group-hover:text-green-400 transition-colors">DISTANCE</div>
                                 <div className="retro-text text-green-400 text-lg sm:text-2xl">{distanceValue.toFixed(2)} <span className="text-xs text-gray-500 uppercase">{distanceLabel}</span></div>
                             </div>
-                            <div className="bg-black/70 border-2 border-gray-700 p-3 md:p-4 text-left hover:border-green-500/50 transition-colors group">
+                            <div className="bg-black/70 border-2 border-gray-700 p-3 xl:p-4 text-left hover:border-green-500/50 transition-colors group">
                                 <div className="retro-text text-gray-400 text-[10px] mb-1 group-hover:text-green-400 transition-colors">DURATION</div>
                                 <div className="retro-text text-green-400 text-lg sm:text-2xl">{formatDuration(summary.totalDurationMinutes * 60)}</div>
                             </div>
-                            <div className="bg-black/70 border-2 border-gray-700 p-3 md:p-4 text-left hover:border-green-500/50 transition-colors group">
+                            <div className="bg-black/70 border-2 border-gray-700 p-3 xl:p-4 text-left hover:border-green-500/50 transition-colors group">
                                 <div className="retro-text text-gray-400 text-[10px] mb-1 group-hover:text-green-400 transition-colors">AVERAGE PACE</div>
                                 <div className="retro-text text-green-400 text-lg sm:text-2xl">{formatPace(paceValue, distanceLabel)}</div>
                             </div>
-                            <div className="bg-black/70 border-2 border-gray-700 p-3 md:p-4 text-left hover:border-green-500/50 transition-colors group">
+                            <div className="bg-black/70 border-2 border-gray-700 p-3 xl:p-4 text-left hover:border-green-500/50 transition-colors group">
                                 <div className="retro-text text-gray-400 text-[10px] mb-1 group-hover:text-green-400 transition-colors">CALORIES</div>
                                 <div className="retro-text text-green-400 text-lg sm:text-2xl">{summary.totalCaloriesBurned.toLocaleString(locale)} <span className="text-xs text-gray-500 uppercase">KCAL</span></div>
                             </div>
-                            <div className="bg-black/70 border-2 border-gray-700 p-3 md:p-4 text-left hover:border-green-500/50 transition-colors group">
+                            <div className="bg-black/70 border-2 border-gray-700 p-3 xl:p-4 text-left hover:border-green-500/50 transition-colors group">
                                 <div className="retro-text text-gray-400 text-[10px] mb-1 group-hover:text-green-400 transition-colors">TOTAL RUNS</div>
                                 <div className="retro-text text-green-400 text-lg sm:text-2xl">{summary.totalRuns}</div>
                             </div>
-                            <div className="bg-black/70 border-2 border-yellow-700 p-3 md:p-4 text-left hover:border-yellow-500/50 transition-colors group relative overflow-hidden">
+                            <div className="bg-black/70 border-2 border-yellow-700 p-3 xl:p-4 text-left hover:border-yellow-500/50 transition-colors group relative overflow-hidden">
                                 <div className="retro-text text-yellow-500 text-[10px] mb-1 group-hover:text-yellow-400 transition-colors">ESTIMATED VALUE</div>
                                 <div className="retro-text text-yellow-400 text-2xl sm:text-3xl font-bold">{formatCurrency(summary.estimatedDollarValue, locale, currency)}</div>
                                 <div className="absolute top-0 right-0 p-1 opacity-20">
@@ -246,7 +246,7 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
                     </>
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 xl:gap-4 justify-center">
                     <div className="flex-1 max-w-xs mx-auto sm:mx-0">
                         <MenuButton onClick={onPrimaryAction} disabled={primaryActionDisabled}>
                             {primaryActionLabel}

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
+### Fixed
+- Improve mobile experience.
+
 ## [0.7.4] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
 - Removed unused Geist font CSS variables `--font-sans` and `--font-mono` from `frontend/app/globals.css` to eliminate dead declarations.
