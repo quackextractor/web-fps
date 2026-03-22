@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-03-22 [Author: Filip Houdek]
+### Fixed
+- Economy offline fallback: cache save data to localStorage on every state change and after successful cloud saves, ensuring a recent local backup is always available (Fixes #13).
+
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
 - Improve mobile experience.

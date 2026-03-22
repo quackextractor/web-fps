@@ -286,6 +286,12 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
             const data = await response.json();
             applySaveData(data.saveData);
             setCloudStatus("synced");
+            try {
+                const key = `industrialist_save_${credentialsRef.current.username || "guest"}`;
+                if (typeof window !== "undefined" && window.localStorage) {
+                    window.localStorage.setItem(key, JSON.stringify(payload));
+                }
+            } catch { void 0; }
             return true;
         } catch {
             try {
@@ -454,6 +460,19 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         }, 5000);
         return () => clearInterval(interval);
     }, [isAuthenticated, processProductionTick]);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        try {
+            const key = `industrialist_save_${credentialsRef.current.username || "guest"}`;
+            if (typeof window !== "undefined" && window.localStorage) {
+                window.localStorage.setItem(key, JSON.stringify({
+                    ...saveData,
+                    last_saved_at: Date.now(),
+                }));
+            }
+        } catch { void 0; }
+    }, [saveData, isAuthenticated]);
 
     const addResource = useCallback((resource: string, amount: number) => {
         if (amount <= 0) {
