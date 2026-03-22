@@ -66,6 +66,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Enforce GZIP/Brotli compression for all responses
+  compress: true,
 }
 
 export default nextConfig
