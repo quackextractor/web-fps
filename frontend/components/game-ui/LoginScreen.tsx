@@ -45,12 +45,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full md:max-w-xl bg-black retro-border p-4 md:p-8">
-                <h2
+                <h1
                     className="retro-text text-xl md:text-4xl text-red-600 mb-2 md:mb-4 text-center tracking-tighter"
                     style={{ textShadow: "2px 2px 0px #300000" }}
                 >
-                    <p>INDUSTRIALIST CORP.</p>
-                    <p className="text-[10px] md:text-xs text-gray-400" style={{ marginTop: "0.25rem" }}>AUTHORIZED ACCESS TERMINAL</p>
+                    INDUSTRIALIST CORP.
+                </h1>
+                <h2 className="retro-text text-[10px] md:text-xs text-gray-400 text-center mb-2 md:mb-4" style={{ marginTop: "0.25rem" }}>
+                    AUTHORIZED ACCESS TERMINAL
                 </h2>
 
                 <div className="flex flex-col gap-2 md:gap-4 mb-4 md:mb-6">

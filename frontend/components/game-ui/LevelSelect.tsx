@@ -116,9 +116,9 @@ export const LevelSelect: React.FC<LevelSelectProps> = ({
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full md:max-w-5xl bg-black retro-border p-0 md:p-8 shadow-2xl overflow-y-auto max-h-full m-0" style={{ margin: 0 }}>
-                <h2 className="retro-text text-xl md:text-5xl text-red-600 mb-2 text-center tracking-tighter" style={{ textShadow: "2px 2px 0px #300000" }}>
+                <h1 className="retro-text text-xl md:text-5xl text-red-600 mb-2 text-center tracking-tighter" style={{ textShadow: "2px 2px 0px #300000" }}>
                     EXPEDITION SELECT
-                </h2>
+                </h1>
                 <p className="retro-text text-[7px] md:text-[9px] text-gray-500 text-center mb-4 md:mb-6 tracking-widest">
                     SELECT A SECTOR FOR DEPLOYMENT
                 </p>
@@ -192,9 +192,9 @@ export const LevelSelect: React.FC<LevelSelectProps> = ({
                         {selectedInfo && (selectedIndex !== null) ? (
                             <>
                                 <div>
-                                    <p className="retro-text text-[8px] md:text-[10px] text-red-400 mb-3 tracking-widest">MISSION BRIEFING</p>
+                                    <h2 className="retro-text text-[8px] md:text-[10px] text-red-400 mb-3 tracking-widest">MISSION BRIEFING</h2>
 
-                                    <p className="retro-text text-base md:text-lg text-white mb-1">{selectedInfo.sectorName}</p>
+                                    <h3 className="retro-text text-base md:text-lg text-white mb-1">{selectedInfo.sectorName}</h3>
                                     <p className="retro-text text-[7px] md:text-[9px] text-gray-500 mb-4">SECTOR {(selectedIndex + 1).toString().padStart(2, "0")}</p>
 
                                     <div className="w-full h-px bg-gray-800 mb-3" />

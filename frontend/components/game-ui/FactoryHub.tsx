@@ -367,6 +367,12 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
             <ScanlinesOverlay />
 
             <div className="relative z-10 w-full max-w-4xl bg-black retro-border p-4 md:p-8 overflow-y-auto max-h-full">
+                <h1 className="retro-text text-3xl md:text-5xl text-red-600 mb-3 text-center tracking-tighter" style={{ textShadow: "4px 4px 0px #300000" }}>
+                    FACTORY HUB
+                </h1>
+                <h2 className="retro-text text-[9px] md:text-[10px] text-gray-500 text-center mb-4 tracking-widest">
+                    PRODUCTION CONTROL TERMINAL
+                </h2>
 
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 mb-4 px-1">
                     <p className="retro-text text-xs text-gray-400 tracking-widest">
@@ -397,6 +403,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                     CLOUD {cloudStatusText}
                 </p>
 
+                <h3 className="retro-text text-xs text-gray-400 tracking-widest mb-3">ACTIVE SLOTS</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     {slots.map((machine, idx) => {
                         const isUnlocked = idx <= saveData.highestLevelCompleted;
@@ -431,6 +438,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                     })}
                 </div>
 
+                <h3 className="retro-text text-xs text-gray-400 tracking-widest mb-3">SYNC OPERATIONS</h3>
                 <div className="flex gap-3 mb-4">
                     <MenuButton onClick={async () => { await forceCloudSave(); }} variant="secondary">
                         SAVE
@@ -440,6 +448,7 @@ export const FactoryHub: React.FC<FactoryHubProps> = ({
                     </MenuButton>
                 </div>
 
+                <h3 className="retro-text text-xs text-gray-400 tracking-widest mb-3">NAVIGATION</h3>
                 <div className="flex gap-3">
                     <MenuButton onClick={onOpenArmory} variant="secondary">ARMORY</MenuButton>
                     {onDeploy && (

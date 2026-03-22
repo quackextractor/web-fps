@@ -181,9 +181,9 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-4 select-none pointer-events-auto overflow-y-auto">
             <ScanlinesOverlay />
             <div className="relative z-10 w-full max-w-3xl p-4 sm:p-6 md:p-8 bg-black/90 retro-border text-center shadow-[0_0_50px_rgba(0,0,0,0.8)] my-auto">
-                <h2 className="retro-text text-2xl sm:text-3xl md:text-5xl text-yellow-500 mb-6 md:mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>
+                <h1 className="retro-text text-2xl sm:text-3xl md:text-5xl text-yellow-500 mb-6 md:mb-8 animate-pulse tracking-tight" style={{ textShadow: "4px 4px 0px #303000" }}>
                     {title}
-                </h2>
+                </h1>
 
                 {isLoading ? (
                     <div className="retro-text text-white text-sm sm:text-base mb-8 py-12 flex flex-col items-center gap-4">
@@ -230,7 +230,7 @@ export const PostRunSummary: React.FC<PostRunSummaryProps> = ({
                         {/* Progress Visualization */}
                         <div className="mb-8 p-4 bg-gray-900/30 border-2 border-gray-800 rounded-sm">
                             <div className="flex justify-between items-end mb-2">
-                                <div className="retro-text text-gray-400 text-[10px]">GOAL PROGRESS</div>
+                                <h2 className="retro-text text-gray-400 text-[10px]">GOAL PROGRESS</h2>
                                 <div className="retro-text text-green-400 text-xs">{summary.progressPercentage.toFixed(1)}%</div>
                             </div>
                             <div className="w-full h-4 bg-black border border-gray-700 overflow-hidden p-[2px]">

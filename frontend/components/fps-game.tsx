@@ -64,6 +64,7 @@ export default function FPSGame() {
   const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>("mainMenu");
   const [preloadedLevelIndex, setPreloadedLevelIndex] = useState<number | null>(null);
+  const [isSceneTransitioning, setIsSceneTransitioning] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [previousGameState, setPreviousGameState] = useState<GameState>("mainMenu");
   const [isNextLevelTransitioning, setIsNextLevelTransitioning] = useState(false);
@@ -117,6 +118,7 @@ export default function FPSGame() {
   const lastTimeRef = useRef(0);
   const accumulatorRef = useRef(0);
   const gameStateRef = useRef(gameState);
+  const isSceneTransitioningRef = useRef(false);
   const nextLevelTransitionRef = useRef(false);
 
   const touchJoystickRef = useRef({ x: 0, y: 0 });
@@ -282,6 +284,14 @@ export default function FPSGame() {
     }
   }, [savedProgress.unlockedWeapons, getDifficultyMultiplier, resetRunMetrics]);
 
+  const beginLevelTransition = useCallback((levelIndex: number, preservePlayer = false) => {
+    isSceneTransitioningRef.current = true;
+    setIsSceneTransitioning(true);
+    setPreloadedLevelIndex(null);
+    setCurrentLevel(levelIndex);
+    loadLevel(levelIndex, preservePlayer);
+  }, [loadLevel]);
+
   const restartCurrentLevel = useCallback(() => {
     // Restore weapons and ammo from before current level started
     weaponsUnlockedRef.current = new Set(previousLevelWeaponsRef.current);
@@ -295,17 +305,16 @@ export default function FPSGame() {
       playerRef.current.weapon = WeaponType.CHAINGUN;
     }
 
-    loadLevel(currentLevelRef.current, false);
+    beginLevelTransition(currentLevelRef.current, false);
     setGameState("playing");
     lock(true);
-  }, [loadLevel, lock]);
+  }, [beginLevelTransition, lock]);
 
   const startGame = useCallback((levelIndex: number) => {
-    setCurrentLevel(levelIndex);
-    loadLevel(levelIndex, false);
+    beginLevelTransition(levelIndex, false);
     setGameState("playing");
     lock(true);
-  }, [loadLevel, lock]);
+  }, [beginLevelTransition, lock]);
 
   const nextLevel = useCallback(() => {
     if (gameStateRef.current !== "levelComplete") {
@@ -329,16 +338,15 @@ export default function FPSGame() {
         highestLevel: Math.max(prev.highestLevel, next),
       }));
       void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
-      setCurrentLevel(next);
       totalKillsRef.current += killsRef.current;
-      loadLevel(next, true);
+      beginLevelTransition(next, true);
       setGameState("playing");
       lock(true);
     } else {
       setGameState("victory");
       void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
     }
-  }, [loadLevel, forceCloudSave]);
+  }, [beginLevelTransition, forceCloudSave]);
 
   const openFactory = useCallback(() => {
     if (!isAuthenticated) {
@@ -513,7 +521,7 @@ export default function FPSGame() {
 
   // Game loop
   useEffect(() => {
-    if (gameState !== "playing") return;
+    if (gameState !== "playing" || isSceneTransitioning) return;
 
     const canvas = canvasRef.current;
     const offscreen = offscreenCanvasRef.current;
@@ -784,7 +792,7 @@ export default function FPSGame() {
     };
 
     const gameLoop = (time: number) => {
-      if (gameStateRef.current !== "playing") return;
+      if (gameStateRef.current !== "playing" || isSceneTransitioningRef.current) return;
 
       const deltaTime = time - lastTimeRef.current;
       lastTimeRef.current = time;
@@ -847,7 +855,7 @@ export default function FPSGame() {
 
     animationId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animationId);
-  }, [gameState, settings.mouseSensitivity, settings.timeScale, settings.debugMode, settings.ragdollEnabled, settings.ragdollMultiplier]);
+  }, [gameState, isSceneTransitioning, settings.mouseSensitivity, settings.timeScale, settings.debugMode, settings.ragdollEnabled, settings.ragdollMultiplier]);
 
 
   // Keyboard controls
@@ -1072,19 +1080,24 @@ export default function FPSGame() {
   const [resW, resH] = settings.resolution.split("x").map(Number);
   const aspectRatio = resW / resH;
   const activeLevel = LEVELS[currentLevel] ?? LEVELS[0];
-  const shouldShowAssetPreloader = preloadedLevelIndex !== currentLevel;
+  const shouldShowAssetPreloader = isSceneTransitioning || preloadedLevelIndex !== currentLevel;
 
   return (
     <div className="flex flex-col items-center justify-center bg-black w-screen h-screen overflow-hidden p-0 m-0">
       {shouldShowAssetPreloader && (
         <AssetPreloader
-          onComplete={() => setPreloadedLevelIndex(currentLevel)}
+          onComplete={() => {
+            setPreloadedLevelIndex(currentLevelRef.current);
+            isSceneTransitioningRef.current = false;
+            setIsSceneTransitioning(false);
+          }}
           level={activeLevel}
           sounds={[]}
         />
       )}
 
       {/* Main Game Container - Responsively scales to fit screen while maintaining aspect ratio */}
+      {!shouldShowAssetPreloader && (
       <div
         className="relative flex items-center justify-center bg-black shadow-[0_0_50px_rgba(0,0,0,1)]"
         style={{
@@ -1300,6 +1313,7 @@ export default function FPSGame() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
