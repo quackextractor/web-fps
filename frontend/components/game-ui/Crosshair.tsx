@@ -7,7 +7,8 @@ interface CrosshairProps {
 export const Crosshair: React.FC<CrosshairProps> = ({ style = "cross" }) => {
     return (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 mix-blend-difference">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-label="Crosshair" role="img" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <title>Crosshair</title>
                 {style === "dot" ? (
                     <circle cx="12" cy="12" r="3" fill="#0f0" className="drop-shadow-md" />
                 ) : style === "circle" ? (

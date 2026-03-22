@@ -1141,6 +1141,8 @@ export default function FPSGame() {
         >
           <canvas
             ref={canvasRef}
+            aria-label="3D Game View"
+            role="img"
             className={`w-full h-full block ${isTouchDeviceRef.current ? "cursor-default" : "cursor-none"}`}
             style={{ imageRendering: "pixelated" }}
           />
