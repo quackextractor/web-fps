@@ -43,16 +43,23 @@ INDUSTRIALIST is a 2.5D retro FPS engine built with React and Next.js, utilizing
 - **Viewmodel Scaling**: Weapon sprites are automatically scaled based on vertical resolution to maintain a consistent visual weight across different screen heights.
 - **Standalone Mode**: Includes a web manifest for an app-like fullscreen experience when added to the home screen.
 
-## Dependency Update Process
+## Log Analysis & Error Tracking
 
-The project uses [Dependabot](https://docs.github.com/en/code-security/dependabot) to automatically check for outdated npm dependencies in the `frontend/` directory on a weekly basis. The configuration is defined in `.github/dependabot.yml`.
+The project uses [Sentry](https://sentry.io/) as a centralized error tracking and log analysis tool, integrated via the `@sentry/nextjs` SDK.
 
-### Team Process for Reviewing Dependabot PRs
-1. **Triage**: When Dependabot opens a pull request, a team member is assigned to review it within one business day.
-2. **Review**: The reviewer checks the changelog and release notes of the updated dependency for breaking changes or deprecations.
-3. **Test**: The reviewer ensures that the CI pipeline passes and manually verifies any areas of the application affected by the updated dependency.
-4. **Merge or Defer**: If all checks pass, the PR is approved and merged. If a breaking change is detected, the reviewer documents the issue and defers the update until compatibility is resolved.
-5. **Batch Updates**: Minor and patch updates may be batched and merged together. Major version bumps must be reviewed individually.
+### How It Works
+- **Client-side errors** are captured automatically via `sentry.client.config.ts`, including session replays on error.
+- **Server-side errors** are captured via `sentry.server.config.ts`, loaded through the Next.js instrumentation hook (`instrumentation.ts`).
+- All unhandled exceptions, rejected promises, and performance traces are forwarded to the configured Sentry project.
+
+### Setup
+1. Create a Sentry project at [sentry.io](https://sentry.io/) and obtain your DSN.
+2. Set the `NEXT_PUBLIC_SENTRY_DSN` environment variable in your `.env.production` (or your hosting provider's environment settings) to the DSN value.
+3. Deploy the application. Errors and performance data will appear in your Sentry dashboard automatically.
+
+### Viewing Logs
+- Navigate to your Sentry project dashboard to view captured errors, stack traces, breadcrumbs, and session replays.
+- Use Sentry's filtering and search capabilities to triage issues by environment, release, or user.
 
 ## Assets
 - **Preloading**: `AssetPreloader` ensures all required textures and sounds are cached before gameplay begins.
