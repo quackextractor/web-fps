@@ -72,7 +72,7 @@ export default function FPSGame() {
   const previousGameStateRef = useRef<GameState>("mainMenu");
   const { settings, setSettings, updateSetting, isLoaded, resetSettings } = useSettings();
   const { registerClearRagdolls } = useGameActions();
-  const { isAuthenticated, logout, forceCloudSave, addResource, saveData, incrementKills } = useEconomy();
+  const { isAuthenticated, logout, forceCloudSave, addResource, saveData, incrementKills, updateHighestLevel } = useEconomy();
 
   const rendererRef = useRef<GameRenderer | null>(null);
 
@@ -337,6 +337,7 @@ export default function FPSGame() {
         unlockedWeapons: new Set([...prev.unlockedWeapons, ...weaponsUnlockedRef.current]),
         highestLevel: Math.max(prev.highestLevel, next),
       }));
+      updateHighestLevel(next);
       void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
       totalKillsRef.current += killsRef.current;
       beginLevelTransition(next, true);
@@ -346,7 +347,7 @@ export default function FPSGame() {
       setGameState("victory");
       void forceCloudSave(undefined, totalKillsRef.current + killsRef.current);
     }
-  }, [beginLevelTransition, forceCloudSave]);
+  }, [beginLevelTransition, forceCloudSave, updateHighestLevel]);
 
   const openFactory = useCallback(() => {
     if (!isAuthenticated) {
@@ -1062,6 +1063,7 @@ export default function FPSGame() {
           highestLevel: parsed.highestLevel
         });
         weaponsUnlockedRef.current = new Set(parsed.unlockedWeapons);
+        updateHighestLevel(parsed.highestLevel);
       } catch (e) {
         console.error("Failed to load savegame", e);
       }

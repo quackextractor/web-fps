@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 ## [0.8.2] - 2026-03-22 [Author: Filip Houdek]
 ### Verified
 - Verified offline progress calculation awards passively generated resources upon profile load based on last_saved_at timestamp (Fixes #15).
+## [0.7.9] - 2026-03-22 [Author: Filip Houdek]
+### Fixed
+- Fixed factory plots not unlocking after completing corresponding levels by syncing `highestLevelCompleted` from game progression to EconomyContext (Fixes #24).
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
