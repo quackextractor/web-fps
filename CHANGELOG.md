@@ -26,6 +26,9 @@ All notable changes to this project will be documented in this file.
 ## [0.7.7] - 2026-03-22 [Author: Filip Houdek]
 ### Fixed
 - Enabled GZIP/Brotli compression in Next.js config by adding `compress: true` (Fixes #37, #44).
+## [0.7.8] - 2026-03-22 [Author: Filip Houdek]
+### Added
+- Enabled Next.js image optimization and added Cache-Control headers for static assets (JS, CSS, images) (Fixes #48).
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
