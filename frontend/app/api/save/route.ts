@@ -5,6 +5,17 @@ import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { BACKEND_CONFIG } from '@/config/backend/server.config';
+import { z } from 'zod';
+
+const savePayloadSchema = z.object({
+    credits: z.number().min(0).optional(),
+    inventory: z.any().optional(),
+    machines: z.any().optional(),
+    unlockedWeapons: z.array(z.string()).optional(),
+    highestLevelCompleted: z.number().min(0).optional(),
+    net_worth: z.number().min(0).optional(),
+    kills: z.number().min(0).optional(),
+});
 
 function getJwtSecret() {
     const secret = process.env.JWT_SECRET;
@@ -39,11 +50,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
         }
 
-        if (!body || typeof body !== 'object') {
-            return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+        const parseResult = savePayloadSchema.safeParse(body);
+        if (!parseResult.success) {
+            return NextResponse.json({ error: 'Invalid data', details: parseResult.error.format() }, { status: 400 });
         }
 
-        const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = body;
+        const { credits, inventory, machines, unlockedWeapons, highestLevelCompleted, net_worth, kills } = parseResult.data;
 
         const userId = payload.id as string;
         const user = await prisma.user.findUnique({
