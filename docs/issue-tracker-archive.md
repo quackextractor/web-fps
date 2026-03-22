@@ -64,7 +64,7 @@ Tento dokument slouží jako oficiální evidence všech úkolů a hlášených 
 ## 📈 Sekce 9: Monitoring
 - **#65 (9.2):** Standardizace formátu logů (Timestamp/Error Type)
 - **#66 (9.3):** Integrace nástroje pro analýzu logů (Sentry)
-- **#67 (9.4):** Monitoring počtu hráčů a herních metrik
+- **#94 (9.4):** Monitoring počtu hráčů a herních metrik (Implemented)
 - **#68 (9.6):** Uptime monitoring (website availability)
 
 ## 🚀 Sekce 10: Deployment

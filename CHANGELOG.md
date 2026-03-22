@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
+### Added
+- Implemented administrative monitoring API at `/api/admin/metrics` using Prisma aggregations (Fixes #94).
+- Added unit tests for player count and game activity aggregation.
+
 ## [0.7.2] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Completed retroactive issue tracker audit. All past bug fixes and features are now linked to formal tracking IDs (Fixes #64).
