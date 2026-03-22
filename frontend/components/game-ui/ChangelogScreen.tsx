@@ -38,7 +38,7 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
     for (const rawLine of lines) {
         const line = rawLine.trim();
 
-        const entryMatch = line.match(/^##\s+\[([^\]]+)\]\s*-\s*([^\[]+?)(?:\s*\[Author:\s*([^\]]+)\])?\s*$/);
+        const entryMatch = line.match(/^##\s+\[([^\]]+)\]\s*-\s*([^[]+?)(?:\s*\[Author:\s*([^\]]+)\])?\s*$/);
         if (entryMatch) {
             if (currentEntry !== null) {
                 entries.push(currentEntry);
