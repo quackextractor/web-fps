@@ -9,7 +9,7 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
 
 ## Deployment
 This application is automatically deployed via Vercel ensuring high availability and zero-downtime edge caching.
-[![Deployment Status](https://img.shields.io/badge/Vercel-Deployed-green.svg)](https://web-fps.vercel.app)
+[![Deployment Status](https://img.shields.io/badge/Vercel-Deployed-green.svg)](https://web-fps-sigma.vercel.app/)
 
 ## Technologies and Versions
 - **Next.js**: v16.1.6
