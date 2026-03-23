@@ -5,6 +5,7 @@ export class SoundManager {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private sfxGain: GainNode | null = null;
+  private musicGain: GainNode | null = null;
   private sfxEnabled: boolean = true;
   private musicEnabled: boolean = true;
   private masterVolume: number = 0.5;
@@ -13,23 +14,22 @@ export class SoundManager {
   private musicActive: boolean = false;
   private musicMode: "unknown" | "sequence" | "full" | "none" = "unknown";
   private musicLoadPromise: Promise<void> | null = null;
-  private startTemplate: HTMLAudioElement | null = null;
-  private loopTemplate: HTMLAudioElement | null = null;
-  private endTemplate: HTMLAudioElement | null = null;
-  private fullTemplate: HTMLAudioElement | null = null;
+
+  private startBuffer: AudioBuffer | null = null;
+  private loopBuffer: AudioBuffer | null = null;
+  private endBuffer: AudioBuffer | null = null;
+  private fullBuffer: AudioBuffer | null = null;
   private hitmarkTemplate: HTMLAudioElement | null = null;
-  private sequenceStartAudio: HTMLAudioElement | null = null;
-  private sequenceLoopAudio: HTMLAudioElement | null = null;
-  private fallbackPrimary: HTMLAudioElement | null = null;
-  private fallbackSecondary: HTMLAudioElement | null = null;
-  private fallbackIntervalId: number | null = null;
-  private fallbackFadeMs = 220;
-  private fallbackCrossfadeActive = false;
+
+  private activeMusicNode: AudioBufferSourceNode | null = null;
+  private loopMusicNode: AudioBufferSourceNode | null = null;
+  private activeMusicTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   private readonly audioSources = {
-    start: "/audio/start.mp3",
-    loop: "/audio/loop.mp3",
-    end: "/audio/end.mp3",
-    full: "/audio/full.mp3",
+    start: "/sounds/start.mp3",
+    loop: "/sounds/loop.mp3",
+    end: "/sounds/end.mp3",
+    full: "/sounds/full.mp3",
     hitmark: "/audio/hitmark.mp3",
   };
 
@@ -44,9 +44,14 @@ export class SoundManager {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       this.masterGain = this.ctx.createGain();
       this.sfxGain = this.ctx.createGain();
+      this.musicGain = this.ctx.createGain();
+
       this.masterGain.gain.value = this.masterVolume;
       this.sfxGain.gain.value = this.sfxVolume;
+      this.musicGain.gain.value = this.musicVolume;
+
       this.sfxGain.connect(this.masterGain);
+      this.musicGain.connect(this.masterGain);
       this.masterGain.connect(this.ctx.destination);
       
       // Proactively load music assets
@@ -61,7 +66,6 @@ export class SoundManager {
     if (this.masterGain) {
       this.masterGain.gain.value = this.masterVolume;
     }
-    this.applyMusicVolumes();
   }
 
   public setSfxVolume(volume: number) {
@@ -73,7 +77,9 @@ export class SoundManager {
 
   public setMusicVolume(volume: number) {
     this.musicVolume = Math.max(0, Math.min(1, volume));
-    this.applyMusicVolumes();
+    if (this.musicGain) {
+      this.musicGain.gain.value = this.musicVolume;
+    }
   }
 
   public setSfxEnabled(enabled: boolean) {
@@ -88,13 +94,15 @@ export class SoundManager {
 
   public setMusicEnabled(enabled: boolean) {
     this.musicEnabled = enabled;
+    if (this.musicGain) {
+      this.musicGain.gain.value = enabled ? this.musicVolume : 0;
+    }
     if (!enabled) {
       this.stopMusic(false);
       return;
     }
-    this.applyMusicVolumes();
     if (this.musicActive) {
-      this.startMusic();
+      void this.playDynamicMusic();
     }
   }
 
@@ -106,28 +114,6 @@ export class SoundManager {
     this.setSfxVolume(volume);
   }
 
-  private getMusicElementVolume(): number {
-    if (!this.musicEnabled) {
-      return 0;
-    }
-    return this.masterVolume * this.musicVolume;
-  }
-
-  private applyMusicVolumes() {
-    const volume = this.getMusicElementVolume();
-    const active = [
-      this.sequenceStartAudio,
-      this.sequenceLoopAudio,
-      this.fallbackPrimary,
-      this.fallbackSecondary,
-    ];
-    for (const audio of active) {
-      if (audio) {
-        audio.volume = volume;
-      }
-    }
-  }
-
   private safePlay(audio: HTMLAudioElement) {
     const playPromise = audio.play();
     if (playPromise && typeof playPromise.catch === "function") {
@@ -135,19 +121,6 @@ export class SoundManager {
         logger.warn("Audio playback blocked or failed", e);
       });
     }
-  }
-
-  private rampVolume(audio: HTMLAudioElement, from: number, to: number, durationMs: number) {
-    const steps = Math.max(1, Math.round(durationMs / 20));
-    let step = 0;
-    const intervalId = window.setInterval(() => {
-      step += 1;
-      const ratio = Math.min(1, step / steps);
-      audio.volume = from + (to - from) * ratio;
-      if (ratio >= 1) {
-        window.clearInterval(intervalId);
-      }
-    }, 20);
   }
 
   private async probeAudio(src: string): Promise<boolean> {
@@ -179,8 +152,21 @@ export class SoundManager {
     });
   }
 
+  private async loadAudioBuffer(src: string): Promise<AudioBuffer | null> {
+    if (!this.ctx) return null;
+    try {
+      const response = await fetch(src);
+      if (!response.ok) return null;
+      const arrayBuffer = await response.arrayBuffer();
+      return await this.ctx.decodeAudioData(arrayBuffer);
+    } catch (e) {
+      logger.warn(`Failed to load or decode audio from ${src}`, e);
+      return null;
+    }
+  }
+
   private async ensureMusicLoaded() {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || !this.ctx) {
       this.musicMode = "none";
       return;
     }
@@ -194,11 +180,11 @@ export class SoundManager {
 
     this.musicLoadPromise = (async () => {
       try {
-        const [startOk, loopOk, endOk, fullOk, hitmarkOk] = await Promise.all([
-          this.probeAudio(this.audioSources.start),
-          this.probeAudio(this.audioSources.loop),
-          this.probeAudio(this.audioSources.end),
-          this.probeAudio(this.audioSources.full),
+        const [startBuf, loopBuf, endBuf, fullBuf, hitmarkOk] = await Promise.all([
+          this.loadAudioBuffer(this.audioSources.start),
+          this.loadAudioBuffer(this.audioSources.loop),
+          this.loadAudioBuffer(this.audioSources.end),
+          this.loadAudioBuffer(this.audioSources.full),
           this.probeAudio(this.audioSources.hitmark),
         ]);
 
@@ -207,18 +193,15 @@ export class SoundManager {
           this.hitmarkTemplate.preload = "auto";
         }
 
-        if (startOk && loopOk && endOk) {
+        this.startBuffer = startBuf;
+        this.loopBuffer = loopBuf;
+        this.endBuffer = endBuf;
+        this.fullBuffer = fullBuf;
+
+        if (startBuf && loopBuf && endBuf) {
           this.musicMode = "sequence";
-          this.startTemplate = new Audio(this.audioSources.start);
-          this.loopTemplate = new Audio(this.audioSources.loop);
-          this.endTemplate = new Audio(this.audioSources.end);
-          this.startTemplate.preload = "auto";
-          this.loopTemplate.preload = "auto";
-          this.endTemplate.preload = "auto";
-        } else if (fullOk) {
+        } else if (fullBuf) {
           this.musicMode = "full";
-          this.fullTemplate = new Audio(this.audioSources.full);
-          this.fullTemplate.preload = "auto";
         } else {
           this.musicMode = "none";
           logger.warn("No playable music assets found (start/loop/end or full)");
@@ -235,144 +218,97 @@ export class SoundManager {
   }
 
   private stopCurrentMusicTracks() {
-    const tracks = [
-      this.sequenceStartAudio,
-      this.sequenceLoopAudio,
-      this.fallbackPrimary,
-      this.fallbackSecondary,
-    ];
-    for (const track of tracks) {
-      if (!track) continue;
-      track.pause();
-      track.currentTime = 0;
-      track.onended = null;
-      track.ontimeupdate = null;
+    if (this.activeMusicNode) {
+      try { this.activeMusicNode.stop(); } catch (e) { void e; }
+      this.activeMusicNode = null;
     }
-    this.sequenceStartAudio = null;
-    this.sequenceLoopAudio = null;
-    this.fallbackPrimary = null;
-    this.fallbackSecondary = null;
-    if (this.fallbackIntervalId !== null) {
-      window.clearInterval(this.fallbackIntervalId);
-      this.fallbackIntervalId = null;
+    if (this.loopMusicNode) {
+      try { this.loopMusicNode.stop(); } catch (e) { void e; }
+      this.loopMusicNode = null;
     }
-    this.fallbackCrossfadeActive = false;
+    if (this.activeMusicTimeoutId !== null) {
+      clearTimeout(this.activeMusicTimeoutId);
+      this.activeMusicTimeoutId = null;
+    }
   }
 
   public async startMusic() {
-    if (typeof window === "undefined") {
-      return;
-    }
-    this.musicActive = true;
-    if (!this.musicEnabled) {
-      return;
-    }
-    await this.ensureMusicLoaded();
-    if (!this.musicActive || !this.musicEnabled) {
-      return;
-    }
-
-    if (this.musicMode === "sequence") {
-      this.startSequenceMusic();
-      return;
-    }
-    if (this.musicMode === "full") {
-      this.startFullFallbackMusic();
-      return;
-    }
+    await this.playDynamicMusic();
   }
 
   public stopMusic(playEndClip: boolean = true) {
-    if (typeof window === "undefined") {
-      return;
-    }
-    const shouldPlayEnd = playEndClip && this.musicEnabled && this.musicMode === "sequence" && !!this.endTemplate;
+    if (typeof window === "undefined") return;
     this.musicActive = false;
-    this.stopCurrentMusicTracks();
-
-    if (shouldPlayEnd && this.endTemplate) {
-      const ending = this.endTemplate.cloneNode(true) as HTMLAudioElement;
-      ending.volume = this.getMusicElementVolume();
-      this.safePlay(ending);
+    
+    if (playEndClip && this.musicEnabled && this.musicMode === "sequence" && this.ctx && this.musicGain) {
+      this.playEndMusic();
+    } else {
+      this.stopCurrentMusicTracks();
     }
   }
 
-  private startSequenceMusic() {
-    if (!this.startTemplate || !this.loopTemplate) {
-      return;
-    }
+  public async playDynamicMusic() {
+    if (typeof window === "undefined" || !this.ctx || !this.musicGain) return;
+    this.musicActive = true;
+    if (!this.musicEnabled) return;
+    
+    await this.ensureMusicLoaded();
+    if (!this.musicActive || !this.musicEnabled || this.musicMode === "none") return;
+
     this.stopCurrentMusicTracks();
-    const volume = this.getMusicElementVolume();
-    this.sequenceStartAudio = this.startTemplate.cloneNode(true) as HTMLAudioElement;
-    this.sequenceLoopAudio = this.loopTemplate.cloneNode(true) as HTMLAudioElement;
-    this.sequenceStartAudio.volume = volume;
-    this.sequenceLoopAudio.volume = volume;
-    this.sequenceLoopAudio.loop = true;
-    this.sequenceStartAudio.currentTime = 0;
-    this.sequenceLoopAudio.currentTime = 0;
+    
+    if (this.ctx.state === "suspended") {
+      await this.ctx.resume();
+    }
 
-    this.sequenceStartAudio.onended = () => {
-      if (!this.musicActive || !this.musicEnabled || !this.sequenceLoopAudio) {
-        return;
-      }
-      this.sequenceLoopAudio.currentTime = 0;
-      this.safePlay(this.sequenceLoopAudio);
-    };
+    const t = this.ctx.currentTime;
 
-    this.safePlay(this.sequenceStartAudio);
+    if (this.musicMode === "sequence" && this.startBuffer && this.loopBuffer) {
+      this.activeMusicNode = this.ctx.createBufferSource();
+      this.activeMusicNode.buffer = this.startBuffer;
+      this.activeMusicNode.connect(this.musicGain);
+      
+      this.loopMusicNode = this.ctx.createBufferSource();
+      this.loopMusicNode.buffer = this.loopBuffer;
+      this.loopMusicNode.loop = true;
+      this.loopMusicNode.connect(this.musicGain);
+      
+      this.activeMusicNode.start(t);
+      this.loopMusicNode.start(t + 21.0);
+    } else if (this.musicMode === "full" && this.fullBuffer) {
+      this.activeMusicNode = this.ctx.createBufferSource();
+      this.activeMusicNode.buffer = this.fullBuffer;
+      this.activeMusicNode.loop = true;
+      this.activeMusicNode.connect(this.musicGain);
+      this.activeMusicNode.start(t);
+    }
   }
 
-  private startFullFallbackMusic() {
-    if (!this.fullTemplate) {
+  public playEndMusic() {
+    if (typeof window === "undefined" || !this.ctx || !this.musicGain) return;
+    this.musicActive = true;
+
+    this.stopCurrentMusicTracks();
+    
+    if (!this.musicEnabled || this.musicMode !== "sequence" || !this.endBuffer) {
       return;
     }
-    this.stopCurrentMusicTracks();
 
-    this.fallbackPrimary = this.fullTemplate.cloneNode(true) as HTMLAudioElement;
-    this.fallbackSecondary = this.fullTemplate.cloneNode(true) as HTMLAudioElement;
-    this.fallbackPrimary.loop = false;
-    this.fallbackSecondary.loop = false;
-    this.fallbackPrimary.currentTime = 0;
-    this.fallbackSecondary.currentTime = 0;
-    this.fallbackPrimary.volume = 0;
-    this.fallbackSecondary.volume = 0;
+    if (this.ctx.state === "suspended") {
+      void this.ctx.resume();
+    }
 
-    const targetVolume = this.getMusicElementVolume();
-    this.safePlay(this.fallbackPrimary);
-    this.rampVolume(this.fallbackPrimary, 0, targetVolume, this.fallbackFadeMs);
-
-    this.fallbackIntervalId = window.setInterval(() => {
-      if (!this.musicActive || !this.musicEnabled || !this.fallbackPrimary || !this.fallbackSecondary) {
-        return;
+    this.activeMusicNode = this.ctx.createBufferSource();
+    this.activeMusicNode.buffer = this.endBuffer;
+    this.activeMusicNode.connect(this.musicGain);
+    this.activeMusicNode.start(this.ctx.currentTime);
+    
+    this.activeMusicTimeoutId = setTimeout(() => {
+      this.activeMusicTimeoutId = null;
+      if (this.musicActive) {
+        void this.playDynamicMusic();
       }
-      const current = this.fallbackPrimary;
-      const next = this.fallbackSecondary;
-      if (!Number.isFinite(current.duration) || current.duration <= 0) {
-        return;
-      }
-      const crossfadeWindow = this.fallbackFadeMs / 1000;
-      if (this.fallbackCrossfadeActive) {
-        return;
-      }
-      if (current.currentTime < current.duration - crossfadeWindow) {
-        return;
-      }
-
-      this.fallbackCrossfadeActive = true;
-      next.currentTime = 0;
-      next.volume = 0;
-      this.safePlay(next);
-      this.rampVolume(next, 0, targetVolume, this.fallbackFadeMs);
-      this.rampVolume(current, current.volume, 0, this.fallbackFadeMs);
-
-      window.setTimeout(() => {
-        current.pause();
-        current.currentTime = 0;
-        this.fallbackPrimary = next;
-        this.fallbackSecondary = current;
-        this.fallbackCrossfadeActive = false;
-      }, this.fallbackFadeMs + 20);
-    }, 90);
+    }, 55000);
   }
 
   public playShoot(weapon: WeaponType) {

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2026-03-23 [Author: Agent]
+### Added
+- Implemented continuous dynamic background music system using Web Audio API AudioBufferSourceNodes (Fixes #26).
+
 ## [0.9.0] - 2026-03-23 [Author: Miro Slezák]
 ### Added
 - Configured Vercel deployment with live URL `https://web-fps.vercel.app`. Added Deployment section and status badges to `README.md` (Fixes #68, #69).

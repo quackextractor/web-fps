@@ -156,10 +156,14 @@ export default function FPSGame() {
       return;
     }
     if (gameState === "playing" && settings.musicEnabled) {
-      void soundManager.startMusic();
+      void soundManager.playDynamicMusic();
       return;
     }
-    soundManager.stopMusic(true);
+    if (gameState === "dead") {
+      soundManager.playEndMusic();
+    } else {
+      soundManager.stopMusic(false);
+    }
   }, [gameState, settings.musicEnabled, isLoaded]);
 
   useEffect(() => {
@@ -907,8 +911,6 @@ export default function FPSGame() {
           setGameState(previousGameStateRef.current);
         } else if (gameStateRef.current === "levelSelect") {
           setGameState("mainMenu");
-        } else if (gameStateRef.current === "login") {
-          setGameState("mainMenu");
         } else if (gameStateRef.current === "factory") {
           setGameState("mainMenu");
         } else if (gameStateRef.current === "armory") {
@@ -1095,7 +1097,7 @@ export default function FPSGame() {
             setIsSceneTransitioning(false);
           }}
           level={activeLevel}
-          sounds={[]}
+          sounds={["/sounds/start.mp3", "/sounds/loop.mp3", "/sounds/end.mp3", "/sounds/full.mp3"]}
         />
       )}
 
