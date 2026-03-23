@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-03-23 [Author: Miro Slezák]
+### Added
+- Configured Vercel deployment with live URL `https://web-fps.vercel.app`. Added Deployment section and status badges to `README.md` (Fixes #68, #69).
+- Added `docs/dependencies.md` documenting usage reasons for all external libraries (Fixes #31).
+- Updated Next.js configuration to enforce Vercel Edge CDN caching for static files (`Cache-Control` max-age and `stale-while-revalidate`) and explicitly linked `assetPrefix` (Fixes #43, #47, #51).
+- Added GitHub Actions `.github/workflows/deploy.yml` pipeline (Fixes #71).
+- Detailed zero-downtime deployment (Blue/Green) and database migration strategies in `docs/zero-downtime-strategy.md` and `docs/deployment-procedure.md`.
+- Appended Technologies and Versions section to `README.md` (Fixes #27).
+
 ## [0.8.0] - 2026-03-22 [Author: Filip Houdek]
 ### Fixed
 - Economy offline fallback: cache save data to localStorage on every state change and after successful cloud saves, ensuring a recent local backup is always available (Fixes #13).

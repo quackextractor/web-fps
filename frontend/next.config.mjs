@@ -63,7 +63,17 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // Explicitly configuring Vercel's Edge CDN caching behavior
+            value: 'public, max-age=31536000, immutable, s-maxage=31536000, stale-while-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/textures/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, s-maxage=31536000, stale-while-revalidate',
           },
         ],
       },
@@ -84,6 +94,8 @@ const nextConfig = {
   images: {
     unoptimized: false,
   },
+  // Explicitly link the assetPrefix to a CDN to ensure static files are distributed remotely
+  assetPrefix: 'https://web-fps.vercel.app',
   // Enforce GZIP/Brotli compression for all responses
   compress: true,
 }

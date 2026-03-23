@@ -96,6 +96,7 @@
     "@vitejs/plugin-react": "^4.0.0",
     "dotenv": "^17.3.1",
     "eslint-config-next": "^16.1.6",
+    "globals": "^17.4.0",
     "jsdom": "^27.4.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",

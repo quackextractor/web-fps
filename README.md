@@ -1,6 +1,22 @@
 # INDUSTRIALIST - Descent Into Darkness
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/quackextractor/web-fps)
+
+Play the game live at: `https://web-fps.vercel.app`
+
 A high-performance retro raycasting 3D FPS built with React, Next.js, and a custom Canvas engine.
+
+## Deployment
+This application is automatically deployed via Vercel ensuring high availability and zero-downtime edge caching.
+[![Deployment Status](https://img.shields.io/badge/Vercel-Deployed-green.svg)](https://web-fps.vercel.app)
+
+## Technologies and Versions
+- **Next.js**: v16.1.6
+- **React** (and React DOM): v19.2.0
+- **Prisma** (and Prisma Client): v5.22.0
+- **Tailwind CSS**: v4.1.9
+- **Supabase / PostgreSQL**: (Version managed via the Supabase platform, as noted in the database setup).
 
 ## Features
 -   **Proprietary Raycasting Engine**: Custom-built engine with texture mapping, sprite rendering, and distance shading.

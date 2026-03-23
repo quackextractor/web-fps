@@ -1,0 +1,43 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm i -g pnpm
+
+      - name: Install Dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint Rules Check
+        working-directory: frontend
+        run: pnpm run lint
+
+      - name: Execute Tests
+        working-directory: frontend
+        run: pnpm test
+
+      - name: Generate Prisma Types
+        working-directory: frontend
+        run: pnpm exec prisma generate
+
+      # Production build check (Vercel will handle actual deployment via its native pipeline)
+      - name: Build Application Payload
+        working-directory: frontend
+        run: pnpm run build

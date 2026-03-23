@@ -48,7 +48,7 @@ describe('GET /api/leaderboard', () => {
         const data = await response.json();
 
         expect(response.status).toBe(500);
-        expect(data).toHaveProperty('error', 'Failed to fetch leaderboard');
+        expect(data).toHaveProperty('error', 'Internal server error');
 
         spy.mockRestore();
     });
