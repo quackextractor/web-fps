@@ -46,11 +46,6 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Replaced all `console.error`, `console.warn`, and `console.log` calls across 14 frontend files with the new `logger` utility to ensure logs contain timestamps and error types.
-## [0.8.4] - 2026-03-22 [Author: Filip Houdek]
-### Added
-- Integrated Sentry (`@sentry/nextjs`) for centralized error tracking and log analysis (Fixes #66).
-- Added client and server Sentry configuration files and Next.js instrumentation hook.
-- Documented the Sentry integration in `docs/documentation.md`.
 
 ## [0.7.5] - 2026-03-22 [Author: Tobias Mrazek]
 ### Fixed
