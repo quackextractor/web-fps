@@ -1,6 +1,6 @@
 {
   "name": "industrialist-web-game",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "private": true,
   "scripts": {
     "build": "prisma generate && next build",
@@ -95,6 +95,7 @@
     "@typescript-eslint/parser": "^8.54.0",
     "@vitejs/plugin-react": "^4.0.0",
     "dotenv": "^17.3.1",
+    "eslint": "^9.0.0",
     "eslint-config-next": "^16.1.6",
     "globals": "^17.4.0",
     "jsdom": "^27.4.0",

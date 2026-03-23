@@ -30,16 +30,15 @@ export class SoundManager {
     loop: "/sounds/loop.mp3",
     end: "/sounds/end.mp3",
     full: "/sounds/full.mp3",
-    hitmark: "/audio/hitmark.mp3",
+    hitmark: "/sounds/hitmark.mp3",
   };
 
   constructor() {
-    if (typeof window !== "undefined") {
-      this.init();
-    }
+    // AudioContext initialization deferred to public init() method
   }
 
-  private init() {
+  public init() {
+    if (this.ctx) return;
     try {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       this.masterGain = this.ctx.createGain();
