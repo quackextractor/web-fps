@@ -94,8 +94,8 @@ const nextConfig = {
   images: {
     unoptimized: false,
   },
-  // Explicitly link the assetPrefix to a CDN to ensure static files are distributed remotely
-  assetPrefix: 'https://web-fps.vercel.app',
+  // Explicitly link the assetPrefix to a CDN or dynamically map it for Vercel deployments
+  assetPrefix: process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : '',
   // Enforce GZIP/Brotli compression for all responses
   compress: true,
 }

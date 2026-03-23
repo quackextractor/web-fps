@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] - 2026-03-23 [Author: Miro Slezák]
+### Fixed
+- Removed hardcoded `assetPrefix` in `next.config.mjs` and made it dynamically map to Vercel deployments, preventing infinite loading screens on custom domains.
+- Verified built-in safety timeout in `AssetPreloader` to bypass freezes.
+
 ## [0.10.1] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
 - Fixed critical loading screen freeze caused by browser autoplay policies blocking `audio.oncanplaythrough` events. Preloader now securely caches audio via `fetch` before initializing game assets, and a 10-second safety timeout was implemented to guarantee progression.
