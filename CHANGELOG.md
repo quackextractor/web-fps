@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.3] - 2026-03-23 [Author: Miro Slezák]
+### Fixed
+- Removed hardcoded `assetPrefix` in `next.config.mjs` to resolve Next.js static asset and CSS routing issues (infinite loading/404) on custom Vercel domains.
+- Verified `AssetPreloader.tsx` built-in 10-second safety timeout and fetch fallbacks.
+
 ## [0.10.2] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
 - Removed hardcoded `assetPrefix` in `next.config.mjs` and made it dynamically map to Vercel deployments, preventing infinite loading screens on custom domains.
