@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.4] - 2026-03-23 [Author: Miro Slezák]
+### Fixed
+- Deferred `AudioContext` initialization in `SoundManager` to prevent browser autoplay policy violations on load.
+- Added missing `full.mp3` audio asset to the `public/sounds/` directory.
+- Corrected incorrect file path mapping for the `hitmark.mp3` asset.
+- Fixed GitHub Actions CI pipeline crash by explicitly adding `eslint` to `devDependencies` and regenerating `pnpm-lock.yaml`.
+
 ## [0.10.3] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
 - Removed hardcoded `assetPrefix` in `next.config.mjs` to resolve Next.js static asset and CSS routing issues (infinite loading/404) on custom Vercel domains.
