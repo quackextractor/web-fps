@@ -74,16 +74,28 @@ export function AssetPreloader({ onComplete, level, sounds = [] }: AssetPreloade
 
         // Preload sounds
         sounds.forEach((src) => {
-            const audio = new Audio();
-            audio.src = src;
-            audio.oncanplaythrough = updateProgress;
-            audio.onerror = () => handleError(src);
-            // Some browsers require explicit load for Audio
-            audio.load();
+            // Using fetch instead of Audio object to avoid browser autoplay policy suspensions
+            // which can cause oncanplaythrough to never fire and block loading indefinitely
+            fetch(src)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                    return res.blob();
+                })
+                .then(updateProgress)
+                .catch(() => handleError(src));
         });
+
+        // Safety timeout to ensure game loads even if some assets hang silently
+        const fallbackTimeout = setTimeout(() => {
+            if (!isCancelled && loaded < total) {
+                logger.warn("Asset preloader timed out, forcing completion");
+                onComplete();
+            }
+        }, 10000);
 
         return () => {
             isCancelled = true;
+            clearTimeout(fallbackTimeout);
         };
     }, [level, sounds, onComplete]);
 
