@@ -1022,9 +1022,12 @@ export default function FPSGame() {
 
   // Handle Resolution
   useEffect(() => {
+    // 1. Add the hydration guard to prevent zoomed FOV on startup
     if (!isLoaded) return;
+
     const canvas = offscreenCanvasRef.current;
     const visibleCanvas = canvasRef.current;
+
     if (canvas && visibleCanvas) {
       const [w, h] = settings.resolution.split("x").map(Number);
       canvas.width = w;
@@ -1033,13 +1036,16 @@ export default function FPSGame() {
       visibleCanvas.height = h;
       screenWidthRef.current = w;
       screenHeightRef.current = h;
-      numRaysRef.current = Math.floor(w / 4); // maintain aspect of "rays"
+
+      // This calculates the correct FOV density based on loaded width
+      numRaysRef.current = Math.floor(w / 4);
 
       // Update renderer dimensions
       if (rendererRef.current) {
         rendererRef.current.updateDimensions(w, h, Math.floor(w / 4));
       }
     }
+    // 2. Ensure isLoaded is tracked in the dependency array
   }, [settings.resolution, isLoaded]);
 
   // Handle Fullscreen

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
+### Fixed
+- Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on page load due to a hydration race condition. Added an `isLoaded` guard to ensure settings are fully populated from `localStorage` before adjusting canvas dimensions or raycasting density.
+
 ## [0.10.7] - 2026-03-24 [Author: Miro Slezák]
 ### Added
 - Implemented HTTP `Cache-Control` headers for static assets in `next.config.mjs` to ensure long-term browser/CDN caching.
