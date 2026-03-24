@@ -290,12 +290,17 @@ export default function FPSGame() {
   }, [savedProgress.unlockedWeapons, getDifficultyMultiplier, resetRunMetrics]);
 
   const beginLevelTransition = useCallback((levelIndex: number, preservePlayer = false) => {
+    if (preloadedLevelIndex === levelIndex) {
+      loadLevel(levelIndex, preservePlayer);
+      setCurrentLevel(levelIndex);
+      return;
+    }
     isSceneTransitioningRef.current = true;
     setIsSceneTransitioning(true);
     setPreloadedLevelIndex(null);
     setCurrentLevel(levelIndex);
     loadLevel(levelIndex, preservePlayer);
-  }, [loadLevel]);
+  }, [loadLevel, preloadedLevelIndex]);
 
   const restartCurrentLevel = useCallback(() => {
     // Restore weapons and ammo from before current level started

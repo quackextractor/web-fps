@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.6] - 2026-03-24 [Author: Miro Slezák]
+### Fixed
+- Fixed redundant asset preloading when starting a game from the Main Menu. Implemented a cache check in `beginLevelTransition` to skip resetting the preloader state if assets for the target level are already loaded (Fixes #130).
+
 ## [0.10.5] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Resolved issue #129 where resolution and Field of View (FOV) settings failed to persist on page load. Added an `isLoaded` check to the resolution `useEffect` in `fps-game.tsx` to ensure settings are hydrated from `localStorage` before being applied to the canvas and renderer.
