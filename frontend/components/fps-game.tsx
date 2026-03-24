@@ -1017,6 +1017,7 @@ export default function FPSGame() {
 
   // Handle Resolution
   useEffect(() => {
+    if (!isLoaded) return;
     const canvas = offscreenCanvasRef.current;
     const visibleCanvas = canvasRef.current;
     if (canvas && visibleCanvas) {
@@ -1034,7 +1035,7 @@ export default function FPSGame() {
         rendererRef.current.updateDimensions(w, h, Math.floor(w / 4));
       }
     }
-  }, [settings.resolution]);
+  }, [settings.resolution, isLoaded]);
 
   // Handle Fullscreen
   useEffect(() => {

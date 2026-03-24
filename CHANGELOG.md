@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.5] - 2026-03-24 [Author: Miro Slezák]
+### Fixed
+- Resolved issue #129 where resolution and Field of View (FOV) settings failed to persist on page load. Added an `isLoaded` check to the resolution `useEffect` in `fps-game.tsx` to ensure settings are hydrated from `localStorage` before being applied to the canvas and renderer.
+
 ## [0.10.4] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
 - Deferred `AudioContext` initialization in `SoundManager` to prevent browser autoplay policy violations on load.
