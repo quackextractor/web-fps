@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.7] - 2026-03-24 [Author: Miro Slezák]
+### Added
+- Implemented HTTP `Cache-Control` headers for static assets in `next.config.mjs` to ensure long-term browser/CDN caching.
+- Implemented a cache invalidation mechanism by appending the game version as a query parameter (`?v=`) to texture paths in `fps-engine.ts` (Fixes #131).
+
 ## [0.10.6] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed redundant asset preloading when starting a game from the Main Menu. Implemented a cache check in `beginLevelTransition` to skip resetting the preloader state if assets for the target level are already loaded (Fixes #130).

@@ -459,10 +459,10 @@ export const LEVELS: Level[] = [
     exitX: 18,
     exitY: 12,
     wallTextures: {
-      1: '/textures/wall_tech.bmp',
-      2: '/textures/wall_metal.bmp', // Tech floor
-      3: '/textures/wall_tech.bmp',
-      4: '/textures/wall_tech.bmp',
+      1: '/textures/wall_tech.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      2: '/textures/wall_metal.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION, // Tech floor
+      3: '/textures/wall_tech.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      4: '/textures/wall_tech.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
       9: 'generated:exit', // Exit
     },
     enemies: [
@@ -489,10 +489,10 @@ export const LEVELS: Level[] = [
     exitX: 20,
     exitY: 12,
     wallTextures: {
-      1: '/textures/wall_brick.bmp',
-      2: '/textures/wall_brick.bmp',
-      3: '/textures/wall_metal.bmp',
-      4: '/textures/wall_brick.bmp',
+      1: '/textures/wall_brick.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      2: '/textures/wall_brick.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      3: '/textures/wall_metal.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      4: '/textures/wall_brick.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
       9: 'generated:exit', // Exit
     },
     enemies: [
@@ -524,8 +524,8 @@ export const LEVELS: Level[] = [
     exitX: 22,
     exitY: 10,
     wallTextures: {
-      1: '/textures/wall_stone.bmp',
-      5: '/textures/wall_stone.bmp',
+      1: '/textures/wall_stone.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
+      5: '/textures/wall_stone.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
       9: 'generated:exit', // Exit
     },
     enemies: [
@@ -561,7 +561,7 @@ export const LEVELS: Level[] = [
     exitX: 13,
     exitY: 12,
     wallTextures: {
-      1: '/textures/wall_tech.bmp',
+      1: '/textures/wall_tech.bmp?v=' + process.env.NEXT_PUBLIC_GAME_VERSION,
       9: 'generated:exit',
     },
     enemies: [
