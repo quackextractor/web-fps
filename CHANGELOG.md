@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
-- Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on page load due to a hydration race condition. Added an `isLoaded` guard to ensure settings are fully populated from `localStorage` before adjusting canvas dimensions or raycasting density.
+- Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
 
 ## [0.10.7] - 2026-03-24 [Author: Miro Slezák]
 ### Added

@@ -126,6 +126,8 @@ export default function FPSGame() {
   const touchLookRef = useRef(0);
   const isTouchDeviceRef = useRef(false);
   const isMobile = useIsMobile();
+  const activeLevel = LEVELS[currentLevel] ?? LEVELS[0];
+  const shouldShowAssetPreloader = isSceneTransitioning || preloadedLevelIndex !== currentLevel;
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -1022,8 +1024,10 @@ export default function FPSGame() {
 
   // Handle Resolution
   useEffect(() => {
-    // 1. Add the hydration guard to prevent zoomed FOV on startup
+    // Wait for settings to load AND for the preloader to finish mounting the canvas
     if (!isLoaded) return;
+    if (shouldShowAssetPreloader) return;
+    if (!canvasRef.current) return;
 
     const canvas = offscreenCanvasRef.current;
     const visibleCanvas = canvasRef.current;
@@ -1045,8 +1049,8 @@ export default function FPSGame() {
         rendererRef.current.updateDimensions(w, h, Math.floor(w / 4));
       }
     }
-    // 2. Ensure isLoaded is tracked in the dependency array
-  }, [settings.resolution, isLoaded]);
+    // Ensure all dependencies are tracked
+  }, [settings.resolution, isLoaded, shouldShowAssetPreloader]);
 
   // Handle Fullscreen
   useEffect(() => {
@@ -1096,8 +1100,6 @@ export default function FPSGame() {
 
   const [resW, resH] = settings.resolution.split("x").map(Number);
   const aspectRatio = resW / resH;
-  const activeLevel = LEVELS[currentLevel] ?? LEVELS[0];
-  const shouldShowAssetPreloader = isSceneTransitioning || preloadedLevelIndex !== currentLevel;
 
   return (
     <div className="flex flex-col items-center justify-center bg-black w-full h-[100dvh] min-h-[100dvh] overflow-hidden p-0 m-0">
