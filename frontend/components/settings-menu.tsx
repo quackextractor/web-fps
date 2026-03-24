@@ -385,11 +385,13 @@ export function SettingsMenu({
                         >
                             UNLOCK ALL WEAPONS
                         </button>
-                        <Toggle
-                            label="DEBUG MODE (P)"
-                            value={localSettings.debugMode}
-                            onChange={(v) => updateLocalSetting("debugMode", v)}
-                        />
+                        {process.env.NODE_ENV !== 'production' && (
+                            <Toggle
+                                label="DEBUG MODE (P)"
+                                value={localSettings.debugMode}
+                                onChange={(v) => updateLocalSetting("debugMode", v)}
+                            />
+                        )}
                         <Toggle
                             label="FORCE MOBILE CONTROLS"
                             value={localSettings.forceMobileControls}
