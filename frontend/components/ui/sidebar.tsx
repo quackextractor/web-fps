@@ -273,7 +273,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <PanelLeftIcon aria-label="PanelLeft" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
