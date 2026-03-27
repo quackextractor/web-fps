@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.5] - 2026-03-27 [Author: Pavlo Kosov]
+### Added
+- Exported full repository commit history to `docs/commit-history.txt` to provide a permanent, verifiable record of all team contributions (Fixes #73).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
