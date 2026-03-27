@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.8] - 2026-03-27 [Author: Pavlo Kosov]
+### Changed
+- Converted all wall texture assets in `frontend/public/textures/` from legacy `.bmp` format to modern `.webp` (lossless) using `sharp`.
+- Updated all texture path references in `frontend/lib/fps-engine.ts` to use `.webp` extensions.
+- Added `frontend/scripts/convert_to_webp.js` for converting BMP textures to WebP.
+- Modified `generate-textures` npm script to chain BMP generation with WebP conversion (Fixes #39).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
