@@ -82,6 +82,9 @@ const initialSaveData: EconomySaveData = {
         ore_green: 0,
         iron_bar: 0,
         plasmoid_bar: 0,
+        blueprint_shotgun: 0,
+        blueprint_chaingun: 0,
+        blueprint_chainsaw: 0,
     },
     machines: [
         { id: "factory_slot0", type: "factory", level: 1, lastProducedAt: Date.now(), active: true },
@@ -121,6 +124,9 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
                 nextInventory.ore_green = incoming.inventory.ore_green ?? nextInventory.ore_green ?? 0;
                 nextInventory.iron_bar = incoming.inventory.iron_bar ?? nextInventory.iron_bar ?? 0;
                 nextInventory.plasmoid_bar = incoming.inventory.plasmoid_bar ?? nextInventory.plasmoid_bar ?? 0;
+                nextInventory.blueprint_shotgun = incoming.inventory.blueprint_shotgun ?? nextInventory.blueprint_shotgun ?? 0;
+                nextInventory.blueprint_chaingun = incoming.inventory.blueprint_chaingun ?? nextInventory.blueprint_chaingun ?? 0;
+                nextInventory.blueprint_chainsaw = incoming.inventory.blueprint_chainsaw ?? nextInventory.blueprint_chainsaw ?? 0;
             }
 
             const nextMachines = incoming.machines ?? previous.machines;

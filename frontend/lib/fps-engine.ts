@@ -301,6 +301,9 @@ export enum PickupType {
   MEGAHEALTH = 7,
   ORE_RED = 8,
   ORE_GREEN = 9,
+  BLUEPRINT_SHOTGUN = 10,
+  BLUEPRINT_CHAINGUN = 11,
+  BLUEPRINT_CHAINSAW = 12,
 }
 
 export interface Pickup {
@@ -326,6 +329,9 @@ export const PICKUP_CONFIG: Record<PickupType, {
   [PickupType.MEGAHEALTH]: { name: 'Megahealth', color: '#0000ff', value: 100 },
   [PickupType.ORE_RED]: { name: 'Red Ore', color: '#ff4444', value: 1 },
   [PickupType.ORE_GREEN]: { name: 'Green Ore', color: '#44ff44', value: 1 },
+  [PickupType.BLUEPRINT_SHOTGUN]: { name: 'Shotgun Blueprint', color: '#aaaaff', value: 1 },
+  [PickupType.BLUEPRINT_CHAINGUN]: { name: 'Chaingun Blueprint', color: '#9999ff', value: 1 },
+  [PickupType.BLUEPRINT_CHAINSAW]: { name: 'Chainsaw Blueprint', color: '#ff99ff', value: 1 },
 };
 
 export interface Level {
@@ -476,7 +482,7 @@ export const LEVELS: Level[] = [
     pickups: [
       { x: 8, y: 2, type: PickupType.AMMO_BULLETS, collected: false },
       { x: 10, y: 8, type: PickupType.HEALTH, collected: false },
-      { x: 15, y: 12, type: PickupType.WEAPON_SHOTGUN, collected: false },
+      { x: 15, y: 12, type: PickupType.BLUEPRINT_SHOTGUN, collected: false },
       { x: 5, y: 8, type: PickupType.AMMO_SHELLS, collected: false },
     ],
   },
@@ -510,7 +516,7 @@ export const LEVELS: Level[] = [
       { x: 10, y: 5, type: PickupType.HEALTH, collected: false },
       { x: 5, y: 8, type: PickupType.AMMO_BULLETS, collected: false },
       { x: 15, y: 8, type: PickupType.AMMO_SHELLS, collected: false },
-      { x: 10, y: 12, type: PickupType.WEAPON_CHAINGUN, collected: false },
+      { x: 10, y: 12, type: PickupType.BLUEPRINT_CHAINGUN, collected: false },
       { x: 18, y: 10, type: PickupType.ARMOR, collected: false },
       { x: 3, y: 12, type: PickupType.MEGAHEALTH, collected: false },
     ],
@@ -549,7 +555,7 @@ export const LEVELS: Level[] = [
       { x: 12, y: 10, type: PickupType.AMMO_SHELLS, collected: false },
       { x: 8, y: 9, type: PickupType.ARMOR, collected: false },
       { x: 16, y: 9, type: PickupType.ARMOR, collected: false },
-      { x: 2, y: 10, type: PickupType.WEAPON_CHAINSAW, collected: false },
+      { x: 2, y: 10, type: PickupType.BLUEPRINT_CHAINSAW, collected: false },
     ],
   },
   {
@@ -575,9 +581,9 @@ export const LEVELS: Level[] = [
       createEnemy(EnemyType.CYBERDEMON, 11, 7),
     ],
     pickups: [
-      { x: 3, y: 3, type: PickupType.WEAPON_SHOTGUN, collected: false },
-      { x: 3, y: 5, type: PickupType.WEAPON_CHAINGUN, collected: false },
-      { x: 3, y: 7, type: PickupType.WEAPON_CHAINSAW, collected: false },
+      { x: 3, y: 3, type: PickupType.BLUEPRINT_SHOTGUN, collected: false },
+      { x: 3, y: 5, type: PickupType.BLUEPRINT_CHAINGUN, collected: false },
+      { x: 3, y: 7, type: PickupType.BLUEPRINT_CHAINSAW, collected: false },
       { x: 3, y: 9, type: PickupType.AMMO_BULLETS, collected: false },
       { x: 5, y: 9, type: PickupType.AMMO_SHELLS, collected: false },
       { x: 7, y: 9, type: PickupType.HEALTH, collected: false },

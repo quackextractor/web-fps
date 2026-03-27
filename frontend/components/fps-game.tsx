@@ -680,6 +680,15 @@ export default function FPSGame() {
               weaponsUnlockedRef.current.add(WeaponType.CHAINSAW);
               playerRef.current.weapon = WeaponType.CHAINSAW;
               break;
+            case PickupType.BLUEPRINT_SHOTGUN:
+              addResource("blueprint_shotgun", 1);
+              break;
+            case PickupType.BLUEPRINT_CHAINGUN:
+              addResource("blueprint_chaingun", 1);
+              break;
+            case PickupType.BLUEPRINT_CHAINSAW:
+              addResource("blueprint_chainsaw", 1);
+              break;
             case PickupType.ORE_RED:
               runLootRef.current.ore_red += 1;
               break;
