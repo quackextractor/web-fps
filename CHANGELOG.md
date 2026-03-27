@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.3] - 2026-03-27 [Author: Pavlo Kosov]
+### Added
+- Conducted manual testing on a physical Android device (Samsung Galaxy A52, Android 13, Chrome 124).
+- Created `docs/mobile-testing-log.md` documenting the device, OS, browser, and all touch features tested (Fixes #60).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
