@@ -8,6 +8,8 @@
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:perf": "artillery run scripts/perf-test.yml"
   },
   "pnpm": {
@@ -80,6 +82,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.44.0",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@tailwindcss/postcss": "^4.1.9",
