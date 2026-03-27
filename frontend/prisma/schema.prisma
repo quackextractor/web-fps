@@ -18,3 +18,31 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model TestSession {
+  id             String             @id @default(uuid())
+  testerName     String
+  testDate       DateTime           @default(now())
+  durationMin    Int
+  observations   String?            // General Observations bounding box
+  createdAt      DateTime           @default(now())
+  scenarios      ScenarioResult[]
+}
+
+model ScenarioResult {
+  id             String             @id @default(uuid())
+  sessionId      String
+  scenarioId     String             // e.g., "TS-A-01"
+  issueLog       String?            // Dotted line feedback space
+  session        TestSession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  steps          StepResult[]
+}
+
+model StepResult {
+  id               String           @id @default(uuid())
+  scenarioResultId String
+  stepNumber       Int
+  status           String           // "✓", "✗", or "~"
+  scenarioResult   ScenarioResult   @relation(fields: [scenarioResultId], references: [id], onDelete: Cascade)
+}
+

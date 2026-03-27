@@ -15,7 +15,9 @@ interface MainMenuProps {
     onFactory: () => void;
     onArmory: () => void;
     onLeaderboard: () => void;
+    onQAForm: () => void;
 }
+
 
 export const MainMenu: React.FC<MainMenuProps> = ({
     onStartGame,
@@ -30,7 +32,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onFactory,
     onArmory,
     onLeaderboard,
+    onQAForm,
 }) => {
+
     const [currentPage, setCurrentPage] = useState(0);
 
     const buttonPages = [
@@ -57,8 +61,13 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         ],
         [
             { label: "CREDITS", onClick: onCredits, variant: "secondary" as const },
-            { label: "CHANGELOG", onClick: onChangelog, variant: "secondary" as const },
+            { label: "QA TESTING FORM", onClick: onQAForm, variant: "secondary" as const },
         ],
+        [
+            { label: "CHANGELOG", onClick: onChangelog, variant: "secondary" as const },
+            { label: "SOURCE", onClick: onSource, variant: "secondary" as const },
+        ],
+
     ];
 
     const totalPages = buttonPages.length;
@@ -166,7 +175,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     <MenuButton onClick={onOptions} variant="secondary">
                         OPTIONS
                     </MenuButton>
+                    <MenuButton onClick={onQAForm} variant="secondary">
+                        QA TESTING FORM
+                    </MenuButton>
                 </div>
+
 
                 <div className="hidden xl:block mt-4 sm:mt-8 xl:mt-16 text-gray-500 text-center text-[8px] sm:text-[10px] xl:text-xs font-mono retro-text opacity-50">
                     <p className="text-yellow-600 mb-2">DEFAULT CONTROLS</p>

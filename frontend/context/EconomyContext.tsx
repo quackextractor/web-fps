@@ -73,7 +73,9 @@ interface EconomyContextType {
     unlockWeapon: (weapon: string, barCost: number, creditCost: number) => boolean;
     incrementKills: (amount: number) => void;
     updateHighestLevel: (level: number) => void;
+    clearProgress: () => void;
 }
+
 
 const initialSaveData: EconomySaveData = {
     credits: 500,
@@ -452,6 +454,21 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         setCloudError("");
     }, []);
 
+    const clearProgress = useCallback(() => {
+        setSaveData(initialSaveData);
+        setNetWorth(0);
+        setKills(0);
+        if (typeof window !== "undefined" && window.localStorage) {
+            // Clear all industrialist related keys
+            for (let i = 0; i < window.localStorage.length; i++) {
+                const key = window.localStorage.key(i);
+                if (key?.startsWith("industrialist_save_")) {
+                    window.localStorage.removeItem(key);
+                }
+            }
+        }
+    }, []);
+
     useEffect(() => {
         if (!isAuthenticated) {
             return;
@@ -821,7 +838,9 @@ export function EconomyProvider({ children }: { children: React.ReactNode }) {
         username,
         incrementKills,
         updateHighestLevel,
+        clearProgress,
     ]);
+
 
     return <EconomyContext.Provider value={value}>{children}</EconomyContext.Provider>;
 }

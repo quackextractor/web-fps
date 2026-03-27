@@ -1213,6 +1213,7 @@ export default function FPSGame() {
                   onFactory={openFactory}
                   onArmory={openArmory}
                   onLeaderboard={() => setGameState("leaderboard")}
+                  onQAForm={() => window.location.href = '/qa'}
                   onOptions={() => {
                     setPreviousGameState("mainMenu");
                     setGameState("settings");
