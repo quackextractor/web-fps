@@ -1,79 +1,79 @@
-# 📋 Projektový Issue Tracker (Retroaktivní Archiv)
+# Project Issue Tracker (Retroactive Archive)
 
-Tento dokument slouží jako oficiální evidence všech úkolů a hlášených chyb v projektu Industrialist. Každý bod technického zadání byl převeden na formální "Issue" s unikátním ID pro sledování v Changelogu.
+This document serves as the official record of all tasks and reported bugs in the Industrialist project. Each point of the technical specification has been converted into a formal "Issue" with a unique ID for tracking in the Changelog.
 
-## 🏗️ Sekce 1: Architektura a Infrastruktura
-- **#23 (1.1):** Dokumentace architektury (README)
-- **#24 (1.2):** Přehled verzí technologií
-- **#25 (1.3):** Adresářová struktura projektu
-- **#26 (1.4):** Separace logiky od UI
-- **#27 (1.5):** Separace statických souborů
-- **#28 (1.6):** Produkční konfigurační šablona (.env.production.example)
-- **#29 (1.7):** Ochrana citlivých dat v repozitáři
+## Section 1: Architecture and Infrastructure
+- **#23 (1.1):** Architecture documentation (README)
+- **#24 (1.2):** Technology versions overview
+- **#25 (1.3):** Project directory structure
+- **#26 (1.4):** Separation of logic from UI
+- **#27 (1.5):** Separation of static files
+- **#28 (1.6):** Production configuration template (.env.production.example)
+- **#29 (1.7):** Protection of sensitive data in the repository
 
-## 📦 Sekce 2: Závislosti a Balíčky
-- **#30 (2.1-2.2):** Správa externích knihoven a verzí
-- **#32 (2.3):** Implementace lock souboru (pnpm-lock.yaml)
-- **#33 (2.4):** Pravidelné kontroly aktualizací závislostí
-- **#34 (2.5):** Dokumentace důvodů pro použití knihoven
-- **#35 (2.6):** Audit a odstranění nepoužitých knihoven
+## Section 2: Dependencies and Packages
+- **#30 (2.1-2.2):** Management of external libraries and versions
+- **#32 (2.3):** Implementation of lock file (pnpm-lock.yaml)
+- **#33 (2.4):** Regular checks for dependency updates
+- **#34 (2.5):** Documentation of reasons for using libraries
+- **#35 (2.6):** Audit and removal of unused libraries
 
-## 🌐 Sekce 3: API a Server
-- **#33 (3.1):** Správné HTTP status kódy (200, 400, 404, 500)
-- **#34 (3.3):** Srozumitelné chybové hlášky pro klienta
-- **#35 (3.4):** Maskování interních chyb serveru
-- **#36 (3.6):** Validace vstupních dat (Zod)
-- **#37 (3.7):** GZIP komprese odpovědí serveru
+## Section 3: API and Server
+- **#33 (3.1):** Correct HTTP status codes (200, 400, 404, 500)
+- **#34 (3.3):** Comprehensible error messages for the client
+- **#35 (3.4):** Masking of internal server errors
+- **#36 (3.6):** Input data validation (Zod)
+- **#37 (3.7):** GZIP compression of server responses
 
-## ⚡ Sekce 4: Výkon a Formáty
-- **#38 (4.1):** Optimalizace velikosti obrázků
-- **#39 (4.2):** Převod textur na moderní formát (WebP)
-- **#40 (4.3):** Purge nepoužitého CSS/JS
-- **#41 (4.5):** Analýza počtu HTTP požadavků
-- **#42 (4.6):** Implementace Lazy Loading pro těžké komponenty
-- **#43 (4.7):** Konfigurace Vercel CDN (assetPrefix)
-- **#44 (4.9):** Lighthouse výkonnostní audit
-- **#45 (4.10):** Optimalizace LCP (Largest Contentful Paint)
+## Section 4: Performance and Formats
+- **#38 (4.1):** Image size optimization
+- **#39 (4.2):** Conversion of textures to modern format (WebP)
+- **#40 (4.3):** Purge of unused CSS/JS
+- **#41 (4.5):** Analysis of HTTP request count
+- **#42 (4.6):** Implementation of Lazy Loading for heavy components
+- **#43 (4.7):** Vercel CDN configuration (assetPrefix)
+- **#44 (4.9):** Lighthouse performance audit
+- **#45 (4.10):** LCP (Largest Contentful Paint) optimization
 
-## 🎨 Sekce 5: Optimalizace a Cache
-- **#46 (5.1-5.2):** Cache-Control hlavičky pro statické soubory
-- **#47 (5.3):** Verifikace funkčnosti cache
-- **#48 (5.4):** Invalidation cache při změně souborů (verzionování)
-- **#49 (5.5):** Explicitní konfigurace Edge CDN cache
+## Section 5: Optimization and Cache
+- **#46 (5.1-5.2):** Cache-Control headers for static files
+- **#47 (5.3):** Verification of cache functionality
+- **#48 (5.4):** Cache invalidation upon file changes (versioning)
+- **#49 (5.5):** Explicit Edge CDN cache configuration
 
-## ♿ Sekce 6: SEO a Přístupnost
-- **#50 (6.3):** Sémantická struktura nadpisů (h1-h3)
-- **#51 (6.4):** Alt atributy a aria-labels pro vizuální prvky
-- **#52 (6.5):** Responzivní design a mobilní použitelnost
+## Section 6: SEO and Accessibility
+- **#50 (6.3):** Semantic heading structure (h1-h3)
+- **#51 (6.4):** Alt attributes and aria-labels for visual elements
+- **#52 (6.5):** Responsive design and mobile usability
 
-## 🛡️ Sekce 7: Bezpečnost
-- **#54 (7.1):** Validace uživatelských vstupů (Auth/Save)
-- **#55 (7.2):** Ochrana proti XSS (Sanitizace/CSP)
-- **#56 (7.3):** Ochrana proti CSRF (Origin check)
-- **#57 (7.5):** Striktní odmítání nevalidních dat (400)
-- **#58 (7.6):** Secure a HttpOnly atributy pro session cookies
-- **#59 (7.7):** OWASP Top 10 bezpečnostní audit
+## Section 7: Security
+- **#54 (7.1):** User input validation (Auth/Save)
+- **#55 (7.2):** Protection against XSS (Sanitization/CSP)
+- **#56 (7.3):** Protection against CSRF (Origin check)
+- **#57 (7.5):** Strict rejection of invalid data (400)
+- **#58 (7.6):** Secure and HttpOnly attributes for session cookies
+- **#59 (7.7):** OWASP Top 10 security audit
 
-## 🧪 Sekce 8: Testování
-- **#60 (8.1-8.2):** Cross-browser a fyzické mobilní testování
-- **#61 (8.3):** Testy nevalidních vstupů (API Rejection)
-- **#62 (8.4):** Zátěžové testy (Artillery/K6)
-- **#63 (8.5):** Performance testy serveru
-- **#64 (8.6):** Evidence chyb v issue trackeru
+## Section 8: Testing
+- **#60 (8.1-8.2):** Cross-browser and physical mobile testing
+- **#61 (8.3):** Invalid input tests (API Rejection)
+- **#62 (8.4):** Stress tests (Artillery/K6)
+- **#63 (8.5):** Server performance tests
+- **#64 (8.6):** Error recording in the issue tracker
 
-## 📈 Sekce 9: Monitoring
-- **#65 (9.2):** Standardizace formátu logů (Timestamp/Error Type)
-- **#66 (9.3):** Integrace nástroje pro analýzu logů (Sentry)
-- **#94 (9.4):** Monitoring počtu hráčů a herních metrik (Implemented)
+## Section 9: Monitoring
+- **#65 (9.2):** Log format standardization (Timestamp/Error Type)
+- **#66 (9.3):** Log analysis tool integration (Sentry)
+- **#94 (9.4):** Player count and game metrics monitoring (Implemented)
 - **#68 (9.6):** Uptime monitoring (website availability)
 
-## 🚀 Sekce 10: Deployment
-- **#69 (10.1-10.2):** Produkční deployment a veřejná URL
-- **#70 (10.3):** Deaktivace Debug módu v produkci
+## Section 10: Deployment
+- **#69 (10.1-10.2):** Production deployment and public URL
+- **#70 (10.3):** Deactivation of Debug mode in production
 - **#71 (10.4):** CI/CD deployment procedure (GitHub Workflows)
-- **#72 (10.5):** Zero-downtime deployment strategie
+- **#72 (10.5):** Zero-downtime deployment strategy
 
-## 📂 Sekce 11-12: Management a Retrospektiva
-- **#73 (11.1-11.2):** Audit historie commitů a autorství
-- **#74 (11.5):** Propojení bug-fixů s commity
-- **#75 (12.1-12.7):** Týmová retrospektiva (Team Scrapes)
+## Section 11-12: Management and Retrospective
+- **#73 (11.1-11.2):** Audit of commit history and authorship
+- **#74 (11.5):** Linking bug fixes with commits
+- **#75 (12.1-12.7):** Team retrospective (Team Scrapes)

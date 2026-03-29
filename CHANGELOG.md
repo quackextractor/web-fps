@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.4] - 2026-03-29 [Author: Dominik Hoch]
+### Changed
+- Refactored `docs/issue-tracker-archive.md` to English and removed all emojis to meet professional documentation standards (Fixes #64).
+
+
 ## [0.7.3] - 2026-03-22 [Author: Dominik Hoch]
 ### Added
 - Implemented administrative monitoring API at `/api/admin/metrics` using Prisma aggregations (Fixes #94).
