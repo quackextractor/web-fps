@@ -100,7 +100,7 @@
     "globals": "^17.4.0",
     "jsdom": "^27.4.0",
     "postcss": "^8.5",
-    "tailwindcss": "^4.1.9",
+    "tailwindcss": "^4.2.2",
     "tw-animate-css": "1.3.3",
     "typescript": "^5",
     "typescript-eslint": "^8.54.0",
