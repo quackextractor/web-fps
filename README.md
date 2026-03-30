@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.10.8-blue.svg)](https://github.com/quackextractor/web-fps)
 
-Play the game live at: `https://web-fps.vercel.app`
+Play the game live at: `https://web-fps-sigma.vercel.app`
 
 A high-performance retro raycasting 3D FPS built with React, Next.js, and a custom Canvas engine.
 
