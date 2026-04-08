@@ -8,6 +8,8 @@
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:perf": "artillery run scripts/perf-test.yml"
   },
   "pnpm": {
