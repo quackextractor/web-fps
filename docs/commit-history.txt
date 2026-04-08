@@ -1,0 +1,277 @@
+b4d6a1d 2026-03-27 LostSoul: Merge pull request #109 from quackextractor/issue53
+9452765 2026-03-27 paroniim: fix: remove eslint-plugin-jsx-a11y from package.json to match lock file
+cd742b5 2026-03-27 paroniim: solve issue 25
+b6c8fe8 2026-03-22 paroniim: improve accessibility by adding aria labels to icon components
+2d61665 2026-03-24 LostSoul: docs: update version badge to 0.10.8
+0d76104 2026-03-24 LostSoul: fix: resolve resolution hydration race condition with asset preloader (Fixes #129)
+322488b 2026-03-24 LostSoul: fix: resolve resolution and FOV hydration race condition (Fixes #129)
+256ea9b 2026-03-24 LostSoul: Merge pull request #124 from quackextractor/dependabot/npm_and_yarn/frontend/radix-ui/react-avatar-1.1.11
+21c5764 2026-03-24 LostSoul: Merge pull request #125 from quackextractor/dependabot/npm_and_yarn/frontend/radix-ui/react-separator-1.1.8
+3673285 2026-03-24 LostSoul: Merge pull request #126 from quackextractor/dependabot/npm_and_yarn/frontend/radix-ui/react-progress-1.1.8
+6c9ff46 2026-03-24 dependabot[bot]: chore(deps): bump @radix-ui/react-avatar in /frontend
+42b5c94 2026-03-24 dependabot[bot]: chore(deps): bump @radix-ui/react-separator in /frontend
+2839022 2026-03-24 dependabot[bot]: chore(deps): bump @radix-ui/react-progress in /frontend
+f5f9028 2026-03-24 LostSoul: Merge pull request #127 from quackextractor/dependabot/npm_and_yarn/frontend/jose-6.2.2
+7af87f7 2026-03-24 dependabot[bot]: chore(deps): bump jose from 6.2.0 to 6.2.2 in /frontend
+144c331 2026-03-24 LostSoul: Merge pull request #128 from quackextractor/dependabot/npm_and_yarn/frontend/radix-ui/react-tooltip-1.2.8
+f51207b 2026-03-24 LostSoul: Merge pull request #107 from quackextractor/issue70
+34aab0c 2026-03-24 LostSoul: feat: implement HTTP caching and cache invalidation for static assets (#131)
+e856b35 2026-03-24 LostSoul: fix: resolve redundant asset preloading on game start (Fixes #130)
+5ad44b0 2026-03-24 LostSoul: Delete create-issues.bat
+6c80a8e 2026-03-24 LostSoul: fix: resolve resolution and FOV persistence issue #129
+0736ae5 2026-03-23 LostSoul: Change deployment link in README
+1e8743e 2026-03-23 LostSoul: Fixed: Audio system initialization and CI pipeline lint step
+fb86704 2026-03-23 LostSoul: docs: bump version to 0.10.3 and update documentation
+b78ffb6 2026-03-23 LostSoul: Fixed: Removed hardcoded assetPrefix in next.config.mjs
+e329f08 2026-03-23 LostSoul: fix(config): make assetPrefix dynamic for vercel deployments
+fb4850f 2026-03-23 LostSoul: Update version.md
+3be2c12 2026-03-23 LostSoul: fix preloading
+8d4b00f 2026-03-23 LostSoul: background music
+c0feca3 2026-03-23 LostSoul: chore: Resolve CDN, deployment, and documentation issues
+b1704c7 2026-03-23 LostSoul: Revert "Merge pull request #123 from quackextractor/fix/issue-66"
+4416bbb 2026-03-22 dependabot[bot]: chore(deps): bump @radix-ui/react-tooltip in /frontend
+4756e22 2026-03-22 houdcat: Merge pull request #123 from quackextractor/fix/issue-66
+947e5b1 2026-03-22 houdcat: Integrate Sentry for centralized log analysis (Fixes #66) - Add Sentry client and server configs - Add instrumentation.ts for server-side init - Update .env.production.example with SENTRY_DSN - Document integration in docs/documentation.md
+fc2d59f 2026-03-22 houdcat: Merge pull request #122 from quackextractor/fix/issue-65
+0bc2c67 2026-03-22 houdcat: Add centralized logger with timestamps (Fixes #65) - Create frontend/lib/logger.ts with timestamped log output - Replace console.error/warn calls across the codebase with logger
+33826b2 2026-03-22 houdcat: Merge pull request #121 from quackextractor/fix/issue-63
+3e39ec6 2026-03-22 houdcat: Add server performance benchmark script (Fixes #63) - Add Artillery perf test config with read/write scenarios - Add test:perf script to package.json - Document methodology in docs/performance-test.md
+e4e196a 2026-03-22 houdcat: Merge pull request #120 from quackextractor/fix/issue-62
+32f2b9d 2026-03-22 houdcat: Add Artillery load testing for concurrent players (Fixes #62) - Add load test config with warm-up, sustained, and peak load phases - Add test:load script to package.json - Document methodology in docs/concurrent-users-test.md
+a8fe7e5 2026-03-22 houdcat: Merge pull request #119 from quackextractor/fix/issue-49
+ad1a82a 2026-03-22 houdcat: Document and verify HTTP cache functionality (Fixes #49) Add docs/cache-verification.md with test methodology and results for static asset caching, security headers, and image optimization.
+9e701e7 2026-03-22 houdcat: Merge pull request #118 from quackextractor/fix/issue-48
+133449a 2026-03-22 houdcat: Enable image optimization and static asset caching (Fixes #48) - Remove unoptimized: true from images config - Add Cache-Control headers for /_next/static and /images paths
+fbe6625 2026-03-22 houdcat: Merge pull request #117 from quackextractor/fix/issue-37-44
+7d39ead 2026-03-22 houdcat: Enable GZIP/Brotli compression in Next.js config Add compress: true to nextConfig. Fixes #37 and #44.
+d79cc37 2026-03-22 houdcat: Merge pull request #116 from quackextractor/fix/issue-32
+000f256 2026-03-22 houdcat: Remove unused dependencies (Fixes #32) Removed @hookform/resolvers, date-fns, autoprefixer, and tailwindcss-animate after dependency audit with depcheck.
+ceb401d 2026-03-22 houdcat: Merge pull request #115 from quackextractor/fix/issue-30
+6ad6d13 2026-03-22 houdcat: Configure Dependabot for weekly npm updates (Fixes #30) - Add .github/dependabot.yml for weekly npm dependency checks in /frontend - Document team process for reviewing Dependabot PRs in docs/documentation.md
+00f3910 2026-03-22 houdcat: Merge pull request #114 from quackextractor/fix/issue-24
+03d4fef 2026-03-22 houdcat: Fix factory plots not unlocking after level completion (Fixes #24) Add updateHighestLevel to EconomyContext and call it from fps-game.tsx when a level is completed, syncing the local highestLevel to the cloud-synced highestLevelCompleted that controls factory slot unlocks.
+600d8a4 2026-03-22 houdcat: Merge pull request #113 from quackextractor/fix/issue-15
+018fb71 2026-03-22 houdcat: Verify offline progress calculation is implemented awardOfflineProgress() already calculates time difference from last_saved_at and awards resources on profile load. Fixes #15.
+0c0f001 2026-03-22 houdcat: Merge pull request #112 from quackextractor/fix/issue-14
+4908fed 2026-03-22 houdcat: Verify passive processing is implemented (5s interval) The processProductionTick function already handles passive smelter processing every 5 seconds. Document verification. Fixes #14.
+727b138 2026-03-22 houdcat: Merge pull request #111 from quackextractor/fix/issue-13
+ca82c29 2026-03-22 houdcat: Update .gitignore
+70301c0 2026-03-22 houdcat: Add localStorage offline fallback for economy save data (Fixes #13) - Persist save data to localStorage on every state change when authenticated - Also cache to localStorage after successful cloud saves
+64d7675 2026-03-22 mrz-256: Merge pull request #110 from quackextractor/fix/issue-99
+c99cd67 2026-03-22 Tobias Mrazek: resolve issue 99
+89fc6da 2026-03-22 mrz-256: Merge pull request #108 from quackextractor/fix/issue-99
+0320a90 2026-03-22 Tobias Mrazek: resolve issue 99
+37b3614 2026-03-22 mrz-256: Merge pull request #106 from quackextractor/fix/issue-55
+3a18262 2026-03-22 Tobias Mrazek: resolve issue-55
+c6f1d73 2026-03-22 Tobias Mrazek: resolve issue-55
+7d508c4 2026-03-22 Tobias Mrazek: resolve issue-55
+5506759 2026-03-22 paroniim: restrict debug mode to development environment
+381cca6 2026-03-22 Tobias Mrazek: resolve issue-55
+9456a7e 2026-03-22 mrz-256: Merge pull request #105 from quackextractor/fix/issue-80
+cc7aee4 2026-03-22 Tobias Mrazek: resolve issue-80
+dd22709 2026-03-22 Tobias Mrazek: a small mistake
+66048bf 2026-03-22 mrz-256: Merge pull request #103 from quackextractor/fix/issue-52
+619b89d 2026-03-22 Tobias Mrazek: resolve issue-52
+7790b14 2026-03-22 mrz-256: Merge pull request #102 from quackextractor/fix/issue-42
+91dd1d6 2026-03-22 Tobias Mrazek: resolve issue-42
+1e4e70d 2026-03-22 mrz-256: Merge pull request #101 from quackextractor/fix/issue-40
+166bdc4 2026-03-22 Tobias Mrazek: resolve issue-40
+ad12fbd 2026-03-22 mrz-256: Merge pull request #100 from quackextractor/fix/issue-23
+f3be96c 2026-03-22 Tobias Mrazek: resolve issue-23
+4850760 2026-03-22 mrz-256: Merge pull request #98 from quackextractor/fix/issue-22
+b5ddd38 2026-03-22 LostSoul: Merge pull request #97 from quackextractor/fix/issue-61
+94a1ea9 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-61
+9a94ce1 2026-03-22 Tobias Mrazek: resolve issue-22
+91fad58 2026-03-22 LostSoul: Merge pull request #95 from quackextractor/fix/issue-28-restore
+994b3e8 2026-03-22 hoch12: feat: implement administrative metrics and monitoring API (Fixes #94)
+274755f 2026-03-22 hoch12: docs: comprehensive retroactive issue tracking audit and changelog update (Fixes #64)
+657b6d1 2026-03-22 hoch12: fix(tests): resolve leaderboard db error failure with more stable mocking
+fda3658 2026-03-22 hoch12: fix(config): allow and add .env.production.example template (Fixes #28)
+bbddac9 2026-03-22 LostSoul: Merge pull request #93 from quackextractor/docs/issue-64
+7844f53 2026-03-22 LostSoul: Merge branch 'master' into docs/issue-64
+05cb222 2026-03-22 LostSoul: Merge pull request #92 from quackextractor/fix/issue-61
+f7ac805 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-61
+cc6c814 2026-03-22 LostSoul: Merge pull request #91 from quackextractor/docs/issue-59
+931b9b0 2026-03-22 LostSoul: Merge branch 'master' into docs/issue-59
+83dffea 2026-03-22 LostSoul: Merge pull request #90 from quackextractor/fix/issue-58
+d7de800 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-58
+286456e 2026-03-22 LostSoul: Merge pull request #89 from quackextractor/fix/issue-57
+cc8c4bb 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-57
+2ad4161 2026-03-22 LostSoul: Merge pull request #88 from quackextractor/fix/issue-56
+ece6756 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-56
+bd4d9cd 2026-03-22 LostSoul: Merge pull request #87 from quackextractor/fix/issue-54
+7ce5719 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-54
+cd6d01c 2026-03-22 LostSoul: Merge pull request #86 from quackextractor/fix/issue-36
+f852243 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-36
+849f1d4 2026-03-22 LostSoul: Merge pull request #85 from quackextractor/fix/issue-35
+773fc97 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-35
+31727a3 2026-03-22 LostSoul: Merge pull request #84 from quackextractor/fix/issue-34
+3ea5b8b 2026-03-22 LostSoul: Merge branch 'master' into fix/issue-34
+55d107a 2026-03-22 LostSoul: Merge pull request #83 from quackextractor/fix/issue-33
+72747c8 2026-03-22 hoch12: docs: formal issue tracker linkage and documentation update (Fixes #64)
+9f14d34 2026-03-22 hoch12: test: add comprehensive invalid input and malformed payload tests (Fixes #61)
+d12f598 2026-03-22 hoch12: docs: comprehensive OWASP Top 10 security audit (Fixes #59)
+d06e24b 2026-03-22 hoch12: docs: explicit explicit cookie security verification (Fixes #58)
+484250c 2026-03-22 hoch12: fix: explicit validation rejection formatting standard (Fixes #57)
+31b6004 2026-03-22 hoch12: feat: global edge middleware for csrf referer validation (Fixes #56)
+ff60619 2026-03-22 hoch12: feat: enforce zod payload validation on auth endpoint (Fixes #54)
+c026ce4 2026-03-22 hoch12: feat: strict payload validation using Zod for save api (Fixes #36)
+32a1a78 2026-03-22 hoch12: fix: explicit internal error masking and isolated stack trace logging (Fixes #35)
+54c06fc 2026-03-22 hoch12: chore: bump version to 0.6.3
+54a455f 2026-03-22 hoch12: fix: explicit 400 bad request errors for malformed requests (Fixes #34)
+584b6ce 2026-03-22 hoch12: fix: explicit HTTP 200 status codes for API responses (Fixes #33)
+deba7f8 2026-03-22 hoch12: feat: resolve issue #28 - add production environment config
+675dfd6 2026-03-19 LostSoul: Add dev docs, checklists and archive legacy docs
+23bdf19 2026-03-18 paroniim: vercel deploy fix
+da8f71c 2026-03-16 paroniim: edited changelog
+0ec0629 2026-03-16 paroniim: Fix merge conflict in fps-game.tsx
+cf18505 2026-03-16 paroniim: post-run summary screen with metrics and audio enhancements
+eca5658 2026-03-15 Tobias Mrazek: Fix the factory logic
+6c92cd6 2026-03-15 Tobias Mrazek: Make general ui more mobile friendly
+94e01b4 2026-03-15 Tobias Mrazek: Make main menu more mobile-friendly (todo fix the rest too).
+90d1d3a 2026-03-15 paroniim: gain money by killing enemy and mini map
+564f4a1 2026-03-09 paroniim: Revenue Generation (CRITICAL): Gain money by killing
+df61751 2026-03-09 houdcat: feat: add smelting logic, offline progress, and offline auth fallback
+044f361 2026-03-08 Tobias Mrazek: Add Kitsune to credits
+15d0463 2026-03-08 Tobias Mrazek: Add credits page and change channelog ui.
+63b793b 2026-03-08 Tobias Mrazek: Add channelog page. - fixes
+50b6645 2026-03-08 Tobias Mrazek: Add channelog page.
+6075109 2026-03-08 Tobias Mrazek: Add sound settigns
+136046a 2026-03-02 LostSoul: Rebrand game to INDUSTRIALIST
+7dcf25c 2026-03-02 LostSoul: Migrate project to pnpm and update docs
+5c2792e 2026-03-02 Tobias Mrazek: Add explicit logout
+e342164 2026-03-01 LostSoul: Create Team-TODO.md
+f9f18f3 2026-03-01 LostSoul: chore: approve prisma build scripts for v10
+1e95b2d 2026-03-01 LostSoul: Refresh git cache to apply gitignore
+647e551 2026-03-01 Tobias Mrazek: Change level select UI
+8352116 2026-03-01 hoch12: Fix some mistakes in build
+ab8d0ee 2026-03-01 hoch12: Fixed mistakes in security, etc.
+3e4cfaf 2026-03-01 hoch12: Fixed mistakes in security, etc.
+fd36904 2026-03-01 Tobias Mrazek: add channelog entries
+60ef16f 2026-03-01 Tobias Mrazek: Fixing UI to match wireframes.
+841bf6a 2026-03-01 Dominik Hoch: feat: migrate to Supabase and update documentation to v0.5.23
+da0e2a5 2026-03-01 Dominik Hoch: feat: migrate to Supabase and update documentation to v0.6.0
+9507585 2026-03-01 paronim5: Merge pull request #2 from quackextractor/feature/person1-loot-final
+909eacd 2026-03-01 Tobias Mrazek: fix ui
+335e857 2026-03-01 paroniim: npm build error fix
+7479285 2026-03-01 paroniim: Merge branch 'master' into feature/person1-loot-final
+fb0189d 2026-03-01 paroniim: feat: implement mining loop - loot config, drops, collection, HUD, and cloud sync
+d450cd1 2026-03-01 LostSoul: Update team-draft-v4.md
+ba1b951 2026-03-01 LostSoul: Update team-draft-v4.md
+0688238 2026-03-01 Tobias Mrazek: Fix channelog format.
+76cb14b 2026-03-01 LostSoul: Update team-draft-v4.md
+744cb92 2026-03-01 Tobias Mrazek: add channelog entries
+e181f1d 2026-03-01 LostSoul: Changelog author formatting fix
+48c36f0 2026-03-01 Tobias Mrazek: add merge local: login,leaderboard,factory&armory
+7561bf8 2026-03-01 hoch12: Update documentations
+be69bfa 2026-03-01 hoch12: Fix the configurations
+bae7584 2026-03-01 hoch12: Fix previous mistakes
+94d1a47 2026-03-01 hoch12: Fix Vercel build with explicit prisma generate; Fix vitest jsdom crash
+dd74015 2026-03-01 hoch12: Fix Vercel SSG deployment crash by forcing dynamic API routes
+6a6328f 2026-03-01 hoch12: Fix CI/CD pipeline and downgrade Prisma to stable V5
+22f4784 2026-03-01 hoch12: Update the documentations
+9ef6159 2026-03-01 hoch12: Add implementation of the backend and saving to DB
+44ebb8a 2026-03-01 hoch12: Add implementation of the backend and saving to DB
+0a3310d 2026-03-01 LostSoul: Nerf elite enemy health (v0.5.3)
+fdffdb9 2026-02-28 LostSoul: Create team-draft-v4.md
+0e84ea4 2026-02-28 LostSoul: Add team assignment guidelines for web game project
+1ec1578 2026-02-09 LostSoul: Add Mission Selection wireframe and renumber screens
+96bd148 2026-02-09 LostSoul: Add main menu & briefing wireframes; bump version
+45bab23 2026-02-09 LostSoul: docs: replace placeholders with image embeds
+d080691 2026-02-09 LostSoul: Update analysis-phase2.md
+6bedaa5 2026-02-09 LostSoul: Add documentation images for UI and features
+bc4e422 2026-02-09 LostSoul: Update wireframes.html
+16e4714 2026-02-09 LostSoul: Wireframes: add online login UI; bump version
+242cae2 2026-02-09 LostSoul: Update analysis-phase2.md
+76601da 2026-02-09 LostSoul: Add Phase 2 design docs and wireframes
+1bd5b7a 2026-02-03 LostSoul: Bump version to 0.5.0
+a6a2c8f 2026-02-03 LostSoul: Default resolution to 320x240; use crosshair icon
+b3b351f 2026-02-03 LostSoul: Bump version to 0.4.8 and update changelog
+27aa7e5 2026-02-03 LostSoul: Use Pointer Events for mobile controls
+d1c7871 2026-02-03 LostSoul: Fix mobile touch controls blocked by UI overlay
+d1981f6 2026-02-03 LostSoul: Make mobile look zone full-screen
+efd8eaf 2026-02-03 LostSoul: Add forceMobileControls setting and UI
+f5840dc 2026-02-03 LostSoul: Add accessible mobile controls icons and tests
+727b983 2026-02-03 LostSoul: Add mobile pause button and tests
+af1cfdc 2026-02-03 LostSoul: Revamp mobile controls and add lint/tests
+edab7f3 2026-02-01 LostSoul: Revert "Make menus responsive with fluid typography"
+41faf08 2026-02-01 LostSoul: Make menus responsive with fluid typography
+66be300 2026-02-01 LostSoul: Improve mobile controls and responsive HUD
+dfc0a93 2026-02-01 LostSoul: Add mobile touch controls, HUD, and PWA support
+ad15be4 2026-02-01 LostSoul: Update MainMenu.tsx
+5f93406 2026-01-31 LostSoul: Delete review.md
+246d8c6 2026-01-31 LostSoul: Add asset preloader, input remapping, and actions
+30d1700 2026-01-30 LostSoul: Update review.md
+401c08f 2026-01-30 LostSoul: Add ConfirmationModal and replace window.confirm
+f9bbb46 2026-01-30 LostSoul: Add ragdoll auto-clear toggle and manual purge
+73c8cbc 2026-01-30 LostSoul: Update settings-menu.tsx
+3bded1b 2026-01-30 LostSoul: Add ragdoll settings and gore multiplier
+dae9399 2026-01-30 LostSoul: Add ragdoll death system and rendering
+2418b68 2026-01-30 LostSoul: Retro pixel-art sprite overhaul
+aac2d71 2026-01-30 LostSoul: Update pause menu styling and bump version
+73b2013 2026-01-30 LostSoul: Add SettingsProvider and context hook
+d19f257 2026-01-30 LostSoul: Add ScanlinesOverlay and apply across UI
+daccc5a 2026-01-30 LostSoul: Add scanline settings and refactor settings UI
+d9da149 2026-01-30 LostSoul: Add retro React HUD and effects
+9e8d42a 2026-01-30 LostSoul: Generate exit texture and support generated:exit
+2104666 2026-01-30 LostSoul: Add Clear Progress, dynamic version display
+9641431 2026-01-30 LostSoul: Add retro UI theme and font
+918f779 2026-01-30 LostSoul: Add image smoothing option and fix texture jitter
+f427789 2026-01-30 LostSoul: Add procedural wall textures and texture mapping
+f5917cf 2026-01-30 LostSoul: Bump jsdom and update frontend lockfile
+014037d 2026-01-30 LostSoul: Enable 8-way A* and add enemy stuck detection
+3024fb2 2026-01-30 LostSoul: Bump version to 0.2.23 and update changelog
+ae71ef7 2026-01-30 LostSoul: Update fps-game.tsx
+7657a48 2026-01-30 LostSoul: Add E turn-right and use Space to advance
+4e156db 2026-01-30 LostSoul: Update fps-game.tsx
+7c54e78 2026-01-30 LostSoul: Delete migration.py
+eeea012 2026-01-30 LostSoul: preparing for test refactoring
+a463c18 2026-01-30 LostSoul: Split renderer and UI into dedicated modules
+56fc70c 2026-01-30 LostSoul: Update fps-game.tsx
+9a0f38d 2026-01-30 LostSoul: Refactor imports and formatting in frontend components
+3c4c77d 2026-01-30 LostSoul: Delete InputSystem.ts
+afa6836 2026-01-30 LostSoul: Rename DoomGame to FPSGame and update save key
+3e9fa7d 2026-01-30 LostSoul: Update fps-game.tsx
+6bebaad 2026-01-29 LostSoul: Update fps-game.tsx
+2340e1a 2026-01-29 LostSoul: Remove engine core, state, and renderer modules
+5873d6b 2026-01-29 LostSoul: Update fps-game.tsx
+57964ec 2026-01-29 LostSoul: Refactor rendering functions to accept explicit dimensions
+bc326d9 2026-01-29 LostSoul: migration WIP
+16ef68e 2026-01-29 LostSoul: Revert "WIP refactoring"
+f07f8f7 2026-01-29 LostSoul: Revert "Enhance Renderer and Sprites for advanced entity drawing"
+324764f 2026-01-29 LostSoul: Revert "Update fps-game.tsx"
+a2e7579 2026-01-29 LostSoul: Update fps-game.tsx
+b5be238 2026-01-29 LostSoul: Enhance Renderer and Sprites for advanced entity drawing
+4f81efe 2026-01-29 LostSoul: WIP refactoring
+bc9b412 2026-01-29 LostSoul: Create refactoring-plan.md
+67d477d 2026-01-29 LostSoul: Revert "Refactor rendering and config logic, fix memory leaks"
+ac8ee3f 2026-01-29 LostSoul: Revert "Add frontend testing suite with Vitest and RTL"
+c033be9 2026-01-29 LostSoul: Revert "Refactor rendering and input handling in FPS game"
+d4e6568 2026-01-29 LostSoul: Revert "Fix AI spatial grid update and input race conditions"
+18fa35c 2026-01-29 LostSoul: Fix AI spatial grid update and input race conditions
+0494eab 2026-01-29 LostSoul: Refactor rendering and input handling in FPS game
+595c154 2026-01-29 LostSoul: Add frontend testing suite with Vitest and RTL
+eb6bc60 2026-01-29 LostSoul: Refactor rendering and config logic, fix memory leaks
+4213d54 2026-01-29 LostSoul: Create review.md
+70d03c5 2026-01-29 LostSoul: Fix cursor lock issue on level restart
+fbe9fea 2026-01-29 LostSoul: Add turn speed setting and reset to defaults in settings
+b9d634b 2026-01-29 LostSoul: Add OPTIONS button and improve settings navigation
+fb69465 2026-01-29 LostSoul: Implement usePointerLock hook for mouse locking
+eed9a2b 2026-01-29 LostSoul: Fix scrollbars and arrow key scrolling in game UI
+87124f9 2026-01-29 LostSoul: Fix Debug Mode toggle and update to v0.2.13
+151072b 2026-01-29 LostSoul: Expand .gitignore patterns to match files in all subdirs
+5d647ca 2026-01-29 LostSoul: Update .gitignore
+dd3b1b2 2026-01-29 LostSoul: Move all project files into frontend directory
+9ee36bb 2026-01-28 LostSoul: Expand resolution options in settings menu
+6b689eb 2026-01-28 LostSoul: Refactor settings management and add settings menu
+30de6e3 2026-01-28 LostSoul: Rebrand Doom engine and components to FPS
+e39d598 2026-01-28 LostSoul: Fix Hell Knight spawn in Warehouse level
+2ad263a 2026-01-28 LostSoul: Center enemy spawns within tiles
+747bab9 2026-01-28 LostSoul: Refactor enemy AI and improve pathfinding robustness
+a4872fd 2026-01-28 LostSoul: Add 2D debug view and improve enemy pathfinding
+73903a7 2026-01-28 LostSoul: Add enemy pathfinding and auto-fire features
+e716a0b 2026-01-28 LostSoul: Add game speed control and fixed timestep loop
+2082f58 2026-01-28 LostSoul: Upgrade Next.js and Vitest dependencies
+77fc8fc 2026-01-28 LostSoul: Add WebAudio sound manager and test level for audio/VFX
+2fbb5b8 2026-01-28 LostSoul: Create LICENSE
+8add757 2026-01-28 LostSoul: init
