@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.2] - 2026-03-27 [Author: Pavlo Kosov]
+### Fixed
+- Added accessibility attributes (aria-label, role="img", <title>) to SVG elements in `Crosshair.tsx` and `MobileControls.tsx`. Added `aria-label="3D Game View"` and `role="img"` to the main canvas element in `fps-game.tsx` (Fixes #53).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
