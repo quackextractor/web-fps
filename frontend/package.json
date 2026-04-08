@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest run",
+    "generate-textures": "node scripts/generate_textures.js && node scripts/convert_to_webp.js",
     "test:perf": "artillery run scripts/perf-test.yml"
   },
   "pnpm": {
