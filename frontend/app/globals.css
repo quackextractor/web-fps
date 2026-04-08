@@ -130,6 +130,10 @@
   }
 }
 
+canvas, img {
+  image-rendering: pixelated;
+}
+
 .retro-text {
   font-family: var(--font-press-start-2p), cursive;
   text-shadow: 2px 2px 0px #000;
