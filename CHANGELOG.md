@@ -2,47 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.6] - 2026-03-27 [Author: Pavlo Kosov]
+### Changed
+- Updated CHANGELOG.md to include short commit hashes for all recent bug-fix entries, establishing a traceable link between fixes and their source commits (Fixes #75).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
-- Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
+- Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized. (commit: 0d76104)
 
 ## [0.10.7] - 2026-03-24 [Author: Miro Slezák]
 ### Added
 - Implemented HTTP `Cache-Control` headers for static assets in `next.config.mjs` to ensure long-term browser/CDN caching.
-- Implemented a cache invalidation mechanism by appending the game version as a query parameter (`?v=`) to texture paths in `fps-engine.ts` (Fixes #131).
+- Implemented a cache invalidation mechanism by appending the game version as a query parameter (`?v=`) to texture paths in `fps-engine.ts` (Fixes #131). (commit: 34aab0c)
 
 ## [0.10.6] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
-- Fixed redundant asset preloading when starting a game from the Main Menu. Implemented a cache check in `beginLevelTransition` to skip resetting the preloader state if assets for the target level are already loaded (Fixes #130).
+- Fixed redundant asset preloading when starting a game from the Main Menu. Implemented a cache check in `beginLevelTransition` to skip resetting the preloader state if assets for the target level are already loaded (Fixes #130). (commit: e856b35)
 
 ## [0.10.5] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
-- Resolved issue #129 where resolution and Field of View (FOV) settings failed to persist on page load. Added an `isLoaded` check to the resolution `useEffect` in `fps-game.tsx` to ensure settings are hydrated from `localStorage` before being applied to the canvas and renderer.
+- Resolved issue #129 where resolution and Field of View (FOV) settings failed to persist on page load. Added an `isLoaded` check to the resolution `useEffect` in `fps-game.tsx` to ensure settings are hydrated from `localStorage` before being applied to the canvas and renderer. (commit: 322488b)
 
 ## [0.10.4] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
 - Deferred `AudioContext` initialization in `SoundManager` to prevent browser autoplay policy violations on load.
 - Added missing `full.mp3` audio asset to the `public/sounds/` directory.
 - Corrected incorrect file path mapping for the `hitmark.mp3` asset.
-- Fixed GitHub Actions CI pipeline crash by explicitly adding `eslint` to `devDependencies` and regenerating `pnpm-lock.yaml`.
+- Fixed GitHub Actions CI pipeline crash by explicitly adding `eslint` to `devDependencies` and regenerating `pnpm-lock.yaml`. (commit: 1e8743e)
 
 ## [0.10.3] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
-- Removed hardcoded `assetPrefix` in `next.config.mjs` to resolve Next.js static asset and CSS routing issues (infinite loading/404) on custom Vercel domains.
+- Removed hardcoded `assetPrefix` in `next.config.mjs` to resolve Next.js static asset and CSS routing issues (infinite loading/404) on custom Vercel domains. (commit: b78ffb6)
 - Verified `AssetPreloader.tsx` built-in 10-second safety timeout and fetch fallbacks.
 
 ## [0.10.2] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
-- Removed hardcoded `assetPrefix` in `next.config.mjs` and made it dynamically map to Vercel deployments, preventing infinite loading screens on custom domains.
+- Removed hardcoded `assetPrefix` in `next.config.mjs` and made it dynamically map to Vercel deployments, preventing infinite loading screens on custom domains. (commit: e329f08)
 - Verified built-in safety timeout in `AssetPreloader` to bypass freezes.
 
 ## [0.10.1] - 2026-03-23 [Author: Miro Slezák]
 ### Fixed
-- Fixed critical loading screen freeze caused by browser autoplay policies blocking `audio.oncanplaythrough` events. Preloader now securely caches audio via `fetch` before initializing game assets, and a 10-second safety timeout was implemented to guarantee progression.
+- Fixed critical loading screen freeze caused by browser autoplay policies blocking `audio.oncanplaythrough` events. Preloader now securely caches audio via `fetch` before initializing game assets, and a 10-second safety timeout was implemented to guarantee progression. (commit: 3be2c12)
 
 ## [0.10.0] - 2026-03-23 [Author: Miro Slezák]
 ### Added
-- Implemented continuous dynamic background music system using Web Audio API AudioBufferSourceNodes (Fixes #26).
+- Implemented continuous dynamic background music system using Web Audio API AudioBufferSourceNodes (Fixes #26). (commit: 8d4b00f)
 
 ## [0.9.0] - 2026-03-23 [Author: Miro Slezák]
 ### Added
