@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.1] - 2026-03-27 [Author: Pavlo Kosov]
+### Fixed
+- Verified cache invalidation: all texture paths in `frontend/lib/fps-engine.ts` already include `?v=NEXT_PUBLIC_GAME_VERSION` query strings, ensuring browsers fetch fresh assets after version bumps (Fixes #50).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.
