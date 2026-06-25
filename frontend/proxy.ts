@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-    // Apply CSRF protection to mutating requests directed at the API
+export function proxy(request: NextRequest) {
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
         const origin = request.headers.get('origin');
         const referer = request.headers.get('referer');
@@ -14,7 +13,6 @@ export function middleware(request: NextRequest) {
 
         let isSafeOrigin = false;
 
-        // Strictly validate Origin against Host
         if (origin) {
             try {
                 const originUrl = new URL(origin);
@@ -25,11 +23,9 @@ export function middleware(request: NextRequest) {
                 // Malformed origin
             }
         }
-        // Fallback to strict Referer validation if Origin is missing
         else if (referer) {
             try {
                 const refererUrl = new URL(referer);
-                // NextJS sometimes uses local IPs so we verify the host directly
                 if (refererUrl.host === host) {
                     isSafeOrigin = true;
                 }
@@ -39,7 +35,6 @@ export function middleware(request: NextRequest) {
         }
 
         if (!isSafeOrigin) {
-            // Block request if headers are completely missing or do not securely match the host domain
             return NextResponse.json(
                 { error: 'CSRF validation failed: Origin or Referer mismatch' },
                 { status: 403 }
@@ -51,6 +46,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Apply middleware to all API routes
     matcher: '/api/:path*',
 };
