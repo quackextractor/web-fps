@@ -97,6 +97,7 @@ const nextConfig = {
 
   // Enforce GZIP/Brotli compression for all responses
   compress: true,
+  output: 'standalone',
 }
 
 export default nextConfig

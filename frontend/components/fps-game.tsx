@@ -48,6 +48,7 @@ const Armory = dynamic(() => import("./game-ui/Armory").then((mod) => mod.Armory
 const Leaderboard = dynamic(() => import("./game-ui/Leaderboard").then((mod) => mod.Leaderboard), { ssr: false });
 const CreditsScreen = dynamic(() => import("./game-ui/CreditsScreen").then((mod) => mod.CreditsScreen), { ssr: false });
 const ChangelogScreen = dynamic(() => import("./game-ui/ChangelogScreen").then((mod) => mod.ChangelogScreen), { ssr: false });
+const PrivacyPolicyScreen = dynamic(() => import("./game-ui/PrivacyPolicyScreen").then((mod) => mod.PrivacyPolicyScreen), { ssr: false });
 const HUD = dynamic(() => import("./game-ui/HUD").then((mod) => mod.HUD), { ssr: false });
 const EffectsLayer = dynamic(() => import("./game-ui/EffectsLayer").then((mod) => mod.EffectsLayer), { ssr: false });
 const Crosshair = dynamic(() => import("./game-ui/Crosshair").then((mod) => mod.Crosshair), { ssr: false });
@@ -58,7 +59,7 @@ const ROTATION_SPEED = 0.003;
 const TICK_RATE = 1000 / 60;
 const RUN_METERS_PER_WORLD_UNIT = 25;
 
-type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard" | "credits" | "changelog";
+type GameState = "mainMenu" | "levelSelect" | "settings" | "playing" | "paused" | "dead" | "victory" | "levelComplete" | "login" | "factory" | "armory" | "leaderboard" | "credits" | "changelog" | "privacyPolicy";
 
 export default function FPSGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1217,6 +1218,10 @@ export default function FPSGame() {
                     setPreviousGameState("mainMenu");
                     setGameState("settings");
                   }}
+                  onPrivacyPolicy={() => {
+                    setPreviousGameState("mainMenu");
+                    setGameState("privacyPolicy");
+                  }}
                 />
               )}
 
@@ -1224,6 +1229,10 @@ export default function FPSGame() {
                 <LoginScreen
                   onBack={() => setGameState(previousGameState)}
                   onSuccess={() => setGameState(previousGameState)}
+                  onPrivacyPolicy={() => {
+                    setPreviousGameState("login");
+                    setGameState("privacyPolicy");
+                  }}
                 />
               )}
 
@@ -1260,6 +1269,12 @@ export default function FPSGame() {
                 />
               )}
 
+              {gameState === "privacyPolicy" && (
+                <PrivacyPolicyScreen
+                  onBack={() => setGameState(previousGameState)}
+                />
+              )}
+
               {/* Level Select */}
               {gameState === "levelSelect" && (
                 <LevelSelect
@@ -1280,6 +1295,24 @@ export default function FPSGame() {
                   unlockAllWeapons={unlockAllWeapons}
                   resetSettings={resetSettings}
                   clearProgress={clearProgress}
+                  isAuthenticated={isAuthenticated}
+                  onDeleteAccount={async () => {
+                    try {
+                      const response = await fetch("/api/profile", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" }
+                      });
+                      if (response.ok) {
+                        logout();
+                        setGameState("mainMenu");
+                      } else {
+                        const data = await response.json().catch(() => ({}));
+                        logger.error("Failed to delete account:", data.error || "Unknown error");
+                      }
+                    } catch (err) {
+                      logger.error("Error deleting account:", err);
+                    }
+                  }}
                 />
               )}
 

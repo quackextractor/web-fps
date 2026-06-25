@@ -13,6 +13,8 @@ interface SettingsMenuProps {
     unlockAllWeapons: () => void;
     resetSettings: () => void;
     clearProgress: () => void;
+    isAuthenticated?: boolean;
+    onDeleteAccount?: () => void;
 }
 
 export function SettingsMenu({
@@ -23,6 +25,8 @@ export function SettingsMenu({
     unlockAllWeapons,
     resetSettings,
     clearProgress,
+    isAuthenticated = false,
+    onDeleteAccount,
 }: SettingsMenuProps) {
     const { clearRagdolls } = useGameActions();
 
@@ -30,6 +34,7 @@ export function SettingsMenu({
     const [localSettings, setLocalSettings] = useState<GameSettings>(settings);
     const [hasChanges, setHasChanges] = useState(false);
     const [showResetProgressModal, setShowResetProgressModal] = useState(false);
+    const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
     // Sync local settings when props change (e.g., after reset)
     useEffect(() => {
@@ -399,13 +404,24 @@ export function SettingsMenu({
                         />
 
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8">DATA</h3>
-                        <button
-                            type="button"
-                            onClick={() => setShowResetProgressModal(true)}
-                            className="w-full py-3 bg-red-900/50 hover:bg-red-600 hover:text-white text-red-200 retro-text text-[10px] retro-border transition-colors uppercase"
-                        >
-                            CLEAR PROGRESS
-                        </button>
+                        <div className="flex flex-col gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowResetProgressModal(true)}
+                                className="w-full py-3 bg-red-900/50 hover:bg-red-600 hover:text-white text-red-200 retro-text text-[10px] retro-border transition-colors uppercase cursor-pointer"
+                            >
+                                CLEAR PROGRESS
+                            </button>
+                            {isAuthenticated && onDeleteAccount && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDeleteAccountModal(true)}
+                                    className="w-full py-3 bg-red-950/75 hover:bg-red-700 hover:text-white text-red-100 retro-text text-[10px] retro-border transition-colors uppercase cursor-pointer"
+                                >
+                                    DELETE CLOUD ACCOUNT
+                                </button>
+                            )}
+                        </div>
 
                         <h3 className="retro-text text-lg text-yellow-500 border-b-4 border-gray-800 pb-2 mb-4 mt-8 uppercase">MOBILE</h3>
                         <Slider
@@ -492,6 +508,21 @@ export function SettingsMenu({
                     }}
                     onCancel={() => setShowResetProgressModal(false)}
                     confirmText="CLEAR ALL"
+                    cancelText="CANCEL"
+                />
+
+                <ConfirmationModal
+                    isOpen={showDeleteAccountModal}
+                    title="DELETE CLOUD ACCOUNT?"
+                    message="Are you sure you want to permanently delete your cloud account and all progress? This action is irreversible."
+                    onConfirm={() => {
+                        if (onDeleteAccount) {
+                            onDeleteAccount();
+                        }
+                        setShowDeleteAccountModal(false);
+                    }}
+                    onCancel={() => setShowDeleteAccountModal(false)}
+                    confirmText="DELETE ACCOUNT"
                     cancelText="CANCEL"
                 />
 

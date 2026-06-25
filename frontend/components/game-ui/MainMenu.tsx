@@ -15,6 +15,7 @@ interface MainMenuProps {
     onFactory: () => void;
     onArmory: () => void;
     onLeaderboard: () => void;
+    onPrivacyPolicy: () => void;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({
@@ -30,6 +31,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onFactory,
     onArmory,
     onLeaderboard,
+    onPrivacyPolicy,
 }) => {
     const [currentPage, setCurrentPage] = useState(0);
 
@@ -58,6 +60,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         [
             { label: "CREDITS", onClick: onCredits, variant: "secondary" as const },
             { label: "CHANGELOG", onClick: onChangelog, variant: "secondary" as const },
+            { label: "PRIVACY POLICY", onClick: onPrivacyPolicy, variant: "secondary" as const },
         ],
     ];
 
@@ -177,13 +180,22 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={onChangelog}
-                    className="hidden xl:block absolute bottom-4 left-4 text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase"
-                >
-                    CHANGELOG
-                </button>
+                <div className="hidden xl:flex absolute bottom-4 left-4 flex-col items-start gap-2">
+                    <button
+                        type="button"
+                        onClick={onChangelog}
+                        className="text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase text-left"
+                    >
+                        CHANGELOG
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onPrivacyPolicy}
+                        className="text-[8px] sm:text-[10px] text-gray-700 hover:text-red-600 font-mono retro-text transition-colors uppercase text-left"
+                    >
+                        PRIVACY POLICY
+                    </button>
+                </div>
 
                 <div className="hidden xl:flex absolute bottom-4 right-4 flex-col items-end gap-2">
                     <button

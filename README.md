@@ -1,7 +1,7 @@
 # INDUSTRIALIST - Descent Into Darkness
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.10.8-blue.svg)](https://github.com/quackextractor/web-fps)
+[![Version](https://img.shields.io/badge/version-0.11.0-blue.svg)](https://github.com/quackextractor/web-fps)
 
 Play the game live at: `https://web-fps-sigma.vercel.app`
 
@@ -10,6 +10,8 @@ A high-performance retro raycasting 3D FPS built with React, Next.js, and a cust
 ## Deployment
 This application is automatically deployed via Vercel ensuring high availability and zero-downtime edge caching.
 [![Deployment Status](https://img.shields.io/badge/Vercel-Deployed-green.svg)](https://web-fps-sigma.vercel.app/)
+
+For containerized self-hosting deployments, see our [Docker Deployment Guide](file:///c:/Users/Soul/Documents/GitHub/web-fps/docs/docker-deployment-guide.md).
 
 ## Technologies and Versions
 - **Next.js**: v16.1.6

@@ -6,9 +6,10 @@ import { useEconomy } from "@/context/EconomyContext";
 interface LoginScreenProps {
     onBack: () => void;
     onSuccess: () => void;
+    onPrivacyPolicy: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess, onPrivacyPolicy }) => {
     const { login, cloudStatus, cloudError } = useEconomy();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -126,6 +127,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onSuccess }) =
                         {/* <MenuButton onClick={handleRegister} variant="secondary">REGISTER</MenuButton> */}
                     </div>
                     <MenuButton onClick={onBack} variant="secondary">BACK TO MAIN MENU</MenuButton>
+                </div>
+
+                <div className="text-center mt-4 opacity-60">
+                    <button
+                        type="button"
+                        onClick={onPrivacyPolicy}
+                        className="retro-text text-[8px] xl:text-[10px] text-gray-500 hover:text-red-500 transition-colors uppercase cursor-pointer"
+                    >
+                        By registering, you agree to our Privacy Policy
+                    </button>
                 </div>
             </div>
         </div>

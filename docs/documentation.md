@@ -57,3 +57,26 @@ The project uses [Dependabot](https://docs.github.com/en/code-security/dependabo
 ## Assets
 - **Preloading**: `AssetPreloader` ensures all required textures and sounds are cached before gameplay begins.
 - **Ragdolls**: Procedural physics system for enemy deaths, fully configurable via settings.
+
+## GDPR & Data Security Architecture
+
+### Privacy & Governance Statement
+A dedicated `PrivacyPolicyScreen` details harvested telemetry (Worker ID username, encrypted password hashes, game progress statistics, and anonymized Vercel traffic metrics). The screen links to a backend profile deletion route to support the GDPR Right to Erasure.
+
+### Right to Erasure (Account Deletion API)
+- **Endpoint**: `DELETE /api/profile`
+- **Session Verification**: Authenticated via standard `jose` JWT cookie decryption (`auth_token`).
+- **Database Execution**: Wipes user profile, saves, and stats from PostgreSQL (`prisma.user.delete`).
+- **Cookie Termination**: Instantly revokes the JWT authentication cookie on success.
+- **Entry Points**: Integrated inside both the terminal **Settings Menu** and the **Privacy Policy Screen**.
+
+## Containerization & Deployment Orchestration
+
+### Multi-Stage Build Optimization
+A specialized `Dockerfile` builds the application using a three-tier Alpine structure:
+1. **deps**: Resolves exact package dependencies using `pnpm`.
+2. **builder**: Bundles the application with Next.js standalone file-tracing configurations, significantly minimizing runner size.
+3. **runner**: Spawns a production Alpine instance containing only runtime assets (`.next/standalone`, `.next/static`, and `public` texture/audio assets), alongside the `prisma` CLI engine.
+
+### Service Orchestration & Automatic Migrations
+The `docker-compose.yml` launches a PostgreSQL 15 database alongside the Next.js server. The web container's entrypoint script (`entrypoint.sh`) holds server initialization until the database container passes its health checks, then automatically deploys pending schema migrations (`prisma migrate deploy`) before launching the Next.js service.

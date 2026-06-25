@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2026-06-25 [Author: Antigravity]
+### Added
+- Implemented GDPR-compliant Privacy Policy Screen visual layouts, providing a detailed data governance statement and account deletion capabilities.
+- Added user registration and punch-in agreement disclaimer text linking to the Privacy Policy.
+- Integrated right to erasure (DELETE /api/profile endpoint) to purge database records and clear auth tokens.
+- Exposed a "DELETE CLOUD ACCOUNT" option under the settings DATA management menu.
+- Enabled standalone Next.js builds and introduced a multi-stage Docker deployment configuration.
+- Configured a Postgres container orchestration service via Docker Compose with automated Prisma database migration hooks.
+- Published a Docker Deployment Guide for self-hosted instances.
+
+### Security
+- Audited client/server dependencies and resolved all vulnerabilities via global package overrides and direct devDependency whitelisting (Mitigating Dompurify, Vite, and Next.js vulnerabilities).
+
 ## [0.10.8] - 2026-03-24 [Author: Miro Slezák]
 ### Fixed
 - Fixed issue #129 where resolution and Field of View (FOV) settings failed to persist on startup. Resolved a race condition where the resolution hook executed while the `AssetPreloader` was active and the canvas was unmounted. Added `shouldShowAssetPreloader` to the hook's dependency array and guard logic to ensure settings are applied immediately after the canvas is initialized.

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: industrialist-db
+    environment:
+      POSTGRES_USER: industrialist
+      POSTGRES_PASSWORD: industrialist_pass
+      POSTGRES_DB: industrialist
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U industrialist -d industrialist"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: industrialist-web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://industrialist:industrialist_pass@db:5432/industrialist?schema=public"
+      DIRECT_URL: "postgresql://industrialist:industrialist_pass@db:5432/industrialist?schema=public"
+      JWT_SECRET: "secure-dev-jwt-secret-fallback-only-for-local"
+      NODE_ENV: "production"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
